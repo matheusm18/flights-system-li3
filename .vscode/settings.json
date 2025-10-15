@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "passenger.h": "c",
+        "airport.h": "c",
+        "flight.h": "c",
+        "reservation.h": "c"
+    }
+}
