@@ -24,7 +24,6 @@ void ler_csv(const char *filename, void (*callback)(char **campos, int num_campo
     }
     char linha[MAX_LINE_LENGTH];
     int primeira_linha = 1;
-
     while (fgets(linha, sizeof(linha), fp)){
         if (primeira_linha) {
             primeira_linha = 0;
@@ -34,7 +33,6 @@ void ler_csv(const char *filename, void (*callback)(char **campos, int num_campo
         char *campos[MAX_FIELDS];
         int num_campos = 0;
         char *token = strtok(linha, ",");
-
         while (token && num_campos < MAX_FIELDS){
             remover_aspas(token);
             campos[num_campos++] = token;
