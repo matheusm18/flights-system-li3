@@ -22,7 +22,6 @@ void ler_csv(const char *filename, void (*callback)(char **campos, int num_campo
         perror("Erro ao abrir ficheiro");
         return;
     }
-
     char linha[MAX_LINE_LENGTH];
     int primeira_linha = 1;
 
@@ -31,9 +30,7 @@ void ler_csv(const char *filename, void (*callback)(char **campos, int num_campo
             primeira_linha = 0;
             continue;
         }
-
         linha[strcspn(linha, "\r\n")] = '\0';
-
         char *campos[MAX_FIELDS];
         int num_campos = 0;
         char *token = strtok(linha, ",");
@@ -43,11 +40,9 @@ void ler_csv(const char *filename, void (*callback)(char **campos, int num_campo
             campos[num_campos++] = token;
             token = strtok(NULL, ",");
         }
-
         if (callback)
             callback(campos, num_campos);
     }
-
     fclose(fp);
 }
 
@@ -94,7 +89,6 @@ bool valida_icao_airport(const char *icao){
 
 bool valida_type_airport(const char *type){
     if (!type) return false;
-
     return (strcmp(type, "small_airport") == 0 ||
             strcmp(type, "medium_airport") == 0 ||
             strcmp(type, "large_airport") == 0);
@@ -115,37 +109,30 @@ void processar_linha_valida(char **campos, int num_campos){
         printf("Aeroporto descartado: código '%s' inválido\n", codigo);
         return;
     }
-
     if (!valida_name_city_airport(nome)){
         printf("Aeroporto descartado: nome '%s' inválido\n", nome);
         return;
     }
-
     if (!valida_name_city_airport(cidade)){
         printf("Aeroporto descartado: cidade '%s' inválida\n", cidade);
         return;
     }
-
     if (!valida_country_airport(pais)){
         printf("Aeroporto descartado: país '%s' inválido\n", pais);
         return;
     }
-
     if (!valida_latitude_airport(latitude)){
         printf("Aeroporto descartado: latitude '%f' inválida\n", latitude);
         return;
     }
-
     if (!valida_longitude_airport(longitude)){
         printf("Aeroporto descartado: longitude '%f' inválida\n", longitude);
         return;
     }
-
     if (!valida_icao_airport(icao)){
         printf("Aeroporto descartado: icao '%s' inválida\n", icao);
         return;
     }
-
     if (!valida_type_airport(type)){
         printf("Aeroporto descartado: type '%s' inválida\n", type);
         return;
