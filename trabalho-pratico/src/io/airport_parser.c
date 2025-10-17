@@ -9,7 +9,7 @@
 #define MAX_LINE_LENGTH 1024
 #define MAX_FIELDS 8
 
-void remover_aspas(char *s) {
+void remove_quotation_marks(char *s) {
     if (!s) return;
     
     size_t len = strlen(s);
@@ -21,38 +21,38 @@ void remover_aspas(char *s) {
     }
 }
 
-void ler_csv(const char *filename, void (*callback)(char **campos, int num_campos)) {
+void read_csv(const char *filename, void (*callback)(char **fields, int num_fields)) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("Erro ao abrir ficheiro");
         return;
     }
 
-    char linha[MAX_LINE_LENGTH];
-    int primeira_linha = 1;
+    char line[MAX_LINE_LENGTH];
+    int first_line = 1;
 
-    while (fgets(linha, sizeof(linha), fp)) {
-        if (primeira_linha) {
-            primeira_linha = 0;
+    while (fgets(line, sizeof(line), fp)) {
+        if (first_line) {
+            first_line = 0;
             continue;
         }
 
-        linha[strcspn(linha, "\r\n")] = '\0';
+        line[strcspn(line, "\r\n")] = '\0';
 
-        char *campos[MAX_FIELDS];
-        int num_campos = 0;
-        char *token = strtok(linha, "\"");
+        char *fields[MAX_FIELDS];
+        int num_fields = 0;
+        char *token = strtok(line, "\"");
 
-        while (token && num_campos < MAX_FIELDS) {
+        while (token && num_fields < MAX_FIELDS) {
             if (!(token[0] == ',' && token[1] == '\0')) {
-                remover_aspas(token);
-                campos[num_campos++] = token;
+                remove_quotation_marks(token);
+                fields[num_fields++] = token;
             }
             token = strtok(NULL, "\"");
         }
 
         if (callback)
-            callback(campos, num_campos);
+            callback(fields, num_fields);
     }
 
     fclose(fp);

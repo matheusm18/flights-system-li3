@@ -11,6 +11,6 @@ void load_datasets(const char* dataset_path) {
     snprintf(airports_file, sizeof(airports_file), "%s/airports.csv", dataset_path);
     
     printf("A carregar os aeroportos de: %s\n", airports_file);
-    ler_csv(airports_file, processar_linha_valida);
+    ler_csv(airports_file, process_valid_line);
     printf("\nTodos os aeroportos válidos foram carregados!\n");
 }
