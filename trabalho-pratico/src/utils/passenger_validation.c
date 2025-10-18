@@ -3,3 +3,101 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
+
+
+
+
+bool validate_passenger_document_number(const char *document_number){
+    if(document_number == NULL) {
+        return false;
+    }
+
+    // tem de ter obrigatoriamente 9 dígitos
+    if(strlen(document_number) != 9){
+        return false;
+    }
+
+    // todos os caracteres devem ser digitos entre 0 e 9
+    for(int i = 0; i < 9; i++){
+        if(!isdigit((unsigned char)document_number[i])){ // a função isdigit espera valores positivos, por isso temos de converter para unsigned
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool validate_passenger_gender(const char *gender) {
+    if (gender == NULL) {
+        return false;
+    }
+
+    return strcmp(gender, "M") == 0 || strcmp(gender, "F") == 0 || strcmp(gender, "O") == 0;
+}
+
+bool validate_passenger_email(const char *email){
+    if(email == NULL){
+        return false;
+    }
+
+    // na string tem de existir o caracter @ 
+    const char *at = strchr(email,'@'); // procura e retorna um ponteiro para a sua primeira ocorrência
+    if (!at) return false; // não encotrou
+
+    // validar username
+    for(const char* i = email; i < at; i++){
+        if (!(islower((unsigned char)*i) || isdigit((unsigned char)*i) || *i == '.')){
+            return false;
+        }
+    }
+
+    // validar domain
+    const char *domain = at + 1; // ponteiro para o inicio do domain
+    const char *dot = strchr(domain, '.');  // procura o ponto no domínio
+    if (!dot) return false;                  // domínio inválido 
+
+    // valida domain antes do ponto
+    if (dot == domain) return false;         // lstring vazia
+    for (const char *i = domain; i < dot; i++) {
+        if (!islower((unsigned char)*i)) return false;
+    }
+
+    // valida depois do ponto
+    unsigned int rstring_len = strlen(dot + 1);
+    if (rstring_len < 2 || rstring_len > 3) return false; 
+    for (const char *i = dot + 1; *i; i++) {
+        if (!islower((unsigned char)*i)) return false;
+    }
+
+    return true;
+
+}
+
+void process_valid_line_passengers(char **fields, int num_fields) {
+    char *document_number = fields[0];
+    char *first_name = fields[1];
+    char *last_name = fields[2];
+    char *dob = fields[3];
+    char *nationality = fields[4];
+    char *gender = fields[5];
+    char *email = fields[6];
+    char *phone = fields[7];
+    char *adress = fields[8];
+    char *photo = fields[9];
+
+    if (!validate_passenger_document_number(document_number)) {
+        printf("Passageiro descartado: número de documento '%s' inválido\n", document_number);
+        return;
+    }
+
+    if(!validate_passenger_email(email)){
+        printf("Passageiro descartado: email '%s' inválido\n", email);
+        return;
+    }
+
+    if(!validate_passenger_gender(gender)){
+        printf("Passageiro descartado: género '%s' inválido\n", gender);
+        return;
+    }
+}
