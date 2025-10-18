@@ -59,7 +59,7 @@ void read_csv(int fields_length, const char *filename, void (*callback)(char **f
 void load_datasets(const char* dataset_path) {
 
     char airports_file[256];
-    snprintf(airports_file, sizeof(airports_file), "%s/airports.csv", dataset_path);
+    snprintf(airports_file, sizeof(airports_file), "%s/airports.csv", dataset_path); 
 
     char aircrafts_file[256];
     snprintf(aircrafts_file, sizeof(aircrafts_file), "%s/aircrafts.csv", dataset_path);
