@@ -4,6 +4,10 @@
         "passenger.h": "c",
         "airport.h": "c",
         "flight.h": "c",
-        "reservation.h": "c"
+        "reservation.h": "c",
+        "airport_parser.h": "c",
+        "validation.h": "c",
+        "typeinfo": "c",
+        "aircraft.h": "c"
     }
 }

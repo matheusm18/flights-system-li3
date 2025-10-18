@@ -53,7 +53,8 @@ bool validate_model_aircraft(const char *model) {
     if (!model) return false;
 
     for (int i = 0; model[i] != '\0'; i++) {
-        if (model[i] < 32 || model[i] > 126) return false;
+        unsigned char c = (unsigned char) model[i];
+        if (c < 32 || c > 126) return false;
     }
 
     return true;
