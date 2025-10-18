@@ -65,9 +65,13 @@ void load_datasets(const char* dataset_path) {
     char aircrafts_file[256];
     snprintf(aircrafts_file, sizeof(aircrafts_file), "%s/aircrafts.csv", dataset_path);
 
+
+    char flights_file[256];
+    snprintf(flights_file, sizeof(flights_file), "%s/flights.csv", dataset_path);
+  
     char passengers_file[256];
     snprintf(passengers_file, sizeof(passengers_file), "%s/passengers.csv", dataset_path);
-    
+  
     printf("\nA carregar os aeroportos de: %s\n", airports_file);
     read_csv(8, airports_file, process_valid_line_airports);
 
@@ -77,6 +81,11 @@ void load_datasets(const char* dataset_path) {
     read_csv(6, aircrafts_file, process_valid_line_aircrafts);
 
     printf("\nTodas as aeronaves válidas foram carregadas!\n");
+
+    printf("\nA carregar os voos de: %s\n", flights_file);
+    read_csv(6, flights_file, process_valid_line_flights);
+
+    printf("\nTodos os voos válidos foram carregados!\n");
 
     printf("\nA carregar os passageiros de: %s\n", passengers_file);
     read_csv(9, passengers_file, process_valid_line_passengers);

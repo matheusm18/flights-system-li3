@@ -89,3 +89,12 @@ void process_valid_line_airports(char **fields, int num_fields) {
         return;
     }
 }
+
+void process_valid_line_flights(char **fields, int num_fields) {
+    char *flight_id = fields[0];
+
+    if (!validate_flight_id_flight(flight_id)) {
+        printf("Voo descartado: código '%s' inválido\n", flight_id);
+        return;
+    }
+}
