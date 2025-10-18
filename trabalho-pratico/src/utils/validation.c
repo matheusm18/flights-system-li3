@@ -114,8 +114,8 @@ bool validate_code_airport(const char *code) {
 bool validate_name_city_airport(const char *name) {
     if (!name) return false;
     for (int i = 0; name[i]; i++) {
-
-        if (name[i] < 32) return false;
+        unsigned char c = (unsigned char) name[i];
+        if (c < 32) return false;
     }
     return true;
 }
