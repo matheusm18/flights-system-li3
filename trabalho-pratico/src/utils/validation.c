@@ -22,6 +22,85 @@ bool validate_date(char* date) {
 
 }
 
+//======== Syntactic validation: Aircrafts
+
+bool validate_identifier_aircraft(const char *identifier) {
+    if (!identifier || strlen(identifier) != 8) return false;
+
+    if (identifier[2] != '-') return false;
+
+    for (int i = 0; i < 8; i++) {
+
+        if (i != 2) {
+            if (!isupper(identifier[i]) && !isdigit(identifier[i])) return false;
+        }
+    }
+    return true;
+}
+
+bool validate_manufacturer_aircraft(const char *manufacturer) {
+    if (!manufacturer) return false;
+
+    if (!isupper(manufacturer[0])) return false;
+
+    for(int i = 1; manufacturer[i] != '\0'; i++) {
+        if (!isalpha(manufacturer[i])) return false;
+    }
+    return true;
+}
+
+bool validate_model_aircraft(const char *model) {
+    if (!model) return false;
+
+    for (int i = 0; model[i] != '\0'; i++) {
+        if (model[i] < 32 || model[i] > 126) return false;
+    }
+
+    return true;
+}
+
+bool validate_year_aircraft(const char *string) {
+    if (!string) return false;
+
+    for (int i = 0; string[i] != '\0'; i++) {
+        if (!isdigit(string[i])) return false;
+    }
+
+    int year = atoi(string);
+
+    if (year < 1900 || year > 2025) return false; // defini 1900 como ano minimo que faça sentido ter voos
+
+    return true;
+}
+
+bool validate_capacity_aircraft(const char *string) {
+    if (!string) return false;
+
+    for (int i = 0; string[i] != '\0'; i++) {
+        if (!isdigit(string[i])) return false;
+    }
+
+    int capacity = atoi(string);
+
+    if (capacity <= 0) return false;
+
+    return true;
+}
+
+bool validate_range_aircraft(const char *string) {
+    if (!string) return false;
+
+    for (int i = 0; string[i] != '\0'; i++) {
+        if (!isdigit(string[i])) return false;
+    }
+
+    int range = atoi(string);
+
+    if (range <= 0) return false;
+
+    return true;
+}
+
 //======== Syntactic validation: Airports
 
 bool validate_code_airport(const char *code) {
@@ -35,9 +114,8 @@ bool validate_code_airport(const char *code) {
 bool validate_name_city_airport(const char *name) {
     if (!name) return false;
     for (int i = 0; name[i]; i++) {
-        unsigned char c = (unsigned char)name[i];
 
-        if (c < 32) return false;
+        if (name[i] < 32) return false;
     }
     return true;
 }
@@ -50,13 +128,11 @@ bool validate_country_airport(const char *country) {
     return true;
 }
 
-
 bool validate_latitude_airport(double latitude) {
     return latitude >= -90 && latitude <= 90;
 }
 
-
-bool valida_longitude_airport(double longitude) {
+bool validate_longitude_airport(double longitude) {
     return longitude >= -180 && longitude <= 180;
 }
 
@@ -77,7 +153,41 @@ bool validate_type_airport(const char *type) {
             strcmp(type, "seaplane_base") == 0);
 }
 
-void process_valid_line(char **fields, int num_fields) {
+void process_valid_line_aircrafts(char **fields, int num_fields) {
+    char *identifier = fields[0];
+    char *manufacturer = fields[1];
+    char *model = fields[2];
+    char *year = fields[3];
+    char *capacity = fields[4];
+    char *range = fields[5];
+
+    if (!validate_identifier_aircraft(identifier)) {
+        printf("Aeronave descartada: identificador '%s' inválido\n", identifier);
+        return;
+    }
+    if (!validate_manufacturer_aircraft(manufacturer)) {
+        printf("Aeronave descartada: fabricante '%s' inválido\n", manufacturer);
+        return;
+    }
+    if (!validate_model_aircraft(model)) {
+        printf("Aeronave descartada: modelo '%s' inválido\n", model);
+        return;
+    }
+    if (!validate_year_aircraft(year)) {
+        printf("Aeronave descartada: ano '%s' inválido\n", year);
+        return;
+    }
+    if (!validate_capacity_aircraft(capacity)) {
+        printf("Aeronave descartada: capacidade '%s' inválida\n", capacity);
+        return;
+    }
+    if (!validate_range_aircraft(range)) {
+        printf("Aeronave descartada: alcance '%s' inválido\n", range);
+        return;
+    }
+}
+
+void process_valid_line_airports(char **fields, int num_fields) {
     char *code = fields[0];
     char *name = fields[1];
     char *city = fields[2];
