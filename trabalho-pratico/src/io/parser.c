@@ -83,7 +83,7 @@ void load_datasets(const char* dataset_path) {
     printf("\nTodas as aeronaves válidas foram carregadas!\n");
 
     printf("\nA carregar os voos de: %s\n", flights_file);
-    read_csv(6, flights_file, process_valid_line_flights);
+    read_csv(12, flights_file, process_valid_line_flights);
 
     printf("\nTodos os voos válidos foram carregados!\n");
 

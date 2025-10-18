@@ -92,9 +92,64 @@ void process_valid_line_airports(char **fields, int num_fields) {
 
 void process_valid_line_flights(char **fields, int num_fields) {
     char *flight_id = fields[0];
+    char *departure = fields[1];
+    char *actual_departure = fields[2];
+    char *arrival = fields[3];
+    char *actual_arrival = fields[4];
+    char *gate = fields[5];
+    char *status = fields[6];
+    char *origin = fields[7];
+    char *destination = fields[8];
+    char *aircraft = fields[9];
+    char *airline = fields[10];
+    char *tracking_url = fields[11];
 
     if (!validate_flight_id_flight(flight_id)) {
-        printf("Voo descartado: código '%s' inválido\n", flight_id);
+        printf("Voo descartado: flight_id '%s' inválido\n", flight_id);
+        return;
+    }
+    if (!validate_arrivals_and_departures_flight(departure)) {
+        printf("Voo descartado: departure '%s' inválido\n", departure);
+        return;
+    }
+    if (!validate_actual_arrivals_and_departures_flight(departure, actual_departure)) {
+        printf("Voo descartado: actual departure '%s' inválido\n", actual_departure);
+        return;
+    }
+    if (!validate_arrivals_and_departures_flight(arrival)) {
+        printf("Voo descartado: arrival '%s' inválido\n", arrival);
+        return;
+    }
+    if (!validate_actual_arrivals_and_departures_flight(arrival, actual_arrival)) {
+        printf("Voo descartado: actual arrival '%s' inválido\n", actual_arrival);
+        return;
+    }
+    if (!validate_gate_flight(gate)) {
+        printf("Voo descartado: gate '%s' inválido\n", gate);
+        return;
+    }
+    if (!validate_status_flight(status, departure, arrival,actual_departure, actual_arrival)) {
+        printf("Voo descartado: status '%s' inválido\n", status);
+        return;
+    }
+    if (!validate_origin_flight(origin)) {
+        printf("Voo descartado: origin '%s' inválido\n", origin);
+        return;
+    }
+    if (!validate_destination_flight(origin, destination)) {
+        printf("Voo descartado: destination '%s' inválido\n", destination);
+        return;
+    }
+    if (!validate_aircraft_flight(aircraft)) {
+        printf("Voo descartado: aircraft '%s' inválido\n", aircraft);
+        return;
+    }
+    if (!validate_airline_flight(airline)) {
+        printf("Voo descartado: airline '%s' inválido\n", airline);
+        return;
+    }
+    if (!validate_tracking_url_flight(tracking_url, flight_id)) {
+        printf("Voo descartado: tracking url '%s' inválido\n", tracking_url);
         return;
     }
 }
