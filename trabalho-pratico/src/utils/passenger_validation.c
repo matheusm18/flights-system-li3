@@ -43,7 +43,7 @@ bool validate_passenger_email(const char *email){
 
     // na string tem de existir o caracter @ 
     const char *at = strchr(email,'@'); // procura e retorna um ponteiro para a sua primeira ocorrência
-    if (!at) return false; // não encotrou
+    if (!at) return false; // não encontrou
 
     // validar username
     for(const char* i = email; i < at; i++){
