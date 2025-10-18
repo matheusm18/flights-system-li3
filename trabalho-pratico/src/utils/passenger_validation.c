@@ -1,4 +1,5 @@
 #include "utils/passenger_validation.h"
+#include "utils/date_validation.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,6 +75,13 @@ bool validate_passenger_email(const char *email){
 
 }
 
+bool validate_passenger_birth_date(const char *dob){
+    if(!validate_date(dob)){
+        return false;
+    }
+    return true;
+}
+
 void process_valid_line_passengers(char **fields, int num_fields) {
     char *document_number = fields[0];
     char *first_name = fields[1];
@@ -87,17 +95,22 @@ void process_valid_line_passengers(char **fields, int num_fields) {
     char *photo = fields[9];
 
     if (!validate_passenger_document_number(document_number)) {
-        printf("Passageiro descartado: número de documento '%s' inválido\n", document_number);
+        printf("Passageiro descartado: número de documento '%s' inválido!\n", document_number);
         return;
     }
 
     if(!validate_passenger_email(email)){
-        printf("Passageiro descartado: email '%s' inválido\n", email);
+        printf("Passageiro descartado: email '%s' inválido!\n", email);
         return;
     }
 
     if(!validate_passenger_gender(gender)){
-        printf("Passageiro descartado: género '%s' inválido\n", gender);
+        printf("Passageiro descartado: género '%s' inválido!\n", gender);
+        return;
+    }
+
+    if(!validade_passenger_birth_date(dob)){
+        printf("Passageiro descartado: data de nascimento '%s' inválida!\n", dob);
         return;
     }
 }
