@@ -11,7 +11,8 @@ CFLAGS = -Wall -Iinclude `pkg-config --cflags glib-2.0`
 NAME = programa-principal
 
 # Ficheiros fonte
-SRCS = src/main.c src/io/parser.c src/utils/validation.c
+SRCS = src/main.c src/io/parser.c src/utils/validation.c src/utils/aircraft_validation.c src/utils/airport_validation.c src/utils/date_validation.c\
+       src/utils/date.c src/utils/flight_validation.c src/utils/passenger_validation.c src/utils/reservation_validation.c
 
 # Ficheiros objeto
 OBJS = $(SRCS:.c=.o)

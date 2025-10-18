@@ -1,1 +1,4 @@
-#include <stdbool.h>
+#ifndef FLIGHT_VALIDATION_H
+#define FLIGHT_VALIDATION_H
+
+#endif

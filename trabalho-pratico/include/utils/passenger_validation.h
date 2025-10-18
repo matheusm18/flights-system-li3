@@ -1,1 +1,4 @@
-#include <stdbool.h>
+#ifndef PASSENGER_VALIDATION_H
+#define PASSENGER_VALIDATION_H
+
+#endif

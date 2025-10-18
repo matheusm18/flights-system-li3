@@ -8,6 +8,13 @@
         "airport_parser.h": "c",
         "validation.h": "c",
         "typeinfo": "c",
-        "aircraft.h": "c"
+        "aircraft.h": "c",
+        "stdbool.h": "c",
+        "airport_validation.h": "c",
+        "aircraft_validation.h": "c",
+        "date_validation.h": "c",
+        "passenger_validation.h": "c",
+        "flight_validation.h": "c",
+        "reservation_validation.h": "c"
     }
 }

@@ -1,1 +1,4 @@
-#include <stdbool.h>
+#ifndef RESERVATION_VALIDATION_H
+#define RESERVATION_VALIDATION_H
+
+#endif
