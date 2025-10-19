@@ -4,7 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
 //======== Syntactic validation: Airports
 
 bool validate_code_airport(const char *code) {

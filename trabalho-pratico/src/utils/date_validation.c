@@ -7,7 +7,7 @@
 
 //======== Syntactic validation: Dates
 
-bool validate_date(char* date) {
+bool validate_date(const char* date) {
     if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') return false;
 
     for (int i = 0; i < 10; i++) {

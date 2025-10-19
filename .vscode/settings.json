@@ -15,6 +15,7 @@
         "date_validation.h": "c",
         "passenger_validation.h": "c",
         "flight_validation.h": "c",
-        "reservation_validation.h": "c"
+        "reservation_validation.h": "c",
+        "ctype.h": "c"
     }
 }

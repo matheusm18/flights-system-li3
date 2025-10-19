@@ -6,8 +6,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-
-
+//======== Syntactic validation: Passengers
 
 bool validate_passenger_document_number(const char *document_number){
     if(document_number == NULL) {
@@ -80,37 +79,4 @@ bool validate_passenger_birth_date(const char *dob){
         return false;
     }
     return true;
-}
-
-void process_valid_line_passengers(char **fields, int num_fields) {
-    char *document_number = fields[0];
-    char *first_name = fields[1];
-    char *last_name = fields[2];
-    char *dob = fields[3];
-    char *nationality = fields[4];
-    char *gender = fields[5];
-    char *email = fields[6];
-    char *phone = fields[7];
-    char *adress = fields[8];
-    char *photo = fields[9];
-
-    if (!validate_passenger_document_number(document_number)) {
-        printf("Passageiro descartado: número de documento '%s' inválido!\n", document_number);
-        return;
-    }
-
-    if(!validate_passenger_email(email)){
-        printf("Passageiro descartado: email '%s' inválido!\n", email);
-        return;
-    }
-
-    if(!validate_passenger_gender(gender)){
-        printf("Passageiro descartado: género '%s' inválido!\n", gender);
-        return;
-    }
-
-    if(!validade_passenger_birth_date(dob)){
-        printf("Passageiro descartado: data de nascimento '%s' inválida!\n", dob);
-        return;
-    }
 }

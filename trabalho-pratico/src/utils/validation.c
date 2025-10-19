@@ -51,7 +51,7 @@ void process_valid_line_airports(char **fields, int num_fields) {
     char *name = fields[1];
     char *city = fields[2];
     char *country = fields[3];
-    double latitude = atof(fields[4]);
+    double latitude = atof(fields[4]); // acho que não deviamos usar atof aqui, se tiver lixo no fim da string ela ignora
     double longitude = atof(fields[5]);
     char *icao = fields[6];
     char *type = fields[7];
@@ -150,6 +150,90 @@ void process_valid_line_flights(char **fields, int num_fields) {
     }
     if (!validate_tracking_url_flight(tracking_url, flight_id)) {
         printf("Voo descartado: tracking url '%s' inválido\n", tracking_url);
+        return;
+    }
+}
+
+void process_valid_line_passengers(char **fields, int num_fields) {
+    char *document_number = fields[0];
+    char *first_name = fields[1];
+    char *last_name = fields[2];
+    char *dob = fields[3];
+    char *nationality = fields[4];
+    char *gender = fields[5];
+    char *email = fields[6];
+    char *phone = fields[7];
+    char *adress = fields[8];
+    char *photo = fields[9];
+
+    if (!validate_passenger_document_number(document_number)) {
+        printf("Passageiro descartado: número de documento '%s' inválido!\n", document_number);
+        return;
+    }
+
+    if(!validate_passenger_email(email)){
+        printf("Passageiro descartado: email '%s' inválido!\n", email);
+        return;
+    }
+
+    if(!validate_passenger_gender(gender)){
+        printf("Passageiro descartado: género '%s' inválido!\n", gender);
+        return;
+    }
+
+    if(!validate_passenger_birth_date(dob)){
+        printf("Passageiro descartado: data de nascimento '%s' inválida!\n", dob);
+        return;
+    }
+}
+
+void process_valid_line_reservations(char **fields, int num_fields) {
+    char *reservation_id = fields[0];
+    char *flight_ids = fields[1];
+    char *document_number = fields[2];
+    char *seat = fields[3];
+    char *price = fields[4];
+    char *extra_luggage = fields[5];
+    char *priority_boarding = fields[6];
+    char *qr_code = fields[7];
+
+    if (!validate_reservation_id(reservation_id)) {
+        printf("Reserva descartada: id de reserva '%s' inválido!\n", reservation_id);
+        return;
+    }
+
+    if (!validate_flight_ids_reservation(flight_ids)) {
+        printf("Reserva descartada: ids de voos '%s' inválidos!\n", flight_ids);
+        return;
+    }
+
+    if (!validate_document_number_reservation(document_number)) {
+        printf("Reserva descartada: número de documento '%s' inválido!\n", document_number);
+        return;
+    }
+
+    if (!validate_seat_reservation(seat)) {
+        printf("Reserva descartada: assento '%s' inválido!\n", seat);
+        return;
+    }
+
+    if (!validate_price_reservation(price)) {
+        printf("Reserva descartada: preço '%s' inválido!\n", price);
+        return;
+    }
+
+    if (!validate_extra_luggage_reservation(extra_luggage)) {
+        printf("Reserva descartada: bagagem extra '%s' inválida!\n", extra_luggage);
+        return;
+    }
+
+    if (!validate_priority_boarding_reservation(priority_boarding)) {
+        printf("Reserva descartada: embarque prioritário '%s' inválido!\n", priority_boarding);
+        return;
+    }
+
+    if (!validate_qr_code_reservation(qr_code)) {
+        printf("Reserva descartada: qr code '%s' inválido!\n", qr_code);
         return;
     }
 }

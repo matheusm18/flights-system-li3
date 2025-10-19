@@ -8,6 +8,4 @@ bool validate_passenger_gender(const char *gender);
 bool validate_passenger_email(const char *email);
 bool validate_passenger_birth_date(const char *dob);
 
-void process_valid_line_passengers(char **fields, int num_fields);
-
 #endif

@@ -8,6 +8,7 @@
 #include "utils/airport_validation.h"
 #include "utils/aircraft_validation.h"
 
+//======== Syntactic validation: Flights
 
 bool validate_flight_id_flight(const char *flight_id) {
     if (!flight_id || strlen(flight_id) != 7) return false;
