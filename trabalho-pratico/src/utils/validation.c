@@ -51,7 +51,7 @@ void process_valid_line_airports(char **fields, int num_fields) {
     char *name = fields[1];
     char *city = fields[2];
     char *country = fields[3];
-    char *latitude = fields[4]; // acho que não deviamos usar atof aqui, se tiver lixo no fim da string ela ignora
+    char *latitude = fields[4];
     char *longitude = fields[5];
     char *icao = fields[6];
     char *type = fields[7];
@@ -73,11 +73,11 @@ void process_valid_line_airports(char **fields, int num_fields) {
         return;
     }
     if (!validate_latitude_airport(latitude)) {
-        printf("Aeroporto descartado: latitude '%f' inválida\n", latitude);
+        printf("Aeroporto descartado: latitude '%s' inválida\n", latitude);
         return;
     }
     if (!validate_longitude_airport(longitude)) {
-        printf("Aeroporto descartado: longitude '%f' inválida\n", longitude);
+        printf("Aeroporto descartado: longitude '%s' inválida\n", longitude);
         return;
     }
     if (!validate_icao_airport(icao)) {

@@ -31,7 +31,7 @@ bool validate_country_airport(const char *country) {
     return true;
 }
 
-bool validate_decimal_cases(char *str) {
+bool validate_decimal_cases(const char *str) {
     if (!str) return false;
 
     const char *p = str;
@@ -56,7 +56,7 @@ bool validate_decimal_cases(char *str) {
     return true;
 }
 
-bool validate_latitude_airport(char *latitude) {
+bool validate_latitude_airport(const char *latitude) {
     if (!latitude) return false;
 
     if (!validate_decimal_cases(latitude))
@@ -74,7 +74,7 @@ bool validate_latitude_airport(char *latitude) {
     return true;
 }
 
-bool validate_longitude_airport(char *longitude) {
+bool validate_longitude_airport(const char *longitude) {
     if (!longitude) return false;
 
     if (!validate_decimal_cases(longitude))

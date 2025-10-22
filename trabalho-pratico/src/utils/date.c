@@ -30,6 +30,7 @@ void date_destroy(Date* date) {
 }
 
 int date_compare(const Date* date1, const Date* date2) {
+    return 0;
 }
 
 // getters:
