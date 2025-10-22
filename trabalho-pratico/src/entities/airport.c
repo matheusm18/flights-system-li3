@@ -43,3 +43,28 @@ void destroy_airport(Airport* a) {
         free(a);
     }
 }
+
+const char* airport_get_code(const Airport* airport) {
+    if (airport == NULL) return NULL;
+    return airport->code;
+}
+
+const char* airport_get_name(const Airport* airport) {
+    if (airport == NULL) return NULL;
+    return airport->name;
+}
+
+const char* airport_get_city(const Airport* airport) {
+    if (airport == NULL) return NULL;
+    return airport->city;
+}
+
+const char* airport_get_country(const Airport* airport) {
+    if (airport == NULL) return NULL;
+    return airport->country;
+}
+
+const char* airport_get_type(const Airport* airport) {
+    if (airport == NULL) return NULL;
+    return airport->type;
+}
