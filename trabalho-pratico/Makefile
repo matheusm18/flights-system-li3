@@ -29,4 +29,4 @@ src/%.o: src/%.c
 
 # Limpeza (remove executável e object files)
 clean:
-	rm -f $(NAME) src/*.o
+	rm -f $(NAME) src/*.o src/**/*.o
