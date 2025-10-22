@@ -1,4 +1,5 @@
 #include "utils/reservation_validation.h"
+#include "utils/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,20 +70,35 @@ bool validate_price_reservation(const char *price) {
 
 // ver se é preciso aceitar "True" e "False" ou se isto seria considerado um erro
 bool validate_extra_luggage_reservation(const char *extra_luggage) {
-   if (!extra_luggage) return false;
+    if (!extra_luggage) return false;
 
-   if (strcmp(extra_luggage, "true") != 0 && strcmp(extra_luggage, "false") != 0) return false;
+    char *lower = lower_string(extra_luggage);
+    if (!lower) return false;
 
-   return true;
+    if (strcmp(lower, "true") != 0 && strcmp(lower, "false") != 0) {
+        free(lower);
+        return false;
+    }
+
+    free(lower);
+    return true;
 }
 
 // ver se é preciso aceitar "True" e "False" ou se isto seria considerado um erro
 bool validate_priority_boarding_reservation(const char *priority_boarding) {
-   if (!priority_boarding) return false;
+    if (!priority_boarding) return false;
 
-   if (strcmp(priority_boarding, "true") != 0 && strcmp(priority_boarding, "false") != 0) return false;
+    char *lower = lower_string(priority_boarding);
+    if (!lower) return false;
 
-   return true;
+
+    if (strcmp(lower, "true") != 0 && strcmp(lower, "false") != 0) {
+        free(lower);
+        return false;
+    }
+
+    free(lower);
+    return true;
 }
 
 // chars usados em qr code

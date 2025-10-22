@@ -9,10 +9,10 @@ struct passenger {
     Date* dob;
     char* nationality;
     char* gender;
-    char* email; // será necessário armazenar?
+    // char* email; // será necessário armazenar? N FAZ FALTA
     char* phone;
     char* address;
-    char* photo; // será necessário armazenar?
+    // char* photo; // será necessário armazenar?
 
 };
 
@@ -28,10 +28,10 @@ Passenger* create_passenger(const char* document_number, const char* first_name,
     passenger->dob = date_create(date_get_year(dob),date_get_month(dob), date_get_day(dob));
     passenger->nationality = strdup(nationality);
     passenger->gender = strdup(gender);
-    passenger->email = strdup(email);
+    // passenger->email = strdup(email);
     passenger->phone = strdup(phone);
     passenger->address = strdup(address);
-    passenger->photo = strdup(photo);
+    // passenger->photo = strdup(photo);
 
     return passenger;
 }
@@ -45,10 +45,10 @@ void destroy_passenger(Passenger* p) {
         date_destroy(p->dob);
         free(p->nationality);
         free(p->gender);
-        free(p->email);
+        // free(p->email);
         free(p->phone);
         free(p->address);
-        free(p->photo);
+        // free(p->photo);
 
         free(p);
     }

@@ -14,7 +14,7 @@ struct flight {
     char* destination;
     char* aircraft;
     char* airline;
-    char* tracking_url; // será necessário armazenar?
+    // char* tracking_url; // será necessário armazenar?
 };
 
 Flight* create_flight(const char* flight_id, Date* departure, Date* actual_departure, Date* arrival, Date* actual_arrival, const char* gate, const char* status, const char* origin, 
@@ -34,7 +34,7 @@ Flight* create_flight(const char* flight_id, Date* departure, Date* actual_depar
     flight->destination = strdup(destination);
     flight->aircraft = strdup(aircraft);
     flight->airline = strdup(airline);
-    flight->tracking_url = strdup(tracking_url);
+    // flight->tracking_url = strdup(tracking_url);
 
     return flight;
 }
@@ -55,7 +55,7 @@ void destroy_flight(Flight* f) {
         free(f->destination);
         free(f->aircraft);
         free(f->airline);
-        free(f->tracking_url);
+        // free(f->tracking_url);
 
         free(f);
     }

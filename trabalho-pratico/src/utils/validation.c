@@ -51,8 +51,8 @@ void process_valid_line_airports(char **fields, int num_fields) {
     char *name = fields[1];
     char *city = fields[2];
     char *country = fields[3];
-    double latitude = atof(fields[4]); // acho que não deviamos usar atof aqui, se tiver lixo no fim da string ela ignora
-    double longitude = atof(fields[5]);
+    char *latitude = fields[4]; // acho que não deviamos usar atof aqui, se tiver lixo no fim da string ela ignora
+    char *longitude = fields[5];
     char *icao = fields[6];
     char *type = fields[7];
 

@@ -31,12 +31,65 @@ bool validate_country_airport(const char *country) {
     return true;
 }
 
-bool validate_latitude_airport(double latitude) {
-    return latitude >= -90 && latitude <= 90;
+bool validate_decimal_cases(char *str) {
+    if (!str) return false;
+
+    const char *p = str;
+    if (*p == '-') p++;  // se for negativo, avança
+
+    bool dot_found = false;
+    int decimals = 0;
+
+    for (; *p != '\0'; p++) {
+        if (*p == '.') {
+            if (dot_found) return false;  // haveriam dois pontos
+            dot_found = true;
+            continue;
+        }
+
+        if (!isdigit((unsigned char) *p)) return false;
+
+        if (dot_found) decimals++;
+        if (decimals > 8) return false;
+    }
+
+    return true;
 }
 
-bool validate_longitude_airport(double longitude) {
-    return longitude >= -180 && longitude <= 180;
+bool validate_latitude_airport(char *latitude) {
+    if (!latitude) return false;
+
+    if (!validate_decimal_cases(latitude))
+        return false;
+
+    char *endptr;
+    double value = strtod(latitude, &endptr); // converte para double
+
+    // verificar se sobrou lixo no fim da conversão
+    if (*endptr != '\0') return false;
+
+    if (value < -90.0 || value > 90.0)
+        return false;
+
+    return true;
+}
+
+bool validate_longitude_airport(char *longitude) {
+    if (!longitude) return false;
+
+    if (!validate_decimal_cases(longitude))
+        return false;
+
+    char *endptr;
+    double value = strtod(longitude, &endptr); // converte para double
+
+    // verificar se sobrou lixo no fim da conversão
+    if (*endptr != '\0') return false;
+
+    if (value < -180.0 || value > 180.0)
+        return false;
+
+    return true;
 }
 
 bool validate_icao_airport(const char *icao) {
