@@ -57,29 +57,25 @@ bool validate_year_aircraft(const char *string) {
 }
 
 bool validate_capacity_aircraft(const char *string) {
-    if (!string) return false;
-
-    for (int i = 0; string[i] != '\0'; i++) {
-        if (!isdigit(string[i])) return false;
-    }
-
-    int capacity = atoi(string);
-
-    if (capacity <= 0) return false;
-
+    if (!string || *string == '\0') return false;  
+    
+    char *invalid_start;    
+    long capacity = strtol(string, &invalid_start, 10); // converte para long int (10 é a base)
+    
+    if (*invalid_start != '\0') return false;    // lixo no final
+    if (capacity <= 0) return false;             // valor inválido
+    
     return true;
 }
 
 bool validate_range_aircraft(const char *string) {
-    if (!string) return false;
-
-    for (int i = 0; string[i] != '\0'; i++) {
-        if (!isdigit(string[i])) return false;
-    }
-
-    int range = atoi(string);
-
-    if (range <= 0) return false;
-
+    if (!string || *string == '\0') return false; 
+    
+    char *invalid_start;
+    long range = strtol(string, &invalid_start, 10);
+    
+    if (*invalid_start != '\0') return false;  
+    if (range <= 0) return false;                
+    
     return true;
 }
