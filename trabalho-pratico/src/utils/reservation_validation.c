@@ -59,10 +59,10 @@ bool validate_price_reservation(const char *price) {
 
     if(!isdigit(price[0])) return false; // verifica se não começa com espaços
 
-    char *endptr;
-    double val = strtod(price,&endptr); // recebe o endereço para poder alterar o ponteiro e apontar para o primeiro caractere após os números
+    char *invalid_start;
+    double val = strtod(price,&invalid_start); // recebe o endereço para poder alterar o ponteiro e apontar para o primeiro caractere após os números
 
-    if (price == endptr || *endptr != '\0') return false; // se nada foi convertido ou então se o primeiro caractere não for o fim da string
+    if (price == invalid_start || *invalid_start != '\0') return false; // se nada foi convertido ou então se o primeiro caractere não for o fim da string
     if (val < 0) return false;
 
     return true;

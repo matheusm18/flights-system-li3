@@ -37,6 +37,8 @@ bool validate_decimal_cases(const char *str) {
     const char *p = str;
     if (*p == '-') p++;  // se for negativo, avança
 
+    if (*p == '\0') return false; 
+
     bool dot_found = false;
     int decimals = 0;
 
@@ -56,17 +58,58 @@ bool validate_decimal_cases(const char *str) {
     return true;
 }
 
+/*
+==== Apenas uma sugestão 
+
+bool validate_decimal_cases(const char *str) {
+    if (!str || *str == '\0') return false;
+
+    if (*str == '-') str++;  // ignora o sinal negativo
+    if (*str == '\0') return false; // caso seja só "-"
+
+    const char *dot = strchr(str, '.');
+
+    // verifica se há mais de um ponto
+    if (dot && strchr(dot + 1, '.') != NULL)
+        return false;
+
+    // parte inteira: percorre até o ponto 
+    const char *p = str;
+    while (*p != '\0' && p != dot) {
+        if (!isdigit((unsigned char)*p))
+            return false;
+        p++;
+    }
+
+    // parte decimal 
+    int decimals = 0;
+    if (dot) {
+        const char *dec = dot + 1;
+        while (*dec) {
+            if (!isdigit((unsigned char)*dec))
+                return false;
+            decimals++;
+            if (decimals > 8)
+                return false;
+            dec++;
+        }
+    }
+
+    return true;
+}
+*/
+
 bool validate_latitude_airport(const char *latitude) {
     if (!latitude) return false;
 
     if (!validate_decimal_cases(latitude))
         return false;
 
-    char *endptr;
-    double value = strtod(latitude, &endptr); // converte para double
+    char *invalid_start;
+    double value = strtod(latitude, &invalid_start); // converte para double, invalid_start aponta para o primeiro caracter n convertido: "45.0a" aponta para a
 
     // verificar se sobrou lixo no fim da conversão
-    if (*endptr != '\0') return false;
+    if (*invalid_start != '\0') return false;
 
     if (value < -90.0 || value > 90.0)
         return false;
@@ -80,11 +123,11 @@ bool validate_longitude_airport(const char *longitude) {
     if (!validate_decimal_cases(longitude))
         return false;
 
-    char *endptr;
-    double value = strtod(longitude, &endptr); // converte para double
+    char *invalid_start;
+    double value = strtod(longitude, &invalid_start); // converte para double
 
     // verificar se sobrou lixo no fim da conversão
-    if (*endptr != '\0') return false;
+    if (*invalid_start != '\0') return false;
 
     if (value < -180.0 || value > 180.0)
         return false;
