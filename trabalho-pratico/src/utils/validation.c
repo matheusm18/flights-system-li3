@@ -159,12 +159,12 @@ void process_valid_line_passengers(char **fields, int num_fields) {
     char *first_name = fields[1];
     char *last_name = fields[2];
     char *dob = fields[3];
-    char *nationality = fields[4];
+    //char *nationality = fields[4];
     char *gender = fields[5];
     char *email = fields[6];
-    char *phone = fields[7];
-    char *adress = fields[8];
-    char *photo = fields[9];
+    //char *phone = fields[7];
+    //char *adress = fields[8];
+    //char *photo = fields[9];
 
     if (!validate_passenger_document_number(document_number)) {
         printf("Passageiro descartado: número de documento '%s' inválido!\n", document_number);
@@ -184,6 +184,18 @@ void process_valid_line_passengers(char **fields, int num_fields) {
     if(!validate_passenger_birth_date(dob)){
         printf("Passageiro descartado: data de nascimento '%s' inválida!\n", dob);
         return;
+    }
+
+    if(!validate_passenger_name(first_name)){
+        printf("Passageiro descartado: nome '%s' inválido!\n", first_name);
+        return;
+
+    }
+
+    if(!validate_passenger_name(last_name)){
+        printf("Passageiro descartado: nome '%s' inválido!\n", last_name);
+        return;
+
     }
 }
 

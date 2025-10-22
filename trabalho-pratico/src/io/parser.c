@@ -30,13 +30,13 @@ void read_csv(int fields_length, const char *filename, void (*callback)(char **f
     char line[1024];
     int first_line = 1;
 
-    while (fgets(line, sizeof(line), fp)) {
+    while (fgets(line, sizeof(line), fp)) {  // lê uma linha: a string lida de fp será armazenada em line(buffer, uma área temporária de armazenamento), lê um número máximo de caracteres
         if (first_line) {
             first_line = 0;
             continue;
         }
 
-        line[strcspn(line, "\r\n")] = '\0'; // remover \n do final da string
+        line[strcspn(line, "\r\n")] = '\0'; // remover \n do final da string na posição devolvida por strcspn
 
         char *fields[fields_length];
         int num_fields = 0;

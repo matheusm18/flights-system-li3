@@ -80,3 +80,10 @@ bool validate_passenger_birth_date(const char *dob){
     }
     return true;
 }
+
+bool validate_passenger_name(const char *name){
+    if(!isupper(name[0])){
+        return false;
+    }
+    return true;
+}
