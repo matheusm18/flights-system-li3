@@ -46,7 +46,7 @@ bool validate_decimal_cases(const char *str) {
         if (*p == '.') {
             if (dot_found) return false;  // haveriam dois pontos
             dot_found = true;
-            continue;
+            continue; // avança para a próxima iteração do for
         }
 
         if (!isdigit((unsigned char) *p)) return false;
@@ -58,46 +58,6 @@ bool validate_decimal_cases(const char *str) {
     return true;
 }
 
-/*
-==== Apenas uma sugestão 
-
-bool validate_decimal_cases(const char *str) {
-    if (!str || *str == '\0') return false;
-
-    if (*str == '-') str++;  // ignora o sinal negativo
-    if (*str == '\0') return false; // caso seja só "-"
-
-    const char *dot = strchr(str, '.');
-
-    // verifica se há mais de um ponto
-    if (dot && strchr(dot + 1, '.') != NULL)
-        return false;
-
-    // parte inteira: percorre até o ponto 
-    const char *p = str;
-    while (*p != '\0' && p != dot) {
-        if (!isdigit((unsigned char)*p))
-            return false;
-        p++;
-    }
-
-    // parte decimal 
-    int decimals = 0;
-    if (dot) {
-        const char *dec = dot + 1;
-        while (*dec) {
-            if (!isdigit((unsigned char)*dec))
-                return false;
-            decimals++;
-            if (decimals > 8)
-                return false;
-            dec++;
-        }
-    }
-
-    return true;
-}
-*/
 
 bool validate_latitude_airport(const char *latitude) {
     if (!latitude) return false;

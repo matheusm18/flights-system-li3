@@ -9,5 +9,6 @@ Passenger* create_passenger(const char* document_number, const char* first_name,
                             const char* phone, const char* address, const char* photo);
 
 void destroy_passenger(Passenger* p);
+const char* get_passenger_dnumber(const Passenger* passenger);
 
 #endif

@@ -19,7 +19,7 @@ AirportCatalog* airport_catalog_create() {
 void airport_catalog_destroy(AirportCatalog* manager) {
     if (manager != NULL) {
         g_hash_table_destroy(manager->airports_by_code);
-        g_ptr_array_free(manager->all_airports, TRUE);
+        g_ptr_array_free(manager->all_airports, TRUE); // não faria sentido ser false? o resto ja foi libertado na anterior?
         free(manager);
     }
 }
@@ -29,7 +29,7 @@ void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     
     const char* code = airport_get_code(airport);
     if (code != NULL) {
-        g_hash_table_insert(manager->airports_by_code, (gpointer)code, airport);
+        g_hash_table_insert(manager->airports_by_code, (gpointer)code, airport); // não seria melhor usar g_strdup?
         g_ptr_array_add(manager->all_airports, airport); // deixar uma função separada para adicionar no array?
     }
 }

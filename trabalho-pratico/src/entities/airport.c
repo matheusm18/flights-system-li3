@@ -26,6 +26,12 @@ Airport* create_airport(const char* code, const char* name, const char* city, co
     airport->longitude = longitude;
     airport->icao = strdup(icao);
     airport->type = strdup(type);
+
+    // verifica se algum falhou === é mesmo necessário verificar??
+    if (!airport->code || !airport->name || !airport->city || !airport->country || !airport->icao || !airport->type) {
+        destroy_airport(airport);
+        return NULL;
+    }
     
     return airport;
 }
