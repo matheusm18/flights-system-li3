@@ -13,7 +13,7 @@ struct airport {
     char* type;
 };
 
-Airport* create_airport(const char* code, const char* name, const char* city, const char* country, double latitude, double longitude, const char* icao, const char* type) {
+Airport* create_airport(const char* code, const char* name, const char* city, const char* country, const char* latitude, const char* longitude, const char* icao, const char* type) {
 
     Airport* airport = malloc(sizeof(Airport));
     if (airport == NULL) return NULL;
@@ -22,16 +22,10 @@ Airport* create_airport(const char* code, const char* name, const char* city, co
     airport->name = strdup(name);
     airport->city = strdup(city);
     airport->country = strdup(country);
-    airport->latitude = latitude;
-    airport->longitude = longitude;
+    airport->latitude = atof(latitude);
+    airport->longitude = atof(longitude);
     airport->icao = strdup(icao);
     airport->type = strdup(type);
-
-    // verifica se algum falhou === é mesmo necessário verificar??
-    if (!airport->code || !airport->name || !airport->city || !airport->country || !airport->icao || !airport->type) {
-        destroy_airport(airport);
-        return NULL;
-    }
     
     return airport;
 }

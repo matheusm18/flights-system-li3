@@ -10,6 +10,8 @@
 #include "catalog/reservation_catalog.h"
 
 #include "io/parser.h"
+#include "io/command_processor.h"
+#include "queries/query1.h"
 
 int main(int argc, char **argv) {
     
@@ -20,9 +22,28 @@ int main(int argc, char **argv) {
     }
 
     const char* dataset_path = argv[1];
-    //const char* commands_path = argv[2];
+    const char* commands_path = argv[2];
 
-    load_datasets(dataset_path);
+    // criar catalogs
+
+    AirportCatalog* airport_catalog = airport_catalog_create();
+    // AircraftCatalog* aircraft_catalog = aircraft_catalog_create();
+    // FlightCatalog* flight_catalog = flight_catalog_create();
+    // PassengerCatalog* passenger_catalog = passenger_catalog_create();
+    // ReservationCatalog* reservation_catalog = reservation_catalog_create();
+
+    // carregar datasets
+    printf("\nA carregar datasets de: %s\n", dataset_path);
+    load_datasets(dataset_path, airport_catalog, NULL, NULL, NULL, NULL);
+
+    // processar comandos do ficheiro
+    printf("\nA processar comandos de: %s\n", commands_path);
+    process_commands(commands_path, airport_catalog);
+
+    printf("\nProcessamento concluído! Verifique a pasta 'resultados/'\n");
+
+    // liberar memória
+    airport_catalog_destroy(airport_catalog);
 
     return 0;
 }

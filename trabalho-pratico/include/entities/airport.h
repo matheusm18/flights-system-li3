@@ -3,10 +3,9 @@
 
 typedef struct airport Airport;
 
-Airport* create_airport(const char* code, const char* name, const char* city, const char* country, double latitude, double longitude, const char* icao, const char* type);
+Airport* create_airport(const char* code, const char* name, const char* city, const char* country, const char* latitude, const char* longitude, const char* icao, const char* type);
 
 void destroy_airport(Airport* airport);
-
 
 // getters
 const char* airport_get_code(const Airport* airport);

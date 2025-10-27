@@ -1,5 +1,6 @@
 #include "utils/validation.h"
 
+#include "catalog/airport_catalog.h"
 #include "utils/aircraft_validation.h"
 #include "utils/airport_validation.h"
 #include "utils/date_validation.h"
@@ -12,7 +13,7 @@
 #include <string.h>
 #include <ctype.h>
 
-void process_valid_line_aircrafts(char **fields, int num_fields) {
+void process_valid_line_aircrafts(char **fields, int num_fields, void* catalog) {
     char *identifier = fields[0];
     char *manufacturer = fields[1];
     char *model = fields[2];
@@ -46,7 +47,9 @@ void process_valid_line_aircrafts(char **fields, int num_fields) {
     }
 }
 
-void process_valid_line_airports(char **fields, int num_fields) {
+void process_valid_line_airports(char **fields, int num_fields, void* catalog) {
+    AirportCatalog* airport_catalog = (AirportCatalog*)catalog;
+
     char *code = fields[0];
     char *name = fields[1];
     char *city = fields[2];
@@ -56,41 +59,21 @@ void process_valid_line_airports(char **fields, int num_fields) {
     char *icao = fields[6];
     char *type = fields[7];
 
-    if (!validate_code_airport(code)) {
-        printf("Aeroporto descartado: código '%s' inválido\n", code);
+    if (!validate_code_airport(code) || !validate_name_city_airport(name) || !validate_name_city_airport(city) || !validate_country_airport(country) || !validate_latitude_airport(latitude) ||
+        !validate_longitude_airport(longitude) || !validate_icao_airport(icao) || !validate_type_airport(type)) {
+        
+        // será preciso escrever caso haja erro? ex: indicar os erros? ver melhor
         return;
     }
-    if (!validate_name_city_airport(name)) {
-        printf("Aeroporto descartado: nome '%s' inválido\n", name);
-        return;
-    }
-    if (!validate_name_city_airport(city)) {
-        printf("Aeroporto descartado: cidade '%s' inválida\n", city);
-        return;
-    }
-    if (!validate_country_airport(country)) {
-        printf("Aeroporto descartado: país '%s' inválido\n", country);
-        return;
-    }
-    if (!validate_latitude_airport(latitude)) {
-        printf("Aeroporto descartado: latitude '%s' inválida\n", latitude);
-        return;
-    }
-    if (!validate_longitude_airport(longitude)) {
-        printf("Aeroporto descartado: longitude '%s' inválida\n", longitude);
-        return;
-    }
-    if (!validate_icao_airport(icao)) {
-        printf("Aeroporto descartado: icao '%s' inválida\n", icao);
-        return;
-    }
-    if (!validate_type_airport(type)) {
-        printf("Aeroporto descartado: type '%s' inválida\n", type);
-        return;
+
+    Airport* airport = create_airport(code, name, city, country, latitude, longitude, icao, type);
+    
+    if (airport != NULL) {
+        airport_catalog_add(airport_catalog, airport);
     }
 }
 
-void process_valid_line_flights(char **fields, int num_fields) {
+void process_valid_line_flights(char **fields, int num_fields, void* catalog) {
     char *flight_id = fields[0];
     char *departure = fields[1];
     char *actual_departure = fields[2];
@@ -154,7 +137,7 @@ void process_valid_line_flights(char **fields, int num_fields) {
     }
 }
 
-void process_valid_line_passengers(char **fields, int num_fields) {
+void process_valid_line_passengers(char **fields, int num_fields, void* catalog) {
     char *document_number = fields[0];
     char *first_name = fields[1];
     char *last_name = fields[2];
@@ -199,7 +182,7 @@ void process_valid_line_passengers(char **fields, int num_fields) {
     }
 }
 
-void process_valid_line_reservations(char **fields, int num_fields) {
+void process_valid_line_reservations(char **fields, int num_fields, void* catalog) {
     char *reservation_id = fields[0];
     char *flight_ids = fields[1];
     char *document_number = fields[2];

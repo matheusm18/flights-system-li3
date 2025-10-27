@@ -12,7 +12,7 @@ void execute_query1(AirportCatalog* manager, const char* airport_code, const cha
         return;
     }
     
-    Airport* airport = find_airport_by_code(manager, airport_code);
+    Airport* airport = airport_catalog_get_by_code(manager, airport_code);
     
     if (airport != NULL) {
         const char* code = airport_get_code(airport);
@@ -21,11 +21,7 @@ void execute_query1(AirportCatalog* manager, const char* airport_code, const cha
         const char* country = airport_get_country(airport);
         const char* type = airport_get_type(airport);
         
-        fprintf(output_file, "%s;%s;%s;%s;%s\n", code, name, city, country, type);
-    }
-    else {
-        // aeroporto não encontrado ent escreve linha vazia
-        fprintf(output_file, "\n");
+        fprintf(output_file, "%s,%s,%s,%s,%s\n", code, name, city, country, type);
     }
     
     fclose(output_file);
