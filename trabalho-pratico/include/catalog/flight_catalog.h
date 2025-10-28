@@ -12,4 +12,6 @@ void flight_catalog_add(FlightCatalog* manager, Flight* flight);
 Flight* flight_catalog_get_by_flight_id(FlightCatalog* manager, const char* flight_id);
 int flight_catalog_get_count(FlightCatalog* manager);
 
+GHashTable* flight_catalog_get_all_flights(FlightCatalog* manager);
+
 #endif

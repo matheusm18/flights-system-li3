@@ -10,6 +10,9 @@ Flight* create_flight(const char* flight_id, DateTime* departure, DateTime* actu
 
 void destroy_flight(Flight* f);
 
+DateTime* flight_get_actual_departure(const Flight* f);
 const char* flight_get_flight_id(const Flight* flight);
+const char* flight_get_origin(const Flight* f);
+const char* flight_get_status(const Flight* f);
 
 #endif

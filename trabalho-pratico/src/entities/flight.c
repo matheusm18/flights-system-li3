@@ -68,6 +68,21 @@ void destroy_flight(Flight* f) {
     free(f);
 }
 
+DateTime* flight_get_actual_departure(const Flight* f) {
+    if (!f) return NULL;
+    return f->actual_departure;
+}
+
+const char* flight_get_origin(const Flight* f) {
+    if (!f) return NULL;
+    return f->origin;
+}
+
+const char* flight_get_status(const Flight* f) {
+    if (!f) return NULL;
+    return f->status;
+}
+
 const char* flight_get_flight_id(const Flight* flight) {
     if (flight == NULL) return NULL;
     return flight->flight_id;

@@ -53,3 +53,11 @@ dkms.conf
 
 # Ignore CSV files
 *.csv
+
+# Outputs do programa
+trabalho-pratico/resultados/*.txt
+trabalho-pratico/resultados/command*_output.txt
+
+# Datasets
+trabalho-pratico/dataset*/
+trabalho-pratico/dataset-fase-1*/

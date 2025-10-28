@@ -7,7 +7,6 @@ struct flight_catalog {
     GHashTable* flights_by_flight_id;
 };
 
-
 FlightCatalog* flight_catalog_create() {
     FlightCatalog* manager = malloc(sizeof(FlightCatalog));
     manager->flights_by_flight_id = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) destroy_flight);
@@ -45,4 +44,9 @@ int flight_catalog_get_count(FlightCatalog* manager) {
     }
 
     return g_hash_table_size(manager->flights_by_flight_id);
+}
+
+GHashTable* flight_catalog_get_all_flights(FlightCatalog* manager) {
+    if (!manager) return NULL;
+    return manager->flights_by_flight_id;
 }

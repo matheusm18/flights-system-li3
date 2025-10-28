@@ -5,7 +5,6 @@
 #include "catalog/airport_catalog.h"
 #include "utils/date.h"
 
-
 void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manager, const char* start_date_str, const char* end_date_str, const char* output_path);
 
 #endif

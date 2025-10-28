@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 Date* date_create(int year, int month, int day) {
     Date* date = malloc(sizeof(Date));
     if (date == NULL) return NULL;

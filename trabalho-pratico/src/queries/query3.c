@@ -41,9 +41,9 @@ static void count_cb(gpointer key, gpointer value, gpointer user_data) {
     Flight* f = (Flight*) value;
     if (!f) return;
 
-    DateTime* actual = f->actual_departure;
-    const char* origin = f->origin;
-    const char* status = f->status;
+    DateTime* actual = flight_get_actual_departure(f);
+    const char* origin = flight_get_origin(f);
+    const char* status = flight_get_status(f);
 
     if (!origin || !actual) return;
     if (is_cancelled(status)) return;
@@ -67,6 +67,7 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
 
     DateTime* start = datetime_create_from_string(start_date_str);
     DateTime* end = datetime_create_from_string(end_date_str);
+
     if (!start || !end) {
         FILE* out = fopen(output_path, "w");
         if (out) { fprintf(out, "\n"); fclose(out); }
@@ -78,10 +79,9 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     GHashTable* counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     Ctx ctx = { .start = start, .end = end, .counts = counts };
 
-    /* itera sobre a hash table armazenada no catálogo -> usa o nome real do campo */
-    if (flight_manager->flights_by_flight_id != NULL) {
-        /* assumimos que flights_by_flight_id é um GHashTable*; se não for, adapta aqui */
-        g_hash_table_foreach(flight_manager->flights_by_flight_id, count_cb, &ctx);
+    GHashTable* flights = flight_catalog_get_all_flights(flight_manager);
+    if (flights != NULL) {
+        g_hash_table_foreach(flights, count_cb, &ctx);
     } else {
         FILE* out = fopen(output_path, "w");
         if (out) { fprintf(out, "\n"); fclose(out); }
@@ -90,7 +90,6 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
         return;
     }
 
-    /* encontrar melhor aeroporto */
     const char* best_code = NULL;
     int best_count = 0;
 
@@ -100,17 +99,10 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     while (g_hash_table_iter_next(&iter, &k, &v)) {
         const char* code = (const char*) k;
         int cnt = *((int*) v);
-        if (!best_code) {
+
+        if (!best_code || cnt > best_count || (cnt == best_count && strcmp(code, best_code) < 0)) {
             best_code = code;
             best_count = cnt;
-        } else if (cnt > best_count) {
-            best_code = code;
-            best_count = cnt;
-        } else if (cnt == best_count) {
-            if (strcmp(code, best_code) < 0) {
-                best_code = code;
-                best_count = cnt;
-            }
         }
     }
 
@@ -122,29 +114,21 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     }
 
     if (!best_code) {
-        /* sem voos no intervalo -> linha vazia */
         fprintf(out, "\n");
-        fclose(out);
-        g_hash_table_destroy(counts);
-        datetime_destroy(start); datetime_destroy(end);
-        return;
-    }
+    } else {
+        const char* name = "";
+        const char* city = "";
+        const char* country = "";
 
-    const char* code = best_code;
-    const char* name = "";
-    const char* city = "";
-    const char* country = "";
-
-    if (airport_manager && airport_manager->airports_by_code != NULL) {
-        Airport* a = g_hash_table_lookup(airport_manager->airports_by_code, code);
+        Airport* a = airport_catalog_get_by_code(airport_manager, best_code);
         if (a) {
-            if (a->name) name = a->name;
-            if (a->city) city = a->city;
-            if (a->country) country = a->country;
+            name = airport_get_name(a);
+            city = airport_get_city(a);
+            country = airport_get_country(a);
         }
-    }
 
-    fprintf(out, "%s, %s, %s, %s, %d\n", code, name, city, country, best_count);
+        fprintf(out, "%s, %s, %s, %s, %d\n", best_code, name, city, country, best_count);
+    }
 
     fclose(out);
     g_hash_table_destroy(counts);

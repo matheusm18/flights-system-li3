@@ -16,6 +16,11 @@
         "passenger_validation.h": "c",
         "flight_validation.h": "c",
         "reservation_validation.h": "c",
-        "ctype.h": "c"
+        "ctype.h": "c",
+        "command_processor.h": "c",
+        "query1.h": "c",
+        "aircraft_catalog.h": "c",
+        "passenger_catalog.h": "c",
+        "airport_catalog.h": "c"
     }
 }
