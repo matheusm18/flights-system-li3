@@ -4,7 +4,7 @@
 #include <string.h>
 
 struct airport_catalog {
-    GHashTable* airports_by_code; // vai ser a responsável por liberar os ponteiros dos aeroportos quando for destruida
+    GHashTable* airports_by_code;
 };
 
 AirportCatalog* airport_catalog_create() {

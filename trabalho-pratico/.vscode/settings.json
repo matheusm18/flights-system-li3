@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "airport.h": "c",
+        "aircraft_validation.h": "c",
+        "airport_catalog.h": "c",
+        "typeinfo": "c",
+        "stdlib.h": "c",
+        "string.h": "c",
+        "validation.h": "c",
+        "passenger_catalog.h": "c",
+        "query3.h": "c",
+        "date.h": "c",
+        "flight_catalog.h": "c",
+        "flight.h": "c"
+    }
+}
