@@ -30,7 +30,8 @@ void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     }
 }
 
-Airport* airport_catalog_get_by_code(AirportCatalog* manager, const char* code) {
+
+Airport* get_airport_by_code(AirportCatalog* manager, const char* code) {
     if (manager == NULL || code == NULL) {
         return NULL;
     }
@@ -45,3 +46,4 @@ int airport_catalog_get_count(AirportCatalog* manager) {
 
     return g_hash_table_size(manager->airports_by_code);
 }
+

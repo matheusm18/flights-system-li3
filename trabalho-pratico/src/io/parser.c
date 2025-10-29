@@ -74,27 +74,27 @@ void load_datasets(const char* dataset_path, AirportCatalog* airport_catalog, Ai
     char reservations_file[256];
     snprintf(reservations_file, sizeof(reservations_file), "%s/reservations.csv", dataset_path);
   
-    printf("\nA carregar os aeroportos de: %s\n", airports_file);
+    printf("\nA carregar os aeroportos de: %s", airports_file);
     read_csv(8, airports_file, process_valid_line_airports, airport_catalog);
 
     printf("\nTodos os aeroportos válidos foram carregados!\n");
 
-    printf("\nA carregar as aeronaves de: %s\n", aircrafts_file);
+    printf("\nA carregar as aeronaves de: %s", aircrafts_file);
     read_csv(6, aircrafts_file, process_valid_line_aircrafts, aircraft_catalog);
 
     printf("\nTodas as aeronaves válidas foram carregadas!\n");
 
-    printf("\nA carregar os voos de: %s\n", flights_file);
+    printf("\nA carregar os voos de: %s", flights_file);
     read_csv(12, flights_file, process_valid_line_flights, flight_catalog);
 
     printf("\nTodos os voos válidos foram carregados!\n");
 
-    printf("\nA carregar os passageiros de: %s\n", passengers_file);
+    printf("\nA carregar os passageiros de: %s", passengers_file);
     read_csv(9, passengers_file, process_valid_line_passengers, passenger_catalog);
 
     printf("\nTodos os passageiros válidos foram carregados!\n");
 
-    printf("\nA carregar as reservas de: %s\n", reservations_file);
+    printf("\nA carregar as reservas de: %s", reservations_file);
     read_csv(8, reservations_file, process_valid_line_reservations, reservation_catalog);
 
     printf("\nTodos as reservas válidas foram carregadas!\n");

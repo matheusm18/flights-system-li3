@@ -120,7 +120,7 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
         const char* city = "";
         const char* country = "";
 
-        Airport* a = airport_catalog_get_by_code(airport_manager, best_code);
+        Airport* a = get_airport_by_code(airport_manager, best_code);
         if (a) {
             name = airport_get_name(a);
             city = airport_get_city(a);

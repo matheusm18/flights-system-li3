@@ -44,6 +44,8 @@ int main(int argc, char **argv) {
 
     // liberar memória
     airport_catalog_destroy(airport_catalog);
+    //aircraft_catalog_destroy(aicraft_catalog);
+    //flight_catalog_destroy(flight_catalog);
 
     return 0;
 }

@@ -36,3 +36,8 @@ void destroy_aircraft(Aircraft* a) {
         free(a);
     }
 }
+
+const char aircraft_get_identifier(Aircraft* a){
+    if (a == NULL) return NULL;
+    return a->identifier;
+}
