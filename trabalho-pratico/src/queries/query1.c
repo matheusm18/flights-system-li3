@@ -15,11 +15,11 @@ void execute_query1(AirportCatalog* manager, const char* airport_code, const cha
     Airport* airport = get_airport_by_code(manager, airport_code);
     
     if (airport != NULL) {
-        const char* code = airport_get_code(airport);
-        const char* name = airport_get_name(airport);
-        const char* city = airport_get_city(airport);
-        const char* country = airport_get_country(airport);
-        const char* type = airport_get_type(airport);
+        const char* code = get_airport_code(airport);
+        const char* name = get_airport_name(airport);
+        const char* city = get_airport_city(airport);
+        const char* country = get_airport_country(airport);
+        const char* type = get_airport_type(airport);
         
         fprintf(output_file, "%s,%s,%s,%s,%s\n", code, name, city, country, type);
     }

@@ -41,9 +41,9 @@ static void count_cb(gpointer key, gpointer value, gpointer user_data) {
     Flight* f = (Flight*) value;
     if (!f) return;
 
-    DateTime* actual = flight_get_actual_departure(f);
-    const char* origin = flight_get_origin(f);
-    const char* status = flight_get_status(f);
+    DateTime* actual = get_flight_actual_departure(f);
+    const char* origin = get_origin_flight(f);
+    const char* status = get_flight_status(f);
 
     if (!origin || !actual) return;
     if (is_cancelled(status)) return;
@@ -79,7 +79,7 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     GHashTable* counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     Ctx ctx = { .start = start, .end = end, .counts = counts };
 
-    GHashTable* flights = flight_catalog_get_all_flights(flight_manager);
+    GHashTable* flights = get_flight_catalog(flight_manager);
     if (flights != NULL) {
         g_hash_table_foreach(flights, count_cb, &ctx);
     } else {
@@ -122,9 +122,9 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
 
         Airport* a = get_airport_by_code(airport_manager, best_code);
         if (a) {
-            name = airport_get_name(a);
-            city = airport_get_city(a);
-            country = airport_get_country(a);
+            name = get_airport_name(a);
+            city = get_airport_city(a);
+            country = get_airport_country(a);
         }
 
         fprintf(out, "%s, %s, %s, %s, %d\n", best_code, name, city, country, best_count);

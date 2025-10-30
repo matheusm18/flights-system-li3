@@ -37,7 +37,14 @@ void destroy_aircraft(Aircraft* a) {
     }
 }
 
-const char aircraft_get_identifier(Aircraft* a){
+const char* get_aircraft_identifier(const Aircraft* a){ 
     if (a == NULL) return NULL;
-    return a->identifier;
+    return a->identifier; 
 }
+
+const char* get_aircraft_manufacturer(const Aircraft* a){
+    if (a == NULL) return NULL;
+    return a->manufacturer;
+}
+
+

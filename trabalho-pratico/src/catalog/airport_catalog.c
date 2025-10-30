@@ -24,7 +24,7 @@ void airport_catalog_destroy(AirportCatalog* manager) {
 void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     if (!manager || !airport) return;
     
-    const char* code = airport_get_code(airport);
+    const char* code = get_airport_code(airport);
     if (code != NULL) {
         g_hash_table_insert(manager->airports_by_code, g_strdup(code), airport);
     }

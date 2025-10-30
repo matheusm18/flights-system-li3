@@ -68,28 +68,30 @@ void destroy_flight(Flight* f) {
     free(f);
 }
 
-DateTime* flight_get_actual_departure(const Flight* f) {
+DateTime* get_flight_actual_departure(const Flight* f) {
     if (!f) return NULL;
     return f->actual_departure;
 }
 
-const char* flight_get_origin(const Flight* f) {
+const char* get_origin_flight(const Flight* f) {
     if (!f) return NULL;
     return f->origin;
 }
 
-const char* flight_get_status(const Flight* f) {
+const char* get_flight_status(const Flight* f) {
     if (!f) return NULL;
     return f->status;
 }
 
-const char* flight_get_flight_id(const Flight* flight) {
+const char* get_flight_id(const Flight* flight) {
     if (flight == NULL) return NULL;
     return flight->flight_id;
 }
 
-const char* get_aircraft_by_flight(const Flight* flight) {
-    if (flight == NULL) return NULL;
+const char* get_aircraft_id_from_flight(const Flight* flight) {
+    if (flight == NULL || flight->aircraft == NULL) {
+        return NULL;
+    }
+    
     return flight->aircraft;
 }
-

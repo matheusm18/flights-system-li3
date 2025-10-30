@@ -21,10 +21,10 @@ void aircraft_catalog_destroy(AircraftCatalog* manager){
     }
 }
 
-void aircarft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
+void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
     if (!manager || !aircraft) return;
     
-    const char* identifier = aircraft_get_identifier(aircraft);
+    const char* identifier = get_aircraft_identifier(aircraft);
     if (identifier != NULL) {
         g_hash_table_insert(manager->aircraft_by_identifier, g_strdup(identifier), aircraft);
     }

@@ -7,6 +7,6 @@
 #include "catalog/passenger_catalog.h"
 #include "catalog/reservation_catalog.h"
 
-void process_commands(const char* commands_file, AirportCatalog* airport_catalog);
+void process_commands(const char* commands_file, AirportCatalog* airport_catalog,FlightCatalog* flight_catalog, AircraftCatalog* aircarft_catalog_);
 
 #endif

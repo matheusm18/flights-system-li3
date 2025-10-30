@@ -24,13 +24,13 @@ void flight_catalog_destroy(FlightCatalog* manager) {
 void flight_catalog_add(FlightCatalog* manager, Flight* flight) {
     if (!manager || !flight) return;
     
-    const char* flight_id = flight_get_flight_id(flight);
+    const char* flight_id = get_flight_id(flight);
     if (flight_id != NULL) {
         g_hash_table_insert(manager->flights_by_flight_id, g_strdup(flight_id), flight);
     }
 }
 
-Flight* flight_catalog_get_by_flight_id(FlightCatalog* manager, const char* flight_id) {
+Flight* get_flight_by_flight_id_from_catalog(FlightCatalog* manager, const char* flight_id) {
     if (manager == NULL || flight_id == NULL) {
         return NULL;
     }
@@ -46,7 +46,8 @@ int flight_catalog_get_count(FlightCatalog* manager) {
     return g_hash_table_size(manager->flights_by_flight_id);
 }
 
-GHashTable* flight_catalog_get_all_flights(FlightCatalog* manager) {
+GHashTable* get_flight_catalog(FlightCatalog* manager) {
     if (!manager) return NULL;
     return manager->flights_by_flight_id;
 }
+

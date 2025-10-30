@@ -9,10 +9,10 @@ Airport* create_airport(const char* code, const char* name, const char* city, co
 void destroy_airport(Airport* airport);
 
 // getters
-const char* airport_get_code(const Airport* airport);
-const char* airport_get_name(const Airport* airport);
-const char* airport_get_city(const Airport* airport);
-const char* airport_get_country(const Airport* airport);
-const char* airport_get_type(const Airport* airport);
+const char* get_airport_code(const Airport* airport);
+const char* get_airport_name(const Airport* airport);
+const char* get_airport_city(const Airport* airport);
+const char* get_airport_country(const Airport* airport);
+const char* get_airport_type(const Airport* airport);
 
 #endif
