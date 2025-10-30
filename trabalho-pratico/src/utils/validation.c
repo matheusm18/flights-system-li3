@@ -1,6 +1,7 @@
 #include "utils/validation.h"
 
 #include "catalog/airport_catalog.h"
+#include "catalog/aircraft_catalog.h"
 #include "catalog/flight_catalog.h"
 #include "utils/aircraft_validation.h"
 #include "utils/airport_validation.h"
@@ -16,6 +17,8 @@
 #include <ctype.h>
 
 void process_valid_line_aircrafts(char **fields, int num_fields, void* catalog) {
+    AircraftCatalog* aircraft_catalog = (AircraftCatalog*)catalog;
+
     char *identifier = fields[0];
     char *manufacturer = fields[1];
     char *model = fields[2];
@@ -47,6 +50,17 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* catalog) 
         printf("Aeronave descartada: alcance '%s' inválido\n", range);
         return;
     }
+
+    int year_int = atoi(year);
+    int capacity_int = atoi(capacity);
+    int range_int = atoi(range);
+
+    Aircraft* aircraft = create_aircraft(identifier, manufacturer, model, year_int, capacity_int, range_int);
+
+    if (aircraft != NULL) {
+        aircraft_catalog_add(aircraft_catalog, aircraft);
+    }
+    
 }
 
 void process_valid_line_airports(char **fields, int num_fields, void* catalog) {

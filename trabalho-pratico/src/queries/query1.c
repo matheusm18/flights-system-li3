@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 
+//==== Listar o resumo de um aeroporto, consoante o identificador recebido por argumento.
 void execute_query1(AirportCatalog* manager, const char* airport_code, const char* output_path) {
     FILE* output_file = fopen(output_path, "w");
     if (output_file == NULL) {

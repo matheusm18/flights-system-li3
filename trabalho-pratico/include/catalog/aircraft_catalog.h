@@ -8,7 +8,7 @@ typedef struct aircraft_catalog AircraftCatalog;
 
 AircraftCatalog* aircraft_catalog_create();
 void aircraft_catalog_destroy(AircraftCatalog* manager);
-void aircarft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft);
+void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft);
 Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier);
 
 

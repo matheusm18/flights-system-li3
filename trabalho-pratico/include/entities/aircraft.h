@@ -8,5 +8,6 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
 void destroy_aircraft(Aircraft* a);
 const char* get_aircraft_identifier(const Aircraft* a);
 const char* get_aircraft_manufacturer(const Aircraft* a);
+const char* get_aircraft_model(const Aircraft* a);
 
 #endif

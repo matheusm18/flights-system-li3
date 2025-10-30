@@ -38,10 +38,18 @@
 1 KVIX
 1 DMN
 1 JDH
+2 8 Airbus
+2 6 Boeing
+2 4 Boeing
+2 34 Bombardier
+2 25 Airbus
 2 37
 2 40
+2 27 Boeing
+2 32 Boeing
 2 7
 2 28
+2 35 Bombardier
 2 31
 2 26
 2 30
@@ -52,6 +60,7 @@
 2 13
 2 10
 2 24
+2 20 AtlasWings
 2 15
 2 1
 2 17
@@ -63,5 +72,10 @@
 2 18
 2 5
 2 33
+2 19 Airbus
 2 12
+2 23 Embraer
+2 22 QuantumAir
+2 9 AtlasWings
+2 11 OrionAero
 

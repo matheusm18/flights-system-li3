@@ -50,7 +50,7 @@ bool validate_status_flight(const char *status, const char *departure, const cha
 
     return ((strcmp(status, "On Time") && strcmp(departure, act_departure) == 0 && strcmp(arrival, act_arrival)) == 0 ||
             (strcmp(status, "Delayed") == 0 && validate_previous_date(departure, act_departure) && validate_previous_date(arrival, act_arrival)) ||
-            (strcmp(status, "Canceled") == 0 && strcmp(act_departure, "N/A") == 0 && strcmp(act_arrival, "N/A")) == 0);
+            (strcmp(status, "Cancelled") == 0 && strcmp(act_departure, "N/A") == 0 && strcmp(act_arrival, "N/A")) == 0);
 }
 
 bool validate_origin_flight(const char *origin) {

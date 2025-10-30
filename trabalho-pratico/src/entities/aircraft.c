@@ -47,4 +47,9 @@ const char* get_aircraft_manufacturer(const Aircraft* a){
     return a->manufacturer;
 }
 
+const char* get_aircraft_model(const Aircraft* a){
+    if (a == NULL) return NULL;
+    return a->model;
+}
+
 

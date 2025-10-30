@@ -36,7 +36,8 @@ Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* ident
     }
 
     return g_hash_table_lookup(manager->aircraft_by_identifier, identifier); 
-}  
+} 
+
 
 
 
