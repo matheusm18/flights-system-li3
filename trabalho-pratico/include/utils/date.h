@@ -14,19 +14,23 @@ typedef struct datetime {
 } DateTime;
 
 Date* date_create(int year, int month, int day);
-void date_destroy(Date* date);
+Date* date_create_from_string(const char* str);
+int date_compare(const Date* date1, const Date* date2);
 
 int date_get_day(const Date* d);
 int date_get_month(const Date* d);
 int date_get_year(const Date* d);
 
-int date_compare(const Date* date1, const Date* date2);
-
 DateTime* datetime_create(int year, int month, int day, int hour, int minute);
+DateTime* datetime_create_from_string(const char* str);
+int compare_datetime(const DateTime* a, const DateTime* b);
+
+void date_destroy(Date* date);
 void datetime_destroy(DateTime* datetime);
 
-struct datetime* datetime_create(int year, int month, int day, int hour, int minute);
-struct datetime* datetime_create_from_string(const char* str);
-void datetime_destroy(DateTime* datetime);
+
+int date_get_day(const Date* d);
+int date_get_month(const Date* d);
+int date_get_year(const Date* d);
 
 #endif

@@ -1,4 +1,3 @@
-/* src/queries/query3.c */
 #include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,46 +12,35 @@
 #include "utils/date.h"
 
 typedef struct {
-    DateTime* start;
-    DateTime* end;
-    GHashTable* counts; /* key = strdup(origin) -> value = int* */
+    Date* start;
+    Date* end;
+    GHashTable* counts; // key = strdup(origin) -> value = int*
 } FlightCounts;
-
-/* compara DateTime: <0 se a<b, 0 se igual, >0 se a>b */
-int compare_datetime(const DateTime* a, const DateTime* b) {
-    if (a == b) return 0;
-    if (!a) return -1;
-    if (!b) return 1;
-
-    if (a->date_part.year != b->date_part.year) return a->date_part.year - b->date_part.year;
-    if (a->date_part.month != b->date_part.month) return a->date_part.month - b->date_part.month;
-    if (a->date_part.day != b->date_part.day) return a->date_part.day - b->date_part.day;
-    if (a->hour != b->hour) return a->hour - b->hour;
-
-    return a->minute - b->minute;
-}
-
 
 int is_cancelled(const char* status) {
     if (!status) return 0;
     return g_strcmp0(status, "Cancelled") == 0;
 }
 
-
-/* callback para cada entry na hashtable de flights */
+// callback para cada entry na hashtable de flights
 void count_number_flights(gpointer key, gpointer value, gpointer user_data) {
     (void) key;
     FlightCounts* counter = (FlightCounts*) user_data;
     Flight* flight = (Flight*) value;
+
     if (!flight) return;
 
-    DateTime* actual = get_flight_actual_departure(flight);
+    DateTime* actual_dt = get_flight_actual_departure(flight);
+    if (!actual_dt) return;
+
+    Date actual_date = actual_dt->date_part; // converte o datetime para date
+
     const char* origin = get_flight_origin(flight);
     const char* status = get_flight_status(flight);
 
-    if (!origin || !actual || is_cancelled(status)) return;
+    if (!origin || is_cancelled(status)) return;
     
-    if (compare_datetime(actual, counter->start) < 0 || compare_datetime(actual, counter->end) > 0) return;
+    if (date_compare(&actual_date, counter->start) < 0 || date_compare(&actual_date, counter->end) > 0) return;
 
     gpointer existing_count = g_hash_table_lookup(counter->counts, origin);
 
@@ -88,7 +76,7 @@ void find_best_airport(GHashTable* counts, const char** best_code, int* best_cou
         const char* code = (const char*) key;
         int count = *((int*) value);
         
-        if (count > *best_count || (count == *best_count && *best_code && strcmp(code, *best_code) < 0)) {
+        if (count > *best_count || (count == *best_count && (*best_code == NULL || strcmp(code, *best_code) < 0))) {
             *best_code = code;
             *best_count = count;
         }
@@ -115,7 +103,7 @@ bool write_result(const char* output_path, AirportCatalog* airport_manager, cons
             }
         }
 
-        fprintf(out, "%s, %s, %s, %s, %d\n", best_code, name, city, country, best_count);
+        fprintf(out, "%s,%s,%s,%s,%d\n", best_code, name, city, country, best_count);
     }
 
     fclose(out);
@@ -123,15 +111,16 @@ bool write_result(const char* output_path, AirportCatalog* airport_manager, cons
 }
 
 void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manager, const char* start_date_str, const char* end_date_str, const char* output_path) {
+
     if (!flight_manager || !start_date_str || !end_date_str || !output_path) return;
 
-    DateTime* start = datetime_create_from_string(start_date_str);
-    DateTime* end = datetime_create_from_string(end_date_str);
+    Date* start = date_create_from_string(start_date_str);
+    Date* end = date_create_from_string(end_date_str);
 
     if (!start || !end) {
         write_empty_result(output_path);
-        if (start) datetime_destroy(start);
-        if (end) datetime_destroy(end);
+        if (start) date_destroy(start);
+        if (end) date_destroy(end);
         return;
     }
 
@@ -142,11 +131,12 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     if (!flights) {
         write_empty_result(output_path);
         g_hash_table_destroy(counts);
-        datetime_destroy(start);
-        datetime_destroy(end);
+        date_destroy(start);
+        date_destroy(end);
         return;
     }
 
+    // para cada voo na hash table flights executa a funcao count number flights e passa o ponteiro &flight_counts
     g_hash_table_foreach(flights, count_number_flights, &flight_counts);
 
     const char* best_code = NULL;
@@ -159,6 +149,6 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     }
 
     g_hash_table_destroy(counts);
-    datetime_destroy(start);
-    datetime_destroy(end);
+    date_destroy(start);
+    date_destroy(end);
 }
