@@ -114,6 +114,9 @@ void write_top_n_to_file(AircraftCount* sorted_array, int number_of_aircrafts, i
             
             fprintf(output_file, "%s,%s,%s,%d\n", aircraft_id, manufacturer, model, flight_count);
         }
+        else {
+            fprintf(output_file,"\n");
+        }
     }
 }
 
