@@ -114,9 +114,6 @@ void write_top_n_to_file(AircraftCount* sorted_array, int number_of_aircrafts, i
             
             fprintf(output_file, "%s,%s,%s,%d\n", aircraft_id, manufacturer, model, flight_count);
         }
-        else {
-            fprintf(output_file,"\n");
-        }
     }
 }
 
@@ -143,6 +140,8 @@ void execute_query2(FlightCatalog* flight_manager, AircraftCatalog* aircraft_man
     AircraftCount* sorted_array = convert_and_sort(flight_counts, &number_of_aircrafts);
 
     write_top_n_to_file(sorted_array, number_of_aircrafts, n, aircraft_manager, output_file);
+
+    if (number_of_aircrafts == 0) fprintf(output_file, "\n");
 
     free_aircraft_count_array(sorted_array, number_of_aircrafts);
     g_hash_table_destroy(flight_counts);
