@@ -73,7 +73,7 @@ DateTime* get_flight_actual_departure(const Flight* f) {
     return f->actual_departure;
 }
 
-const char* get_origin_flight(const Flight* f) {
+const char* get_flight_origin(const Flight* f) {
     if (!f) return NULL;
     return f->origin;
 }

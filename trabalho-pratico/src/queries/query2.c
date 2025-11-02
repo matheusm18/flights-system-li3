@@ -112,7 +112,7 @@ void write_top_n_to_file(AircraftCount* sorted_array, int number_of_aircrafts, i
             const char* manufacturer = get_aircraft_manufacturer(aircraft);
             const char* model = get_aircraft_model(aircraft);
             
-            fprintf(output_file, "%s;%s;%s;%d\n", aircraft_id, manufacturer, model, flight_count);
+            fprintf(output_file, "%s,%s,%s,%d\n", aircraft_id, manufacturer, model, flight_count);
         }
     }
 }

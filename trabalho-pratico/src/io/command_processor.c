@@ -24,16 +24,24 @@ void process_commands(const char* commands_file, AirportCatalog* airport_catalog
         char airport_code[10];
         char manufacturer[100];
         int N;
+        char start_date[20], end_date[20];
         
         // remover o '\n' no final da string
         line[strcspn(line, "\r\n")] = '\0';
 
-        if (sscanf(line, "%d %d %99s", &query, &N, manufacturer) == 3 && query == 2) {
+        if (sscanf(line, "%d %d %s", &query, &N, manufacturer) == 3 && query == 2) {
             char output_path[100];
             snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
             execute_query2(flight_catalog, aircraft_catalog, N, manufacturer, output_path);
             printf("Executada Query %d: %d %s -> %s\n", command_counter, N, manufacturer, output_path);
         }
+        else if (sscanf(line, "%s %s", start_date, end_date) == 2) {
+                char output_path[100];
+                snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
+                
+                execute_query3(flight_catalog, airport_catalog, start_date, end_date, output_path);
+                printf("Executada Query %d: %s -> %s\n", command_counter,airport_code ,output_path);
+        }  
         else if (sscanf(line, "%d %d", &query, &N) == 2) {
                 char output_path[100];
                 snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
@@ -42,7 +50,7 @@ void process_commands(const char* commands_file, AirportCatalog* airport_catalog
                     execute_query2(flight_catalog,aircraft_catalog, N, NULL, output_path);
                     printf("Executada Query %d: %d -> %s\n", command_counter, N, output_path);
                 }
-        }        
+        }      
         else if (sscanf(line, "%d %s", &query, airport_code) == 2) {
                 char output_path[100];
                 snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);

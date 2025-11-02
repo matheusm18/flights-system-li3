@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "queries/query3.h"
 #include "catalog/flight_catalog.h"
@@ -11,55 +12,114 @@
 #include "entities/airport.h"
 #include "utils/date.h"
 
-/* compara DateTime: <0 se a<b, 0 se igual, >0 se a>b */
-static int compare_datetime(const DateTime* a, const DateTime* b) {
-    if (a == b) return 0;
-    if (!a) return -1;
-    if (!b) return 1;
-    if (a->date_part.year != b->date_part.year) return a->date_part.year - b->date_part.year;
-    if (a->date_part.month != b->date_part.month) return a->date_part.month - b->date_part.month;
-    if (a->date_part.day != b->date_part.day) return a->date_part.day - b->date_part.day;
-    if (a->hour != b->hour) return a->hour - b->hour;
-    return a->minute - b->minute;
-}
-
-static int is_cancelled(const char* status) {
-    if (!status) return 0;
-    return g_ascii_strcasecmp(status, "cancelled") == 0;
-}
-
 typedef struct {
     DateTime* start;
     DateTime* end;
     GHashTable* counts; /* key = strdup(origin) -> value = int* */
-} Ctx;
+} FlightCounts;
+
+/* compara DateTime: <0 se a<b, 0 se igual, >0 se a>b */
+int compare_datetime(const DateTime* a, const DateTime* b) {
+    if (a == b) return 0;
+    if (!a) return -1;
+    if (!b) return 1;
+
+    if (a->date_part.year != b->date_part.year) return a->date_part.year - b->date_part.year;
+    if (a->date_part.month != b->date_part.month) return a->date_part.month - b->date_part.month;
+    if (a->date_part.day != b->date_part.day) return a->date_part.day - b->date_part.day;
+    if (a->hour != b->hour) return a->hour - b->hour;
+
+    return a->minute - b->minute;
+}
+
+
+int is_cancelled(const char* status) {
+    if (!status) return 0;
+    return g_strcmp0(status, "Cancelled") == 0;
+}
+
 
 /* callback para cada entry na hashtable de flights */
-static void count_cb(gpointer key, gpointer value, gpointer user_data) {
+void count_number_flights(gpointer key, gpointer value, gpointer user_data) {
     (void) key;
-    Ctx* ctx = (Ctx*) user_data;
-    Flight* f = (Flight*) value;
-    if (!f) return;
+    FlightCounts* counter = (FlightCounts*) user_data;
+    Flight* flight = (Flight*) value;
+    if (!flight) return;
 
-    DateTime* actual = get_flight_actual_departure(f);
-    const char* origin = get_origin_flight(f);
-    const char* status = get_flight_status(f);
+    DateTime* actual = get_flight_actual_departure(flight);
+    const char* origin = get_flight_origin(flight);
+    const char* status = get_flight_status(flight);
 
-    if (!origin || !actual) return;
-    if (is_cancelled(status)) return;
-    if (compare_datetime(actual, ctx->start) < 0) return;
-    if (compare_datetime(actual, ctx->end) > 0) return;
+    if (!origin || !actual || is_cancelled(status)) return;
+    
+    if (compare_datetime(actual, counter->start) < 0 || compare_datetime(actual, counter->end) > 0) return;
 
-    gpointer v = g_hash_table_lookup(ctx->counts, origin);
-    if (!v) {
-        char* kdup = g_strdup(origin);
-        int* cnt = g_new(int, 1);
-        *cnt = 1;
-        g_hash_table_insert(ctx->counts, kdup, cnt);
+    gpointer existing_count = g_hash_table_lookup(counter->counts, origin);
+
+    if (!existing_count) { // primeira ocorrencia do aeroporto: criar "tabela"
+        char* airport_key = g_strdup(origin); 
+        int* count = g_new(int, 1);
+        *count = 1;
+        g_hash_table_insert(counter->counts, airport_key, count);
     } else {
-        int* cnt = (int*) v;
-        (*cnt)++;
+        int* current_count = (int*) existing_count;
+        (*current_count)++;
     }
+}
+
+void write_empty_result(const char* output_path) {
+    FILE* out = fopen(output_path, "w");
+    if (out) {
+        fprintf(out, "\n");
+        fclose(out);
+    }
+}
+
+void find_best_airport(GHashTable* counts, const char** best_code, int* best_count) {
+    *best_code = NULL;
+    *best_count = 0;
+    
+    GHashTableIter iter;
+    gpointer key, value;
+    
+    g_hash_table_iter_init(&iter, counts);
+
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        const char* code = (const char*) key;
+        int count = *((int*) value);
+        
+        if (count > *best_count || (count == *best_count && *best_code && strcmp(code, *best_code) < 0)) {
+            *best_code = code;
+            *best_count = count;
+        }
+    }
+}
+
+bool write_result(const char* output_path, AirportCatalog* airport_manager, const char* best_code, int best_count) {
+    FILE* out = fopen(output_path, "w");
+    if (!out) return false;
+
+    if (!best_code) {
+        fprintf(out, "\n");
+    } else {
+        const char* name;
+        const char* city;
+        const char* country;
+
+        if (airport_manager) {
+            Airport* airport = get_airport_by_code(airport_manager, best_code);
+            if (airport) {
+                name = get_airport_name(airport);
+                city = get_airport_city(airport);
+                country = get_airport_country(airport);
+            }
+        }
+
+        fprintf(out, "%s, %s, %s, %s, %d\n", best_code, name, city, country, best_count);
+    }
+
+    fclose(out);
+    return true;
 }
 
 void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manager, const char* start_date_str, const char* end_date_str, const char* output_path) {
@@ -69,68 +129,35 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     DateTime* end = datetime_create_from_string(end_date_str);
 
     if (!start || !end) {
-        FILE* out = fopen(output_path, "w");
-        if (out) { fprintf(out, "\n"); fclose(out); }
+        write_empty_result(output_path);
         if (start) datetime_destroy(start);
         if (end) datetime_destroy(end);
         return;
     }
 
     GHashTable* counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    Ctx ctx = { .start = start, .end = end, .counts = counts };
+    FlightCounts flight_counts = {.start = start, .end = end, .counts = counts};
 
     GHashTable* flights = get_flight_catalog(flight_manager);
-    if (flights != NULL) {
-        g_hash_table_foreach(flights, count_cb, &ctx);
-    } else {
-        FILE* out = fopen(output_path, "w");
-        if (out) { fprintf(out, "\n"); fclose(out); }
+    if (!flights) {
+        write_empty_result(output_path);
         g_hash_table_destroy(counts);
-        datetime_destroy(start); datetime_destroy(end);
+        datetime_destroy(start);
+        datetime_destroy(end);
         return;
     }
+
+    g_hash_table_foreach(flights, count_number_flights, &flight_counts);
 
     const char* best_code = NULL;
     int best_count = 0;
 
-    GHashTableIter iter;
-    gpointer k, v;
-    g_hash_table_iter_init(&iter, counts);
-    while (g_hash_table_iter_next(&iter, &k, &v)) {
-        const char* code = (const char*) k;
-        int cnt = *((int*) v);
+    find_best_airport(counts, &best_code, &best_count);
 
-        if (!best_code || cnt > best_count || (cnt == best_count && strcmp(code, best_code) < 0)) {
-            best_code = code;
-            best_count = cnt;
-        }
+    if (!write_result(output_path, airport_manager, best_code, best_count)) {
+        write_empty_result(output_path);
     }
 
-    FILE* out = fopen(output_path, "w");
-    if (!out) {
-        g_hash_table_destroy(counts);
-        datetime_destroy(start); datetime_destroy(end);
-        return;
-    }
-
-    if (!best_code) {
-        fprintf(out, "\n");
-    } else {
-        const char* name = "";
-        const char* city = "";
-        const char* country = "";
-
-        Airport* a = get_airport_by_code(airport_manager, best_code);
-        if (a) {
-            name = get_airport_name(a);
-            city = get_airport_city(a);
-            country = get_airport_country(a);
-        }
-
-        fprintf(out, "%s, %s, %s, %s, %d\n", best_code, name, city, country, best_count);
-    }
-
-    fclose(out);
     g_hash_table_destroy(counts);
     datetime_destroy(start);
     datetime_destroy(end);
