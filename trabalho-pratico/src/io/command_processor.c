@@ -29,36 +29,53 @@ void process_commands(const char* commands_file, AirportCatalog* airport_catalog
         // remover o '\n' no final da string
         line[strcspn(line, "\r\n")] = '\0';
 
-        if (sscanf(line, "%d %d %s", &query, &N, manufacturer) == 3 && query == 2) {
-            char output_path[100];
-            snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
-            execute_query2(flight_catalog, aircraft_catalog, N, manufacturer, output_path);
-            printf("Executada Query %d: %d %s -> %s\n", command_counter, N, manufacturer, output_path);
+        // criar caminho do output file
+        char output_path[100];
+        snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
+
+        // primeiro extraimos o n da query
+        if (sscanf(line, "%d", &query) != 1) {
+            command_counter++;
+            continue; // pular para a próxima iteração do while (ler proxima linha do input)
         }
-        else if (sscanf(line, "%s %s", start_date, end_date) == 2) {
-                char output_path[100];
-                snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
-                
-                execute_query3(flight_catalog, airport_catalog, start_date, end_date, output_path);
-                printf("Executada Query %d: %s -> %s\n", command_counter,airport_code ,output_path);
-        }  
-        else if (sscanf(line, "%d %d", &query, &N) == 2) {
-                char output_path[100];
-                snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
-                
-                if (query == 2) {
-                    execute_query2(flight_catalog,aircraft_catalog, N, NULL, output_path);
-                    printf("Executada Query %d: %d -> %s\n", command_counter, N, output_path);
-                }
-        }      
-        else if (sscanf(line, "%d %s", &query, airport_code) == 2) {
-                char output_path[100];
-                snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
-                
-                if (query == 1) {
+
+        switch(query) {
+
+            case 1:
+
+                if (sscanf(line, "%d %s", &query, airport_code) == 2) {
                     execute_query1(airport_catalog, airport_code, output_path);
-                    printf("Executada Query %d: %s -> %s\n", command_counter, airport_code, output_path);
+
+                    printf("Executado Input %d: %s -> %s\n", command_counter, airport_code, output_path);
                 }
+                break;
+                
+            case 2:
+                
+                // tentar com fabricante primeiro
+                if (sscanf(line, "%d %d %99s", &query, &N, manufacturer) == 3) {
+                    execute_query2(flight_catalog, aircraft_catalog, N, manufacturer, output_path);
+                    printf("Executado Input %d: %d %s -> %s\n", command_counter, N, manufacturer, output_path);
+                } 
+
+                // tentar sem fabricante
+                else if (sscanf(line, "%d %d", &query, &N) == 2) {
+                    execute_query2(flight_catalog, aircraft_catalog, N, NULL, output_path);
+                    printf("Executado Input %d: %d -> %s\n", command_counter, N, output_path);
+                }
+                break;
+
+            case 3:
+
+                if (sscanf(line, "%d %19s %19s", &query, start_date, end_date) == 3) {
+                    execute_query3(flight_catalog, airport_catalog, start_date, end_date, output_path);
+                    printf("Executado Input %d: %s %s -> %s\n", command_counter, start_date, end_date, output_path);
+                }
+                break;
+
+            default:
+                printf("Input inválido");
+                break;
         }
         
         command_counter++;

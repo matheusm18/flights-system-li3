@@ -24,6 +24,9 @@ void execute_query1(AirportCatalog* manager, const char* airport_code, const cha
         
         fprintf(output_file, "%s,%s,%s,%s,%s\n", code, name, city, country, type);
     }
+    else {
+        fprintf(output_file,"\n");
+    }
     
     fclose(output_file);
 }
