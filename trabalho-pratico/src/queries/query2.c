@@ -45,16 +45,15 @@ void count_flights_by_aircraft (FlightCatalog* flight_manager, GHashTable* count
         }
 
         gpointer current_flight_count = g_hash_table_lookup(counts, aircraft_id);
-        int new_count;
+        int count;
 
         if (current_flight_count != NULL) {
-            int old_count = GPOINTER_TO_INT(current_flight_count);
-            new_count = old_count + 1;
+            count = GPOINTER_TO_INT(current_flight_count) + 1;
         } else {
-            new_count = 1;
+            count = 1;
         }
 
-        g_hash_table_replace(counts, g_strdup(aircraft_id), GINT_TO_POINTER(new_count)); 
+        g_hash_table_replace(counts, g_strdup(aircraft_id), GINT_TO_POINTER(count)); 
         
     }
 }

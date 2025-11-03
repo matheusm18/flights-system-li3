@@ -42,17 +42,17 @@ void count_number_flights(gpointer key, gpointer value, gpointer user_data) {
     
     if (date_compare(&actual_date, counter->start) < 0 || date_compare(&actual_date, counter->end) > 0) return;
 
-    gpointer existing_count = g_hash_table_lookup(counter->counts, origin);
+    gpointer current_count = g_hash_table_lookup(counter->counts, origin);
 
-    if (!existing_count) { // primeira ocorrencia do aeroporto: criar "tabela"
-        char* airport_key = g_strdup(origin); 
-        int* count = g_new(int, 1);
-        *count = 1;
-        g_hash_table_insert(counter->counts, airport_key, count);
+    int count;
+    
+    if (current_count != NULL) {
+        count = GPOINTER_TO_INT(current_count) + 1;
     } else {
-        int* current_count = (int*) existing_count;
-        (*current_count)++;
+        count = 1;
     }
+    
+    g_hash_table_replace(counter->counts, g_strdup(origin), GINT_TO_POINTER(count));
 }
 
 void write_empty_result(const char* output_path) {
@@ -74,7 +74,7 @@ void find_best_airport(GHashTable* counts, const char** best_code, int* best_cou
 
     while (g_hash_table_iter_next(&iter, &key, &value)) {
         const char* code = (const char*) key;
-        int count = *((int*) value);
+        int count = GPOINTER_TO_INT(value);
         
         if (count > *best_count || (count == *best_count && (*best_code == NULL || strcmp(code, *best_code) < 0))) {
             *best_code = code;
@@ -124,7 +124,7 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
         return;
     }
 
-    GHashTable* counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    GHashTable* counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
     FlightCounts flight_counts = {.start = start, .end = end, .counts = counts};
 
     GHashTable* flights = get_flight_catalog(flight_manager);
