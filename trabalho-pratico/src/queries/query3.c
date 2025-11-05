@@ -45,9 +45,9 @@ void count_number_flights(gpointer key, gpointer value, gpointer user_data) {
     gpointer current_count = g_hash_table_lookup(counter->counts, origin);
 
     if (current_count != NULL) {
-        g_hash_table_replace(counter->counts, g_strdup(origin), G_INT_TO_POINTER(G_POINTER_TO_INT(current_count) + 1));
+        g_hash_table_replace(counter->counts, g_strdup(origin), GINT_TO_POINTER(GPOINTER_TO_INT(current_count) + 1));
     } else {
-        g_hash_table_insert(counter->counts, g_strdup(origin), G_INT_TO_POINTER(G_POINTER_TO_INT(1)));
+        g_hash_table_insert(counter->counts, g_strdup(origin), GINT_TO_POINTER(GPOINTER_TO_INT(1)));
     }
 }
 
