@@ -17,10 +17,10 @@
 #include <ctype.h>
 
 void init_aircrafts_errors_file() {
-    const char *output_path = "resultados/aircrafts_erros.csv";
+    const char *output_path = "resultados/aircrafts_errors.csv";
     FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
     if (f == NULL) {
-        perror("Erro ao criar ficheiro aircrafts_erros.csv");
+        perror("Erro ao criar ficheiro aircrafts_errors.csv");
         return;
     }
     fprintf(f, "\"identifier\",\"manufacturer\",\"model\",\"year\",\"capacity\",\"range\"\n");
@@ -30,10 +30,10 @@ void init_aircrafts_errors_file() {
 void process_valid_line_aircrafts(char **fields, int num_fields, void* catalog) {
     AircraftCatalog* aircraft_catalog = (AircraftCatalog*)catalog;
 
-    const char *output_path = "resultados/aircrafts_erros.csv";
+    const char *output_path = "resultados/aircrafts_errors.csv";
     FILE *aircrafts_errors = fopen(output_path, "a");  // abrir em modo append
     if (aircrafts_errors == NULL) {
-        perror("Erro ao abrir ficheiro aircrafts_erros.csv");
+        perror("Erro ao abrir ficheiro aircrafts_errors.csv");
         return;
     }
 
@@ -77,10 +77,10 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* catalog) 
     fclose(aircrafts_errors);
 }
 void init_airports_errors_file() {
-    const char *output_path = "resultados/airports_erros.csv";
+    const char *output_path = "resultados/airports_errors.csv";
     FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
     if (f == NULL) {
-        perror("Erro ao criar ficheiro airports_erros.csv");
+        perror("Erro ao criar ficheiro airports_errors.csv");
         return;
     }
     fprintf(f, "\"code\",\"name\",\"city\",\"country\",\"latitude\",\"longitude\",\"icao\",\"type\"\n");
@@ -90,10 +90,10 @@ void init_airports_errors_file() {
 void process_valid_line_airports(char **fields, int num_fields, void* catalog) {
     AirportCatalog* airport_catalog = (AirportCatalog*)catalog;
 
-    const char *output_path = "resultados/airports_erros.csv";
+    const char *output_path = "resultados/airports_errors.csv";
     FILE *airports_errors = fopen(output_path, "a");  // abrir em modo append
     if (airports_errors == NULL) {
-        perror("Erro ao abrir ficheiro airports_erros.csv");
+        perror("Erro ao abrir ficheiro airports_errors.csv");
         return;
     }
 
@@ -135,10 +135,10 @@ void process_valid_line_airports(char **fields, int num_fields, void* catalog) {
 }
 
 void init_flights_errors_file() {
-    const char *output_path = "resultados/flights_erros.csv";
+    const char *output_path = "resultados/flights_errors.csv";
     FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
     if (f == NULL) {
-        perror("Erro ao criar ficheiro flights_erros.csv");
+        perror("Erro ao criar ficheiro flights_errors.csv");
         return;
     }
     fprintf(f, "\"flight id\",\"departure\",\"actual departure\",\"arrival\",\"actual arrival\",\"gate\",\"status\",\"origin\",\"destination\",\"aircraft\",\"airline\",\"tracking url\"\n");
@@ -148,7 +148,7 @@ void init_flights_errors_file() {
 void process_valid_line_flights(char **fields, int num_fields, void* catalog) {
     FlightCatalog* flight_catalog = (FlightCatalog*)catalog;
 
-    const char *output_path = "resultados/flights_erros.csv";
+    const char *output_path = "resultados/flights_errors.csv";
     FILE *flights_errors = fopen(output_path, "a");  // append
     if (flights_errors == NULL) {
         perror("Erro ao abrir ficheiro flights_errors");
@@ -208,10 +208,10 @@ void process_valid_line_flights(char **fields, int num_fields, void* catalog) {
 
 
 void init_passengers_errors_file() {
-    const char *output_path = "resultados/passengers_erros.csv";
+    const char *output_path = "resultados/passengers_errors.csv";
     FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
     if (f == NULL) {
-        perror("Erro ao criar ficheiro passengers_erros.csv");
+        perror("Erro ao criar ficheiro passengers_errors.csv");
         return;
     }
     fprintf(f, "\"document_number\",\"first_name\",\"last_name\",\"dob\",\"nationality\",\"gender\",\"email\",\"phone\",\"address\",\"photo\"\n");
@@ -219,10 +219,10 @@ void init_passengers_errors_file() {
 }
 
 void process_valid_line_passengers(char **fields, int num_fields, void* catalog) {
-    const char *output_path = "resultados/passengers_erros.csv";
+    const char *output_path = "resultados/passengers_errors.csv";
     FILE *passengers_errors = fopen(output_path, "a");  // abrir em modo append
     if (passengers_errors == NULL) {
-        perror("Erro ao abrir ficheiro passengers_erros.csv");
+        perror("Erro ao abrir ficheiro passengers_errors.csv");
         return;
     }
 
@@ -262,10 +262,10 @@ void process_valid_line_passengers(char **fields, int num_fields, void* catalog)
 }
 
 void init_reservations_errors_file() {
-    const char *output_path = "resultados/reservations_erros.csv";
+    const char *output_path = "resultados/reservations_errors.csv";
     FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
     if (f == NULL) {
-        perror("Erro ao criar ficheiro reservations_erros.csv");
+        perror("Erro ao criar ficheiro reservations_errors.csv");
         return;
     }
     fprintf(f, "\"reservation_id\",\"flight_ids\",\"document_number\",\"seat\",\"price\",\"extra_luggage\",\"priority_boarding\",\"qr_code\"\n");
@@ -273,10 +273,10 @@ void init_reservations_errors_file() {
 }
 
 void process_valid_line_reservations(char **fields, int num_fields, void* catalog) {
-    const char *output_path = "resultados/reservations_erros.csv";
+    const char *output_path = "resultados/reservations_errors.csv";
     FILE *reservations_errors = fopen(output_path, "a");  // abrir em modo append
     if (reservations_errors == NULL) {
-        perror("Erro ao abrir ficheiro reservations_erros.csv");
+        perror("Erro ao abrir ficheiro reservations_errors.csv");
         return;
     }
 
