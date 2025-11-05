@@ -11,6 +11,7 @@
         "query3.h": "c",
         "date.h": "c",
         "flight_catalog.h": "c",
-        "flight.h": "c"
+        "flight.h": "c",
+        "reservation_validation.h": "c"
     }
 }
