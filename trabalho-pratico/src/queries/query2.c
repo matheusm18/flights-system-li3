@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
+// heap
 // estrutura auxiliar para ordenar
 struct aircraft_count{
     char* aircraft_id;
@@ -45,16 +45,12 @@ void count_flights_by_aircraft (FlightCatalog* flight_manager, GHashTable* count
         }
 
         gpointer current_flight_count = g_hash_table_lookup(counts, aircraft_id);
-        int count;
 
         if (current_flight_count != NULL) {
-            count = GPOINTER_TO_INT(current_flight_count) + 1;
+            g_hash_table_replace(counts, g_strdup(aircraft_id),GINT_TO_POINT(G_POINTER_TO_INT(current_flight_count) + 1 ));
         } else {
-            count = 1;
+            g_hash_table_insert(counts, g_strdup(aircraft_id), GINT_TO_POINTER(G_POINTER_TO_INT(1))); 
         }
-
-        g_hash_table_replace(counts, g_strdup(aircraft_id), GINT_TO_POINTER(count)); 
-        
     }
 }
 
@@ -107,11 +103,8 @@ void write_top_n_to_file(AircraftCount* sorted_array, int number_of_aircrafts, i
 
         Aircraft* aircraft = get_aircraft_by_identifier(aircraft_catalog, aircraft_id);
         
-        if (aircraft) {
-            const char* manufacturer = get_aircraft_manufacturer(aircraft);
-            const char* model = get_aircraft_model(aircraft);
-            
-            fprintf(output_file, "%s,%s,%s,%d\n", aircraft_id, manufacturer, model, flight_count);
+        if (aircraft) {            
+            fprintf(output_file, "%s,%s,%s,%d\n", aircraft_id, get_aircraft_manufacturer(aircraft), get_aircraft_model(aircraft), flight_count);
         }
     }
 }
