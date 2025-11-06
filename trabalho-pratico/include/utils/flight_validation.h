@@ -12,6 +12,5 @@ bool validate_origin_flight(const char *origin);
 bool validate_destination_flight(const char *origin, const char *destination);
 bool validate_aircraft_flight(const char *aircraft);
 bool validate_airline_flight(const char *airline);
-bool validate_tracking_url_flight(const char *url, const char *flight_id);
 
 #endif

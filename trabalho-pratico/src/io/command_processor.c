@@ -45,8 +45,6 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
 
                 if (sscanf(line, "%d %s", &query, airport_code) == 2) {
                     execute_query1(catalog_manager_get_airports(catalog_manager), airport_code, output_path);
-
-                    printf("Executado Input %d: %s -> %s\n", command_counter, airport_code, output_path);
                 }
                 break;
                 
@@ -55,13 +53,11 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
                 // tentar com fabricante primeiro
                 if (sscanf(line, "%d %d %99s", &query, &N, manufacturer) == 3) {
                     execute_query2(catalog_manager_get_flights(catalog_manager), catalog_manager_get_aircrafts(catalog_manager), N, manufacturer, output_path);
-                    printf("Executado Input %d: %d %s -> %s\n", command_counter, N, manufacturer, output_path);
                 } 
 
                 // tentar sem fabricante
                 else if (sscanf(line, "%d %d", &query, &N) == 2) {
                     execute_query2(catalog_manager_get_flights(catalog_manager), catalog_manager_get_aircrafts(catalog_manager), N, NULL, output_path);
-                    printf("Executado Input %d: %d -> %s\n", command_counter, N, output_path);
                 }
                 break;
 
@@ -69,7 +65,6 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
 
                 if (sscanf(line, "%d %19s %19s", &query, start_date, end_date) == 3) {
                     execute_query3(catalog_manager_get_flights(catalog_manager), catalog_manager_get_airports(catalog_manager), start_date, end_date, output_path);
-                    printf("Executado Input %d: %s %s -> %s\n", command_counter, start_date, end_date, output_path);
                 }
                 break;
 

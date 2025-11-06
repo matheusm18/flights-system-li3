@@ -15,7 +15,7 @@ struct flight {
     char* destination;
     char* aircraft;
     char* airline;
-    // char* tracking_url; // será necessário armazenar?
+    // tracking_url não é armazenado para já
 };
 
 Flight* create_flight(const char* flight_id,
@@ -28,8 +28,7 @@ Flight* create_flight(const char* flight_id,
                       const char* origin,
                       const char* destination,
                       const char* aircraft,
-                      const char* airline,
-                      const char* tracking_url) {
+                      const char* airline) {
 
     Flight* flight = malloc(sizeof(Flight));
     if (!flight) return NULL;
@@ -60,10 +59,10 @@ void destroy_flight(Flight* f) {
     free(f->aircraft);
     free(f->airline);
 
-    free(f->departure);
-    free(f->actual_departure);
-    free(f->arrival);
-    free(f->actual_arrival);
+    datetime_destroy(f->departure);
+    datetime_destroy(f->actual_departure);
+    datetime_destroy(f->arrival);
+    datetime_destroy(f->actual_arrival);
 
     free(f);
 }

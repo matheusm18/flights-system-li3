@@ -11,12 +11,11 @@ struct reservation {
     double price;
     bool extra_luggage;
     bool priority_boarding;
-    // char* qr_code;
+    // qr_code não é armazenado para já
 };
 
 // passar o contador para poder alocar a memória? não estou a ver outra maneira
-Reservation* create_reservation(const char* reservation_id, char** flight_ids,const char* document_number, const char* seat, double price, int extra_luggage, int priority_boarding, 
-                                const char* qr_code, int flight_count) {
+Reservation* create_reservation(const char* reservation_id, char** flight_ids,const char* document_number, const char* seat, double price, int extra_luggage, int priority_boarding, int flight_count) {
 
     Reservation* reservation = malloc(sizeof(Reservation));
     if (reservation == NULL) return NULL;
@@ -27,7 +26,6 @@ Reservation* create_reservation(const char* reservation_id, char** flight_ids,co
     reservation->price = price;
     reservation->extra_luggage = extra_luggage;
     reservation->priority_boarding = priority_boarding;
-    // reservation->qr_code = strdup(qr_code);
 
     reservation->flight_ids = malloc(flight_count * sizeof(char*));
 
@@ -50,7 +48,6 @@ void destroy_reservation(Reservation* r) {
 
         free(r->document_number);
         free(r->seat);
-        // free(r->qr_code);
 
         free(r);
     }

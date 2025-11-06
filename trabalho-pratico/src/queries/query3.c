@@ -33,21 +33,30 @@ void count_number_flights(gpointer key, gpointer value, gpointer user_data) {
     DateTime* actual_dt = get_flight_actual_departure(flight);
     if (!actual_dt) return;
 
-    Date actual_date = actual_dt->date_part; // converte o datetime para date
+    Date* actual_date = &actual_dt->date_part; // para obter date em vez de datetime
 
     const char* origin = get_flight_origin(flight);
     const char* status = get_flight_status(flight);
 
     if (!origin || is_cancelled(status)) return;
     
-    if (date_compare(&actual_date, counter->start) < 0 || date_compare(&actual_date, counter->end) > 0) return;
+    if (date_compare(actual_date, counter->start) < 0 || date_compare(actual_date, counter->end) > 0) return;
 
-    gpointer current_count = g_hash_table_lookup(counter->counts, origin);
+    /* usamos g_hash_table_steal() para atualizar o contador sem recriar a chave.
+       se usassemos g_hash_table_replace(),  a cada incremento teriamos o g_free() + g_strdup()
+       o steal remove a entrada sem libertar a memória, permitindo reinserir a mesma chave existente.
+    */
 
-    if (current_count != NULL) {
-        g_hash_table_replace(counter->counts, g_strdup(origin), GINT_TO_POINTER(GPOINTER_TO_INT(current_count) + 1));
+    gpointer stored_key = NULL;
+    gpointer stored_val = NULL;
+
+    // se existir a chave vai incrementar, se não existir entao a função retornou NULL e devemos inserir diretamente
+    if (g_hash_table_lookup_extended(counter->counts, origin, &stored_key, &stored_val)) {
+        int new_count = GPOINTER_TO_INT(stored_val) + 1;
+        g_hash_table_steal(counter->counts, stored_key);
+        g_hash_table_insert(counter->counts, stored_key, GINT_TO_POINTER(new_count));
     } else {
-        g_hash_table_insert(counter->counts, g_strdup(origin), GINT_TO_POINTER(GPOINTER_TO_INT(1)));
+        g_hash_table_insert(counter->counts, g_strdup(origin), GINT_TO_POINTER(1));
     }
 }
 

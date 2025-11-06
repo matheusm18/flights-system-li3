@@ -27,7 +27,6 @@ void count_flights_by_aircraft (FlightCatalog* flight_manager, GHashTable* count
         Flight* flight = (Flight*) value; // temos de colocar (Flight *) porque GHashtable "armazena" ponteiro genéricos para void*
         const char* status = get_flight_status(flight);
 
-
         if (status && g_strcmp0(status, "Cancelled") == 0) continue; // ignora voos cancelados
 
         const char* aircraft_id = get_aircraft_id_from_flight(flight);
@@ -44,12 +43,19 @@ void count_flights_by_aircraft (FlightCatalog* flight_manager, GHashTable* count
             }
         }
 
-        gpointer current_flight_count = g_hash_table_lookup(counts, aircraft_id);
+        gpointer stored_key = NULL;
+        gpointer stored_val = NULL;
 
-        if (current_flight_count != NULL) {
-            g_hash_table_replace(counts, g_strdup(aircraft_id),GINT_TO_POINTER(GPOINTER_TO_INT(current_flight_count) + 1 ));
+        /* se a chave ja existe, usamos lookup_extended para obter o ponteiro interno e reaproveitamos
+           g_hash_table_steal remove a entrada sem libertar a chave, permitindo reinserir o mesmo ponteiro com o novo contador 
+        */
+
+        if (g_hash_table_lookup_extended(counts, aircraft_id, &stored_key, &stored_val)) {
+            int new_count = GPOINTER_TO_INT(stored_val) + 1;
+            g_hash_table_steal(counts, stored_key);
+            g_hash_table_insert(counts, stored_key, GINT_TO_POINTER(new_count));
         } else {
-            g_hash_table_insert(counts, g_strdup(aircraft_id), GINT_TO_POINTER(GPOINTER_TO_INT(1))); 
+            g_hash_table_insert(counts, g_strdup(aircraft_id), GINT_TO_POINTER(1));
         }
     }
 }

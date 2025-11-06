@@ -12,7 +12,6 @@
 #include "utils/reservation_validation.h"
 #include "utils/date.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -28,15 +27,8 @@ void init_aircrafts_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data) {
+void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     CatalogManager* manager = (CatalogManager*) user_data;
-
-    const char *output_path = "resultados/aircrafts_errors.csv";
-    FILE *aircrafts_errors = fopen(output_path, "a");  // abrir em modo append
-    if (aircrafts_errors == NULL) {
-        perror("Erro ao abrir ficheiro aircrafts_errors.csv");
-        return;
-    }
 
     char *identifier = fields[0];
     char *manufacturer = fields[1];
@@ -52,7 +44,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
         !validate_capacity_aircraft(capacity) ||
         !validate_range_aircraft(range)) {
 
-        fprintf(aircrafts_errors,
+        fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 identifier,
                 manufacturer,
@@ -60,8 +52,6 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
                 year,
                 capacity,
                 range);
-
-        fclose(aircrafts_errors);
         return;
     }
 
@@ -74,9 +64,8 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     if (aircraft != NULL) {
         aircraft_catalog_add(catalog_manager_get_aircrafts(manager), aircraft);
     }
-
-    fclose(aircrafts_errors);
 }
+
 void init_airports_errors_file() {
     const char *output_path = "resultados/airports_errors.csv";
     FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
@@ -88,15 +77,8 @@ void init_airports_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_airports(char **fields, int num_fields, void* user_data) {
+void process_valid_line_airports(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     CatalogManager* manager = (CatalogManager*) user_data;
-
-    const char *output_path = "resultados/airports_errors.csv";
-    FILE *airports_errors = fopen(output_path, "a");  // abrir em modo append
-    if (airports_errors == NULL) {
-        perror("Erro ao abrir ficheiro airports_errors.csv");
-        return;
-    }
 
     char *code = fields[0];
     char *name = fields[1];
@@ -111,7 +93,7 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data)
         !validate_country_airport(country) || !validate_latitude_airport(latitude) ||
         !validate_longitude_airport(longitude) || !validate_icao_airport(icao) || !validate_type_airport(type)) {
 
-        fprintf(airports_errors,
+        fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 code,
                 name,
@@ -121,8 +103,6 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data)
                 longitude,
                 icao,
                 type);
-
-        fclose(airports_errors);
         return;
     }
 
@@ -131,8 +111,6 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data)
     if (airport != NULL) {
         airport_catalog_add(catalog_manager_get_airports(manager), airport);
     }
-
-    fclose(airports_errors);
 }
 
 void init_flights_errors_file() {
@@ -146,15 +124,8 @@ void init_flights_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_flights(char **fields, int num_fields, void* user_data) {
+void process_valid_line_flights(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     CatalogManager* manager = (CatalogManager*) user_data;
-
-    const char *output_path = "resultados/flights_errors.csv";
-    FILE *flights_errors = fopen(output_path, "a");  // append
-    if (flights_errors == NULL) {
-        perror("Erro ao abrir ficheiro flights_errors");
-        return;
-    }
 
     char *flight_id = fields[0];
     char *departure = fields[1];
@@ -172,9 +143,9 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data) 
     if (!validate_flight_id_flight(flight_id) || !validate_arrivals_and_departures_flight(departure) || !validate_actual_arrivals_and_departures_flight(departure, actual_departure) ||
         !validate_arrivals_and_departures_flight(arrival) || !validate_actual_arrivals_and_departures_flight(arrival, actual_arrival) || !validate_gate_flight(gate) ||
         !validate_status_flight(status, departure, arrival, actual_departure, actual_arrival) || !validate_origin_flight(origin) || !validate_destination_flight(origin, destination) ||
-        !validate_aircraft_flight(aircraft) || !validate_airline_flight(airline) || !validate_tracking_url_flight(tracking_url, flight_id)) {
+        !validate_aircraft_flight(aircraft) || !validate_airline_flight(airline)) {
 
-        fprintf(flights_errors,
+        fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 flight_id,
                 departure,
@@ -188,8 +159,6 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data) 
                 aircraft,
                 airline,
                 tracking_url);
-
-        fclose(flights_errors);
         return;
     }
 
@@ -198,13 +167,11 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data) 
         datetime_create_from_string(actual_departure),
         datetime_create_from_string(arrival),
         datetime_create_from_string(actual_arrival),
-        gate, status, origin, destination, aircraft, airline, tracking_url);        
+        gate, status, origin, destination, aircraft, airline);        
 
     if (flight != NULL) {
         flight_catalog_add(catalog_manager_get_flights(manager), flight);
     }
-
-    fclose(flights_errors);
 }
 
 
@@ -219,15 +186,8 @@ void init_passengers_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_passengers(char **fields, int num_fields, void* user_data) {
+void process_valid_line_passengers(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     //CatalogManager* manager = (CatalogManager*) user_data;
-
-    const char *output_path = "resultados/passengers_errors.csv";
-    FILE *passengers_errors = fopen(output_path, "a");  // abrir em modo append
-    if (passengers_errors == NULL) {
-        perror("Erro ao abrir ficheiro passengers_errors.csv");
-        return;
-    }
 
     char *document_number = fields[0];
     char *first_name = fields[1];
@@ -247,7 +207,7 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
         !validate_passenger_name(first_name) ||
         !validate_passenger_name(last_name)) {
 
-        fprintf(passengers_errors,
+        fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 document_number,
                 first_name,
@@ -260,8 +220,6 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
                 address,
                 photo);
     }
-
-    fclose(passengers_errors);
 }
 
 void init_reservations_errors_file() {
@@ -275,16 +233,9 @@ void init_reservations_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_reservations(char **fields, int num_fields, void* user_data) {
+void process_valid_line_reservations(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     //CatalogManager* manager = (CatalogManager*) user_data;
     
-    const char *output_path = "resultados/reservations_errors.csv";
-    FILE *reservations_errors = fopen(output_path, "a");  // abrir em modo append
-    if (reservations_errors == NULL) {
-        perror("Erro ao abrir ficheiro reservations_errors.csv");
-        return;
-    }
-
     char *reservation_id = fields[0];
     char *flight_ids = fields[1];
     char *document_number = fields[2];
@@ -303,7 +254,7 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
         !validate_priority_boarding_reservation(priority_boarding) ||
         !validate_qr_code_reservation(qr_code)) {
 
-        fprintf(reservations_errors,
+        fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 reservation_id,
                 flight_ids,
@@ -314,6 +265,4 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
                 priority_boarding,
                 qr_code);
     }
-
-    fclose(reservations_errors);
 }

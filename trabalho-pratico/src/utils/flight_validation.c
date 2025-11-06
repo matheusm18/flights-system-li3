@@ -75,13 +75,3 @@ bool validate_airline_flight(const char *airline) {
     }
     return true;
 }
-
-
-bool validate_tracking_url_flight(const char *url, const char *flight_id) {
-    if (!url) return false;
-    if (strlen(url) != 37 + 7) return false;
-    if (strncmp(url, "https://www.flighttracker.com/flight/", 37) != 0) return false;
-    if (strncmp(url + 37, flight_id, 7) != 0) return false;
-    return true;
-}
-

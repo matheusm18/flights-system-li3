@@ -15,6 +15,7 @@
         "reservation_validation.h": "c",
         "aircraft_catalog.h": "c",
         "glib.h": "c",
-        "catalog_manager.h": "c"
+        "catalog_manager.h": "c",
+        "flight_validation.h": "c"
     }
 }
