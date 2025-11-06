@@ -3,11 +3,7 @@
 #include <string.h>
 #include <glib.h>
 
-#include "catalog/flight_catalog.h"
-#include "catalog/airport_catalog.h" 
-#include "catalog/aircraft_catalog.h"
-#include "catalog/passenger_catalog.h"
-#include "catalog/reservation_catalog.h"
+#include "catalog/catalog_manager.h"
 
 #include "io/parser.h"
 #include "io/command_processor.h"
@@ -25,27 +21,21 @@ int main(int argc, char **argv) {
     const char* dataset_path = argv[1];
     const char* commands_path = argv[2];
 
-    // criar catalogs
-    AirportCatalog* airport_catalog = airport_catalog_create();
-    AircraftCatalog* aircraft_catalog = aircraft_catalog_create();
-    FlightCatalog* flight_catalog = flight_catalog_create();
-    // PassengerCatalog* passenger_catalog = passenger_catalog_create();
-    // ReservationCatalog* reservation_catalog = reservation_catalog_create();
+    CatalogManager* catalog_manager = catalog_manager_create(); // criar o catalog
 
     // carregar datasets
     printf("\nA carregar datasets de: %s\n", dataset_path);
-    load_datasets(dataset_path, airport_catalog, aircraft_catalog, flight_catalog, NULL, NULL);
+    load_datasets(dataset_path, catalog_manager);
 
     // processar comandos do ficheiro
     printf("\nA processar comandos de: %s\n", commands_path);
-    process_commands(commands_path, airport_catalog, flight_catalog, aircraft_catalog);
+    process_commands(commands_path, catalog_manager);
 
     printf("\nProcessamento concluído! Verifique a pasta 'resultados/'\n");
 
     // liberar memória
-    airport_catalog_destroy(airport_catalog);
-    aircraft_catalog_destroy(aircraft_catalog);
-    flight_catalog_destroy(flight_catalog);
 
+    catalog_manager_destroy(catalog_manager);
+    
     return 0;
 }

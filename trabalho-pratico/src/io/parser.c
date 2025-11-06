@@ -1,7 +1,6 @@
 #include "io/parser.h"
-#include "entities/airport.h"
 #include "utils/validation.h"
-#include "utils/passenger_validation.h"
+#include "catalog/catalog_manager.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -20,7 +19,7 @@ void remove_quotation_marks(char *s) {
     }
 }
 
-void read_csv(int fields_length, const char *filename, void (*callback)(char **fields, int num_fields, void* catalog), void* catalog) {
+void read_csv(int fields_length, const char *filename, void (*callback)(char **fields, int num_fields, void* user_data), void* user_data) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("Erro ao abrir ficheiro");
@@ -51,13 +50,13 @@ void read_csv(int fields_length, const char *filename, void (*callback)(char **f
         }
 
         if (callback)
-            callback(fields, num_fields, catalog);
+            callback(fields, num_fields, user_data);
     }
 
     fclose(fp);
 }
 
-void load_datasets(const char* dataset_path, AirportCatalog* airport_catalog, AircraftCatalog* aircraft_catalog, FlightCatalog* flight_catalog, PassengerCatalog* passenger_catalog, ReservationCatalog* reservation_catalog) {
+void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
 
     char airports_file[256];
     snprintf(airports_file, sizeof(airports_file), "%s/airports.csv", dataset_path); 
@@ -78,28 +77,28 @@ void load_datasets(const char* dataset_path, AirportCatalog* airport_catalog, Ai
     init_airports_errors_file();
 
     printf("\nA carregar os aeroportos de: %s", airports_file);
-    read_csv(8, airports_file, process_valid_line_airports, airport_catalog);
+    read_csv(8, airports_file, process_valid_line_airports, catalog_manager);
     printf("\nTodos os aeroportos válidos foram carregados!\n");
 
     printf("\nA inicializar ficheiro de erros de aeronaves...\n");
     init_aircrafts_errors_file();
 
     printf("\nA carregar as aeronaves de: %s", aircrafts_file);
-    read_csv(6, aircrafts_file, process_valid_line_aircrafts, aircraft_catalog);
+    read_csv(6, aircrafts_file, process_valid_line_aircrafts, catalog_manager);
     printf("\nTodas as aeronaves válidas foram carregadas!\n");
 
     printf("\nA inicializar ficheiro de erros de voos...\n");
     init_flights_errors_file();
 
     printf("\nA carregar os voos de: %s", flights_file);
-    read_csv(12, flights_file, process_valid_line_flights, flight_catalog);
+    read_csv(12, flights_file, process_valid_line_flights, catalog_manager);
     printf("\nTodos os voos válidos foram carregados!\n");
 
     printf("\nA inicializar ficheiro de erros de passageiros...\n");
     init_passengers_errors_file();
 
     printf("\nA carregar os passageiros de: %s", passengers_file);
-    read_csv(9, passengers_file, process_valid_line_passengers, passenger_catalog);
+    read_csv(9, passengers_file, process_valid_line_passengers, catalog_manager);
     printf("\nTodos os passageiros válidos foram carregados!\n");
 
 
@@ -107,7 +106,7 @@ void load_datasets(const char* dataset_path, AirportCatalog* airport_catalog, Ai
     init_reservations_errors_file();
 
     printf("\nA carregar as reservas de: %s", reservations_file);
-    read_csv(8, reservations_file, process_valid_line_reservations, reservation_catalog);
+    read_csv(8, reservations_file, process_valid_line_reservations, catalog_manager);
     printf("\nTodos as reservas válidas foram carregadas!\n");
 
 }

@@ -1,5 +1,6 @@
 #include "utils/validation.h"
 
+#include "catalog/catalog_manager.h"
 #include "catalog/airport_catalog.h"
 #include "catalog/aircraft_catalog.h"
 #include "catalog/flight_catalog.h"
@@ -27,8 +28,8 @@ void init_aircrafts_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_aircrafts(char **fields, int num_fields, void* catalog) {
-    AircraftCatalog* aircraft_catalog = (AircraftCatalog*)catalog;
+void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data) {
+    CatalogManager* manager = (CatalogManager*) user_data;
 
     const char *output_path = "resultados/aircrafts_errors.csv";
     FILE *aircrafts_errors = fopen(output_path, "a");  // abrir em modo append
@@ -71,7 +72,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* catalog) 
     Aircraft* aircraft = create_aircraft(identifier, manufacturer, model, year_int, capacity_int, range_int);
 
     if (aircraft != NULL) {
-        aircraft_catalog_add(aircraft_catalog, aircraft);
+        aircraft_catalog_add(catalog_manager_get_aircrafts(manager), aircraft);
     }
 
     fclose(aircrafts_errors);
@@ -87,8 +88,8 @@ void init_airports_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_airports(char **fields, int num_fields, void* catalog) {
-    AirportCatalog* airport_catalog = (AirportCatalog*)catalog;
+void process_valid_line_airports(char **fields, int num_fields, void* user_data) {
+    CatalogManager* manager = (CatalogManager*) user_data;
 
     const char *output_path = "resultados/airports_errors.csv";
     FILE *airports_errors = fopen(output_path, "a");  // abrir em modo append
@@ -128,7 +129,7 @@ void process_valid_line_airports(char **fields, int num_fields, void* catalog) {
     Airport* airport = create_airport(code, name, city, country, latitude, longitude, icao, type);
     
     if (airport != NULL) {
-        airport_catalog_add(airport_catalog, airport);
+        airport_catalog_add(catalog_manager_get_airports(manager), airport);
     }
 
     fclose(airports_errors);
@@ -145,8 +146,8 @@ void init_flights_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_flights(char **fields, int num_fields, void* catalog) {
-    FlightCatalog* flight_catalog = (FlightCatalog*)catalog;
+void process_valid_line_flights(char **fields, int num_fields, void* user_data) {
+    CatalogManager* manager = (CatalogManager*) user_data;
 
     const char *output_path = "resultados/flights_errors.csv";
     FILE *flights_errors = fopen(output_path, "a");  // append
@@ -200,7 +201,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* catalog) {
         gate, status, origin, destination, aircraft, airline, tracking_url);        
 
     if (flight != NULL) {
-        flight_catalog_add(flight_catalog, flight);
+        flight_catalog_add(catalog_manager_get_flights(manager), flight);
     }
 
     fclose(flights_errors);
@@ -218,7 +219,9 @@ void init_passengers_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_passengers(char **fields, int num_fields, void* catalog) {
+void process_valid_line_passengers(char **fields, int num_fields, void* user_data) {
+    //CatalogManager* manager = (CatalogManager*) user_data;
+
     const char *output_path = "resultados/passengers_errors.csv";
     FILE *passengers_errors = fopen(output_path, "a");  // abrir em modo append
     if (passengers_errors == NULL) {
@@ -272,7 +275,9 @@ void init_reservations_errors_file() {
     fclose(f);
 }
 
-void process_valid_line_reservations(char **fields, int num_fields, void* catalog) {
+void process_valid_line_reservations(char **fields, int num_fields, void* user_data) {
+    //CatalogManager* manager = (CatalogManager*) user_data;
+    
     const char *output_path = "resultados/reservations_errors.csv";
     FILE *reservations_errors = fopen(output_path, "a");  // abrir em modo append
     if (reservations_errors == NULL) {
