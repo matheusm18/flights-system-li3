@@ -44,16 +44,18 @@ Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* ident
 void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager){
     if (!manager || !aircraft_id || !*aircraft_id) return;
     
-    if (!g_hash_table_lookup(manager->aircraft_by_identifier, aircraft_id)) {
-        return;
-    }
-    
-    gpointer current_count = g_hash_table_lookup(manager->flight_counts, aircraft_id);
+    gpointer stored_key = NULL;
+    gpointer stored_val = NULL;
 
-    if (current_count) {
-        g_hash_table_replace(manager->flight_counts, g_strdup(aircraft_id), GINT_TO_POINTER(GPOINTER_TO_INT(current_count) + 1));
+     // Usa lookup_extended para reutilizar a chave existente
+    if (g_hash_table_lookup_extended(manager->flight_counts, aircraft_id, &stored_key, &stored_val)) {
+        int new_count = GPOINTER_TO_INT(stored_val) + 1;
+        // Steal remove sem libertar a chave, depois reinsere a MESMA chave
+        g_hash_table_steal(manager->flight_counts, stored_key);
+        g_hash_table_insert(manager->flight_counts, stored_key, GINT_TO_POINTER(new_count));
     } else {
-        g_hash_table_insert(manager->flight_counts, g_strdup(aircraft_id), GINT_TO_POINTER(GPOINTER_TO_INT(1)));
+        // Primeira vez - cria nova chave
+        g_hash_table_insert(manager->flight_counts, g_strdup(aircraft_id), GINT_TO_POINTER(1));
     }
 }
 
