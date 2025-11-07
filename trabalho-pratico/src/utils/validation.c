@@ -37,12 +37,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     char *capacity = fields[4];
     char *range = fields[5];
 
-    if (!validate_identifier_aircraft(identifier) ||
-        !validate_manufacturer_aircraft(manufacturer) ||
-        !validate_model_aircraft(model) ||
-        !validate_year_aircraft(year) ||
-        !validate_capacity_aircraft(capacity) ||
-        !validate_range_aircraft(range)) {
+    if (!validate_year_aircraft(year)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -89,9 +84,8 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
     char *icao = fields[6];
     char *type = fields[7];
 
-    if (!validate_code_airport(code) || !validate_name_city_airport(name) || !validate_name_city_airport(city) ||
-        !validate_country_airport(country) || !validate_latitude_airport(latitude) ||
-        !validate_longitude_airport(longitude) || !validate_icao_airport(icao) || !validate_type_airport(type)) {
+    if (!validate_code_airport(code) || !validate_latitude_airport(latitude) ||
+        !validate_longitude_airport(longitude) || !validate_type_airport(type)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -141,9 +135,9 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
     char *tracking_url = fields[11];
 
     if (!validate_flight_id_flight(flight_id) || !validate_arrivals_and_departures_flight(departure) || !validate_actual_arrivals_and_departures_flight(departure, actual_departure) ||
-        !validate_arrivals_and_departures_flight(arrival) || !validate_actual_arrivals_and_departures_flight(arrival, actual_arrival) || !validate_gate_flight(gate) ||
+        !validate_arrivals_and_departures_flight(arrival) || !validate_actual_arrivals_and_departures_flight(arrival, actual_arrival) ||
         !validate_status_flight(status, departure, arrival, actual_departure, actual_arrival) || !validate_origin_flight(origin) || !validate_destination_flight(origin, destination) ||
-        !validate_aircraft_flight(aircraft) || !validate_airline_flight(airline)) {
+        !validate_aircraft_flight(aircraft)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -203,9 +197,7 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
     if (!validate_passenger_document_number(document_number) ||
         !validate_passenger_email(email) ||
         !validate_passenger_gender(gender) ||
-        !validate_passenger_birth_date(dob) ||
-        !validate_passenger_name(first_name) ||
-        !validate_passenger_name(last_name)) {
+        !validate_passenger_birth_date(dob)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -247,12 +239,7 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
 
     if (!validate_reservation_id(reservation_id) ||
         !validate_flight_ids_reservation(flight_ids) ||
-        !validate_document_number_reservation(document_number) ||
-        !validate_seat_reservation(seat) ||
-        !validate_price_reservation(price) ||
-        !validate_extra_luggage_reservation(extra_luggage) ||
-        !validate_priority_boarding_reservation(priority_boarding) ||
-        !validate_qr_code_reservation(qr_code)) {
+        !validate_document_number_reservation(document_number)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",

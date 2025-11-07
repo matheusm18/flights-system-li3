@@ -38,6 +38,7 @@ bool validate_document_number_reservation(const char *document_number) {
     return true;
 }
 
+/*
 bool validate_seat_reservation(const char *seat) {
     if (!seat) return false;
     size_t l = strlen(seat);
@@ -68,7 +69,6 @@ bool validate_price_reservation(const char *price) {
     return true;
 }
 
-// ver se é preciso aceitar "True" e "False" ou se isto seria considerado um erro
 bool validate_extra_luggage_reservation(const char *extra_luggage) {
     if (!extra_luggage) return false;
 
@@ -100,25 +100,4 @@ bool validate_priority_boarding_reservation(const char *priority_boarding) {
     free(lower);
     return true;
 }
-
-// chars usados em qr code
-bool is_base64_char(char c) {
-    return (c >= 'A' && c <= 'Z') ||
-           (c >= 'a' && c <= 'z') ||
-           (c >= '0' && c <= '9') ||
-           c == '+' || c == '/' || c == '=';
-}
-
-bool validate_qr_code_reservation(const char *qr_code) {
-    if (!qr_code) return false;
-
-    size_t len = strlen(qr_code);
-
-    if (len < 5 || strncmp(qr_code, "iVBOR", 5) != 0) return false;
-
-    for (size_t i = 0; i < len; i++) {
-        if (!is_base64_char(qr_code[i])) return false;
-    }
-
-    return true;
-}
+*/

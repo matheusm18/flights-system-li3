@@ -9,17 +9,17 @@
 //======== Syntactic validation: Passengers
 
 bool validate_passenger_document_number(const char *document_number){
-    if(document_number == NULL) {
+    if (document_number == NULL) {
         return false;
     }
 
     // tem de ter obrigatoriamente 9 dígitos
-    if(strlen(document_number) != 9){
+    if (strlen(document_number) != 9){
         return false;
     }
 
     // todos os caracteres devem ser digitos entre 0 e 9
-    for(int i = 0; i < 9; i++){
+    for (int i = 0; i < 9; i++){
         if(!isdigit((unsigned char)document_number[i])){ // a função isdigit espera valores positivos, por isso temos de converter para unsigned
             return false;
         }
@@ -37,7 +37,7 @@ bool validate_passenger_gender(const char *gender) {
 }
 
 bool validate_passenger_email(const char *email){
-    if(email == NULL){
+    if (email == NULL){
         return false;
     }
 
@@ -46,7 +46,7 @@ bool validate_passenger_email(const char *email){
     if (!at) return false; // não encontrou
 
     // validar username
-    for(const char* i = email; i < at; i++){
+    for (const char* i = email; i < at; i++){
         if (!(islower((unsigned char)*i) || isdigit((unsigned char)*i) || *i == '.')){
             return false;
         }
@@ -75,14 +75,7 @@ bool validate_passenger_email(const char *email){
 }
 
 bool validate_passenger_birth_date(const char *dob){
-    if(!validate_date(dob)){
-        return false;
-    }
-    return true;
-}
-
-bool validate_passenger_name(const char *name){
-    if(!isupper(name[0])){
+    if (!validate_date(dob)){
         return false;
     }
     return true;

@@ -15,7 +15,6 @@ struct aircraft_count{
     int flight_count;
 };
 
-
 void count_flights_by_aircraft (FlightCatalog* flight_manager, GHashTable* counts,const char* manufacturer_filter, AircraftCatalog* aircraft_catalog){
     GHashTable* flights_catalog = get_flight_catalog(flight_manager);
     GHashTableIter i; // i itera pela GHashtable

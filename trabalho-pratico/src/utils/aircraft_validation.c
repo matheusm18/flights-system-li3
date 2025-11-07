@@ -6,6 +6,21 @@
 
 //======== Syntactic validation: Aircrafts
 
+bool validate_year_aircraft(const char *string) {
+    if (!string) return false;
+
+    for (int i = 0; string[i] != '\0'; i++) {
+        if (!isdigit(string[i])) return false;
+    }
+
+    int year = atoi(string);
+
+    if (year > 2025) return false;
+
+    return true;
+}
+
+/*
 bool validate_identifier_aircraft(const char *identifier) {
     if (!identifier || strlen(identifier) != 8) return false;
 
@@ -42,20 +57,6 @@ bool validate_model_aircraft(const char *model) {
     return true;
 }
 
-bool validate_year_aircraft(const char *string) {
-    if (!string) return false;
-
-    for (int i = 0; string[i] != '\0'; i++) {
-        if (!isdigit(string[i])) return false;
-    }
-
-    int year = atoi(string);
-
-    if (year < 1900 || year > 2025) return false; // defini 1900 como ano minimo que faça sentido ter voos
-
-    return true;
-}
-
 bool validate_capacity_aircraft(const char *string) {
     if (!string || *string == '\0') return false;  
     
@@ -79,3 +80,4 @@ bool validate_range_aircraft(const char *string) {
     
     return true;
 }
+*/

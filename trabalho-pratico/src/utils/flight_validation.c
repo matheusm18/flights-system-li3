@@ -36,21 +36,20 @@ bool validate_actual_arrivals_and_departures_flight(const char *datetime1, const
     return validate_previous_date(datetime1, datetime2);
 }
 
-
-bool validate_gate_flight(const char *gate) {
-    if (!gate || (strlen(gate) != 1 && strlen(gate) != 2)) return false;
-    for (int i = 0; gate[i]; i++) {
-        if (gate[i] < '0' || gate[i] > '9') return false;
-    }
-    return true;
-}
-
 bool validate_status_flight(const char *status, const char *departure, const char *arrival, const char *act_departure, const char *act_arrival) {
     if (!status) return false;
 
-    return ((strcmp(status, "On Time") && strcmp(departure, act_departure) == 0 && strcmp(arrival, act_arrival)) == 0 ||
-            (strcmp(status, "Delayed") == 0 && validate_previous_date(departure, act_departure) && validate_previous_date(arrival, act_arrival)) ||
-            (strcmp(status, "Cancelled") == 0 && strcmp(act_departure, "N/A") == 0 && strcmp(act_arrival, "N/A")) == 0);
+    if (strcmp(status, "On Time") == 0) return true;
+
+    else if (strcmp(status, "Delayed") == 0) {
+        return (validate_previous_date(departure, act_departure) && validate_previous_date(arrival, act_arrival));
+    }
+
+    else if (strcmp(status, "Cancelled") == 0) {
+        return (strcmp(act_departure, "N/A") == 0 && strcmp(act_arrival, "N/A") == 0);
+    }
+
+    return false;
 }
 
 bool validate_origin_flight(const char *origin) {
@@ -59,19 +58,21 @@ bool validate_origin_flight(const char *origin) {
 
 bool validate_destination_flight(const char *origin, const char *destination) {
     validate_code_airport(destination);
+
     if (strcmp(origin, destination) == 0) return false;
     return true;
 }
 
 bool validate_aircraft_flight(const char *aircraft) {
-    return validate_identifier_aircraft(aircraft);
+    return true;
 }
 
-bool validate_airline_flight(const char *airline) {
-    if (!airline) return false;
-    for (int i = 0; airline[i]; i++) {
-        unsigned char c = (unsigned char) airline[i];
-        if (c < 32) return false;
+/*
+bool validate_gate_flight(const char *gate) {
+    if (!gate || (strlen(gate) != 1 && strlen(gate) != 2)) return false;
+    for (int i = 0; gate[i]; i++) {
+        if (gate[i] < '0' || gate[i] > '9') return false;
     }
     return true;
 }
+*/

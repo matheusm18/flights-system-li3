@@ -14,23 +14,6 @@ bool validate_code_airport(const char *code) {
     return true;
 }
 
-bool validate_name_city_airport(const char *name) {
-    if (!name) return false;
-    for (int i = 0; name[i]; i++) {
-        unsigned char c = (unsigned char) name[i];
-        if (c < 32) return false;
-    }
-    return true;
-}
-
-bool validate_country_airport(const char *country) {
-    if (!country || strlen(country) != 2) return false;
-    for (int i = 0; i < 2; i++) {
-        if (country[i] < 'A' || country[i] > 'Z') return false;
-    }
-    return true;
-}
-
 bool validate_decimal_cases(const char *str) {
     if (!str) return false;
 
@@ -57,7 +40,6 @@ bool validate_decimal_cases(const char *str) {
 
     return true;
 }
-
 
 bool validate_latitude_airport(const char *latitude) {
     if (!latitude) return false;
@@ -95,14 +77,6 @@ bool validate_longitude_airport(const char *longitude) {
     return true;
 }
 
-bool validate_icao_airport(const char *icao) {
-    if (!icao || strlen(icao) != 4) return false;
-    for (int i = 0; i < 4; i++) {
-        if (icao[i] < 'A' || icao[i] > 'Z') return false;
-    }
-    return true;
-}
-
 bool validate_type_airport(const char *type) {
     if (!type) return false;
     return (strcmp(type, "small_airport") == 0 ||
@@ -111,3 +85,31 @@ bool validate_type_airport(const char *type) {
             strcmp(type, "heliport") == 0 ||
             strcmp(type, "seaplane_base") == 0);
 }
+
+/*
+bool validate_name_city_airport(const char *name) {
+    if (!name) return false;
+    for (int i = 0; name[i]; i++) {
+        unsigned char c = (unsigned char) name[i];
+        if (c < 32) return false;
+    }
+    return true;
+}
+
+bool validate_country_airport(const char *country) {
+    if (!country || strlen(country) != 2) return false;
+    for (int i = 0; i < 2; i++) {
+        if (country[i] < 'A' || country[i] > 'Z') return false;
+    }
+    return true;
+}
+
+bool validate_icao_airport(const char *icao) {
+    if (!icao || strlen(icao) != 4) return false;
+    for (int i = 0; i < 4; i++) {
+        if (icao[i] < 'A' || icao[i] > 'Z') return false;
+    }
+    return true;
+}
+
+*/
