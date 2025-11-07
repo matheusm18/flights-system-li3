@@ -57,7 +57,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     Aircraft* aircraft = create_aircraft(identifier, manufacturer, model, year_int, capacity_int, range_int);
 
     if (aircraft != NULL) {
-        aircraft_catalog_add(catalog_manager_get_aircrafts(manager), aircraft);
+        aircraft_catalog_add(get_aircrafts_from_catalog_manager(manager), aircraft);
     }
 }
 
@@ -103,7 +103,7 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
     Airport* airport = create_airport(code, name, city, country, latitude, longitude, icao, type);
     
     if (airport != NULL) {
-        airport_catalog_add(catalog_manager_get_airports(manager), airport);
+        airport_catalog_add(get_airports_from_catalog_manager(manager), airport);
     }
 }
 
@@ -120,6 +120,7 @@ void init_flights_errors_file() {
 
 void process_valid_line_flights(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     CatalogManager* manager = (CatalogManager*) user_data;
+    AircraftCatalog* aircraft_catalog = get_aircrafts_from_catalog_manager(manager);
 
     char *flight_id = fields[0];
     char *departure = fields[1];
@@ -164,7 +165,11 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         gate, status, origin, destination, aircraft, airline);        
 
     if (flight != NULL) {
-        flight_catalog_add(catalog_manager_get_flights(manager), flight);
+        flight_catalog_add(get_flights_from_catalog_manager(manager), flight);
+
+        if (strcmp(status, "Cancelled") != 0) {
+            aircrafts_counter_increment(get_aircraft_id_from_flight(flight), aircraft_catalog);
+        }
     }
 }
 

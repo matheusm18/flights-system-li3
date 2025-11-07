@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 void process_commands(const char* commands_file, CatalogManager* catalog_manager) {
     
     FILE* file = fopen(commands_file, "r");
@@ -25,7 +26,7 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
         char manufacturer[100];
         int N;
         char start_date[20], end_date[20];
-        
+
         // remover o '\n' no final da string
         line[strcspn(line, "\r\n")] = '\0';
 
@@ -44,7 +45,7 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
             case 1:
 
                 if (sscanf(line, "%d %s", &query, airport_code) == 2) {
-                    execute_query1(catalog_manager_get_airports(catalog_manager), airport_code, output_path);
+                    execute_query1(get_airports_from_catalog_manager(catalog_manager), airport_code, output_path);
                 }
                 break;
                 
@@ -52,19 +53,19 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
                 
                 // tentar com fabricante primeiro
                 if (sscanf(line, "%d %d %99s", &query, &N, manufacturer) == 3) {
-                    execute_query2(catalog_manager_get_flights(catalog_manager), catalog_manager_get_aircrafts(catalog_manager), N, manufacturer, output_path);
+                    execute_query2(get_flights_from_catalog_manager(catalog_manager), get_aircrafts_from_catalog_manager(catalog_manager), N, manufacturer, output_path);
                 } 
 
                 // tentar sem fabricante
                 else if (sscanf(line, "%d %d", &query, &N) == 2) {
-                    execute_query2(catalog_manager_get_flights(catalog_manager), catalog_manager_get_aircrafts(catalog_manager), N, NULL, output_path);
+                    execute_query2(get_flights_from_catalog_manager(catalog_manager), get_aircrafts_from_catalog_manager(catalog_manager), N, NULL, output_path);
                 }
                 break;
 
             case 3:
 
                 if (sscanf(line, "%d %19s %19s", &query, start_date, end_date) == 3) {
-                    execute_query3(catalog_manager_get_flights(catalog_manager), catalog_manager_get_airports(catalog_manager), start_date, end_date, output_path);
+                    execute_query3(get_flights_from_catalog_manager(catalog_manager), get_airports_from_catalog_manager(catalog_manager), start_date, end_date, output_path);
                 }
                 break;
 

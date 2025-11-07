@@ -29,22 +29,22 @@ void catalog_manager_destroy(CatalogManager* manager) {
     free(manager);
 }
 
-AirportCatalog* catalog_manager_get_airports(const CatalogManager* manager) {
+AirportCatalog* get_airports_from_catalog_manager(const CatalogManager* manager) {
     return manager->airport_catalog;
 }
 
-AircraftCatalog* catalog_manager_get_aircrafts(const CatalogManager* manager) {
+AircraftCatalog* get_aircrafts_from_catalog_manager(const CatalogManager* manager) {
     return manager->aircraft_catalog;
 }
 
-FlightCatalog* catalog_manager_get_flights(const CatalogManager* manager) {
+FlightCatalog* get_flights_from_catalog_manager(const CatalogManager* manager) {
     return manager->flight_catalog;
 }
 
-PassengerCatalog* catalog_manager_get_passengers(const CatalogManager* manager) {
+PassengerCatalog* get_passengers_from_catalog_manager(const CatalogManager* manager) {
     return manager->passenger_catalog;
 }
 
-ReservationCatalog* catalog_manager_get_reservations(const CatalogManager* manager) {
+ReservationCatalog* get_passenger_from_catalog_manager(const CatalogManager* manager) {
     return manager->reservation_catalog;
 }

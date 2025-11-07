@@ -8,68 +8,52 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-// heap
-// estrutura auxiliar para ordenar
+
 struct aircraft_count{
     char* aircraft_id;
     int flight_count;
 };
 
-void count_flights_by_aircraft (FlightCatalog* flight_manager, GHashTable* counts,const char* manufacturer_filter, AircraftCatalog* aircraft_catalog){
-    GHashTable* flights_catalog = get_flight_catalog(flight_manager);
-    GHashTableIter i; // i itera pela GHashtable
+GHashTable* count_flights_by_aircraft (FlightCatalog* flight_manager,const char* manufacturer_filter, AircraftCatalog* aircraft_catalog){
+    GHashTable* precalculated_counts = get_aircraft_flights_counter(aircraft_catalog);
+    if (!precalculated_counts) return NULL;
+
+    if (!manufacturer_filter || !*manufacturer_filter) return precalculated_counts;
+
+    GHashTable* filtered = g_hash_table_new(g_str_hash,g_str_equal);
+
+    GHashTableIter i; 
     gpointer key, value;
 
-    g_hash_table_iter_init(&i, flights_catalog); // inicializa i para percorrer a hashtable
+    g_hash_table_iter_init(&i, precalculated_counts);
 
+    // Filtro, só passa o necessário
     while (g_hash_table_iter_next(&i, &key, &value)) {
-        Flight* flight = (Flight*) value; // temos de colocar (Flight *) porque GHashtable "armazena" ponteiro genéricos para void*
-        const char* status = get_flight_status(flight);
+        const char* aircraft_id = (const char*)key; 
+        Aircraft* aircraft = get_aircraft_by_identifier(aircraft_catalog, aircraft_id);
 
-        if (status && g_strcmp0(status, "Cancelled") == 0) continue; // ignora voos cancelados
+        if (!aircraft) continue;
 
-        const char* aircraft_id = get_aircraft_id_from_flight(flight);
-        if (!aircraft_id) continue;
-
-        // filtro do manufacturer
-        if (manufacturer_filter != NULL && strlen(manufacturer_filter) > 0) {
-            Aircraft* aircraft = get_aircraft_by_identifier(aircraft_catalog, aircraft_id);
-            if (!aircraft) continue;
-            
-            const char* manufacturer = get_aircraft_manufacturer(aircraft);
-            if (!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0) {
-                continue; // ignora se não é do fabricante desejado
-            }
+        const char* manufacturer = get_aircraft_manufacturer(aircraft);
+        if (!manufacturer || strcmp(manufacturer, manufacturer_filter) != 0) {
+            continue; // ignora se não é do fabricante desejado
         }
 
-        gpointer stored_key = NULL;
-        gpointer stored_val = NULL;
-
-        /* se a chave ja existe, usamos lookup_extended para obter o ponteiro interno e reaproveitamos
-           g_hash_table_steal remove a entrada sem libertar a chave, permitindo reinserir o mesmo ponteiro com o novo contador 
-        */
-
-        if (g_hash_table_lookup_extended(counts, aircraft_id, &stored_key, &stored_val)) {
-            int new_count = GPOINTER_TO_INT(stored_val) + 1;
-            g_hash_table_steal(counts, stored_key);
-            g_hash_table_insert(counts, stored_key, GINT_TO_POINTER(new_count));
-        } else {
-            g_hash_table_insert(counts, g_strdup(aircraft_id), GINT_TO_POINTER(1));
-        }
+        g_hash_table_insert(filtered, g_strdup(aircraft_id), value);
     }
+    return filtered;
 }
 
 int compare_aircraft_counts(const void* a, const void* b) {
     AircraftCount* ac1 = (AircraftCount*)a;
     AircraftCount* ac2 = (AircraftCount*)b;
     
-    // compara por número de voos (decrescente)
     if (ac2->flight_count != ac1->flight_count) {
         return ac2->flight_count - ac1->flight_count;
     }
     
     // caso de empate 
-    return strcmp(ac1->aircraft_id, ac2->aircraft_id); // ordena por ID (crescente: "XB-NIQ0" antes de "XB-OIQ0")
+    return strcmp(ac1->aircraft_id, ac2->aircraft_id);
 }
 
 AircraftCount* convert_and_sort(GHashTable* counts, int* number_of_aircrafts) {
@@ -87,7 +71,6 @@ AircraftCount* convert_and_sort(GHashTable* counts, int* number_of_aircrafts) {
         index++;
     }
     
-    // ordena o array
     qsort(array, *number_of_aircrafts, sizeof(AircraftCount), compare_aircraft_counts);
     
     return array;
@@ -129,9 +112,15 @@ void execute_query2(FlightCatalog* flight_manager, AircraftCatalog* aircraft_man
         return;
     }
 
-    GHashTable* flight_counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    GHashTable* precalculated_counts = get_aircraft_flights_counter(aircraft_manager);
 
-    count_flights_by_aircraft(flight_manager, flight_counts, manufacturer, aircraft_manager);
+    if (!precalculated_counts) {
+        fprintf(output_file, "\n");
+        fclose(output_file);
+        return;
+    }
+
+    GHashTable* flight_counts = count_flights_by_aircraft(flight_manager, manufacturer, aircraft_manager);
 
     int number_of_aircrafts;
     AircraftCount* sorted_array = convert_and_sort(flight_counts, &number_of_aircrafts);
@@ -140,8 +129,10 @@ void execute_query2(FlightCatalog* flight_manager, AircraftCatalog* aircraft_man
 
     if (number_of_aircrafts == 0) fprintf(output_file, "\n");
 
+    // Só destrói se foi criada temporariamente
+    if (manufacturer && *manufacturer) g_hash_table_destroy(flight_counts); 
+
     free_aircraft_count_array(sorted_array, number_of_aircrafts);
-    g_hash_table_destroy(flight_counts);
     fclose(output_file);
 
 }

@@ -13,10 +13,10 @@ typedef struct CatalogManager CatalogManager;
 CatalogManager* catalog_manager_create(void);
 void catalog_manager_destroy(CatalogManager* manager);
 
-AirportCatalog* catalog_manager_get_airports(const CatalogManager* manager);
-AircraftCatalog* catalog_manager_get_aircrafts(const CatalogManager* manager);
-FlightCatalog* catalog_manager_get_flights(const CatalogManager* manager);
-PassengerCatalog* catalog_manager_get_passengers(const CatalogManager* manager);
-ReservationCatalog* catalog_manager_get_reservations(const CatalogManager* manager);
+AirportCatalog* get_airports_from_catalog_manager(const CatalogManager* manager);
+AircraftCatalog* get_aircrafts_from_catalog_manager(const CatalogManager* manager);
+FlightCatalog* get_flights_from_catalog_manager(const CatalogManager* manager);
+PassengerCatalog* get_passengers_from_catalog_manager(const CatalogManager* manager);
+ReservationCatalog* get_passenger_from_catalog_manager(const CatalogManager* manager);
 
 #endif

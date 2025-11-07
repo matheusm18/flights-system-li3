@@ -5,6 +5,7 @@
 
 struct flight_catalog {
     GHashTable* flights_by_flight_id;
+    GHashTable* flights_by_origin;
 };
 
 FlightCatalog* flight_catalog_create() {
@@ -50,4 +51,6 @@ GHashTable* get_flight_catalog(FlightCatalog* manager) {
     if (!manager) return NULL;
     return manager->flights_by_flight_id;
 }
+
+
 
