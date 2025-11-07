@@ -138,7 +138,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
     if (!validate_flight_id_flight(flight_id) || !validate_arrivals_and_departures_flight(departure) || !validate_actual_arrivals_and_departures_flight(departure, actual_departure) ||
         !validate_arrivals_and_departures_flight(arrival) || !validate_actual_arrivals_and_departures_flight(arrival, actual_arrival) ||
         !validate_status_flight(status, departure, arrival, actual_departure, actual_arrival) || !validate_origin_flight(origin) || !validate_destination_flight(origin, destination) ||
-        !validate_aircraft_flight(aircraft)) {
+        !validate_aircraft_flight(aircraft) || !get_aircraft_by_identifier(aircraft_catalog, aircraft)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
