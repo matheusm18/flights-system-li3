@@ -30,7 +30,10 @@ bool validate_destination_different_origin(const char *origin, const char *desti
 }
 
 // valida se arrival >= departure e actual_arrival >= actual_departure
-bool validate_temporal_consistency(long departure, long arrival, long actual_departure, long actual_arrival) {
+bool validate_temporal_consistency(const char *status, long departure, long arrival, long actual_departure, long actual_arrival) {
+    // se o status for Cancelled, não comparamos as datas
+    if (status && strcmp(status, "Cancelled") == 0) return true; // considera válido
+
     // arrival não pode ser anterior a departure
     if (compare_datetimes(arrival, departure) < 0) return false;
     
@@ -94,7 +97,7 @@ bool validate_flight_logical(const char *origin, const char *destination, long d
     if (!validate_destination_different_origin(origin, destination)) return false;
     
     // validar se arrival >= departure e actual_arrival >= actual_departure
-    if (!validate_temporal_consistency(departure, arrival, actual_departure, actual_arrival)) return false;
+    if (!validate_temporal_consistency(status, departure, arrival, actual_departure, actual_arrival)) return false;
     
     // verificar se aircraft existe no catálogo
     if (!validate_aircraft_flight(aircraft, aircraft_catalog)) return false;

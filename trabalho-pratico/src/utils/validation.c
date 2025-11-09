@@ -156,6 +156,8 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         return;
     }
 
+    // vamos tratar os casos dos campos com 'N/A' convertendo para -1 no datetime
+
     long departure_dt = string_to_datetime(departure);
     long actual_departure_dt = string_to_datetime(actual_departure);
     long arrival_dt = string_to_datetime(arrival);

@@ -50,6 +50,8 @@ bool validate_time(const char* time) {
 // valida formato datetime "YYYY-MM-DD HH:MM"
 bool validate_datetime(const char* datetime) {
     if (!datetime) return false;
+
+    if (strcmp(datetime, "N/A") == 0) return true; // aceitar 'N/A' como válido
     
     // "YYYY-MM-DD HH:MM" = 16 caracteres
     if (strlen(datetime) < 16) return false;

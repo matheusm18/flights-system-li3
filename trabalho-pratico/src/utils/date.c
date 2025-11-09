@@ -1,6 +1,7 @@
 #include "utils/date.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int string_to_date(const char* str) {
     if (!str) return 0;
@@ -15,6 +16,8 @@ int string_to_date(const char* str) {
 
 long string_to_datetime(const char* str) {
     if (!str) return 0;
+
+    if (strcmp(str, "N/A") == 0) return -1; // tratamento especial para 'N/A'
     
     int year, month, day, hour, minute;
     int scanned = sscanf(str, "%d-%d-%d %d:%d", &year, &month, &day, &hour, &minute);
