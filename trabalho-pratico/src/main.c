@@ -28,8 +28,9 @@ int main(int argc, char **argv) {
     load_datasets(dataset_path, catalog_manager);
 
     // processar comandos do ficheiro
+    int command_counter = 1;
     printf("\nA processar inputs de: %s\n", commands_path);
-    process_commands(commands_path, catalog_manager);
+    process_commands(commands_path, catalog_manager, &command_counter);
 
     printf("\nProcessamento concluído! Verifique a pasta 'resultados/'\n");
 

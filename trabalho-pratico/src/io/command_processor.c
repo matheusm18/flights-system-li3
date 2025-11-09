@@ -6,8 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-
-void process_commands(const char* commands_file, CatalogManager* catalog_manager) {
+void process_commands(const char* commands_file, CatalogManager* catalog_manager, int* command_counter) {
     
     FILE* file = fopen(commands_file, "r");
     if (!file) {
@@ -16,7 +15,6 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
     }
     
     char line[100];
-    int command_counter = 1; // contador para saber qual o numero do comando
     
     // fgets vai ler até encontrar o \n e vai incluir no buffer de line
     // fgets retornar null quando chega no EOF (end of file)
@@ -32,11 +30,11 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
 
         // criar caminho do output file
         char output_path[100];
-        snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
+        snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", *command_counter);
 
         // primeiro extraimos o n da query
         if (sscanf(line, "%d", &query) != 1) {
-            command_counter++;
+            (*command_counter)++;
             continue; // pular para a próxima iteração do while (ler proxima linha do input)
         }
 
@@ -74,7 +72,7 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
                 break;
         }
         
-        command_counter++;
+        (*command_counter)++;
     }
     
     fclose(file);

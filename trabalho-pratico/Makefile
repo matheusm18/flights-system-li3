@@ -1,35 +1,53 @@
+# Diretórios
+SRC_DIR     = src
+CATALOG_DIR = $(SRC_DIR)/catalog
+ENTITIES_DIR= $(SRC_DIR)/entities
+IO_DIR      = $(SRC_DIR)/io
+QUERIES_DIR = $(SRC_DIR)/queries
+TESTS_DIR   = tests
+UTILS_DIR   = $(SRC_DIR)/utils
+
 # Compilador
-CC = gcc
-
-# Flags de linkagem
-LDFLAGS = `pkg-config --libs glib-2.0` -lm
-
-# Flags de compilação
+CC     = gcc
 CFLAGS = -Wall -Iinclude `pkg-config --cflags glib-2.0`
+LDFLAGS= `pkg-config --libs glib-2.0` -lm
 
-# Nome do executável
-NAME = programa-principal
+MAIN_PROGRAM = programa-principal
+TEST_PROGRAM = programa-testes
 
-# Ficheiros fonte
-SRCS = src/main.c src/io/parser.c src/utils/utils.c src/utils/validation.c src/utils/aircraft_validation.c src/utils/airport_validation.c src/utils/date_validation.c\
-       src/utils/date.c src/utils/flight_validation.c src/utils/passenger_validation.c src/utils/reservation_validation.c\
-       src/catalog/airport_catalog.c src/catalog/flight_catalog.c src/catalog/aircraft_catalog.c src/catalog/passenger_catalog.c src/catalog/catalog_manager.c\
-       src/entities/airport.c src/entities/flight.c src/entities/aircraft.c src/entities/passenger.c\
-       src/queries/query1.c src/queries/query2.c src/queries/query3.c src/io/command_processor.c
+# Fontes da aplicação
+SRCS_APP     := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c')
+SRCS_MAIN    := $(SRC_DIR)/main.c
+SRCS_TEST    := $(wildcard $(TESTS_DIR)/*.c)
 
-# Ficheiros objeto
-OBJS = $(SRCS:.c=.o)
+# Objetos
+OBJS_APP     := $(SRCS_APP:.c=.o)
+OBJS_MAIN    := $(SRCS_MAIN:.c=.o)
+OBJS_TEST    := $(SRCS_TEST:.c=.o)
 
-# Regra principal (executável)
-all: $(NAME)
+# Alvo padrão
+all: $(MAIN_PROGRAM) $(TEST_PROGRAM)
 
-$(NAME): $(OBJS)
+# Programa principal
+$(MAIN_PROGRAM): $(OBJS_MAIN) $(OBJS_APP)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
-# Regras de compilação de cada ficheiro .c para .o
-src/%.o: src/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+# Programa de testes
+$(TEST_PROGRAM): $(OBJS_TEST) $(OBJS_APP)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
-# Limpeza (remove executável e object files)
+# Compilar .c -> .o (src)
+$(SRC_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compilar .c -> .o (subpastas do src)
+$(SRC_DIR)/%/%.o: $(SRC_DIR)/%/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compilar .c -> .o (tests)
+$(TESTS_DIR)/%.o: $(TESTS_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Limpeza
 clean:
-	rm -f $(NAME) src/*.o src/**/*.o
+	rm -f $(MAIN_PROGRAM) $(TEST_PROGRAM) $(OBJS_APP) $(OBJS_MAIN) $(OBJS_TEST)

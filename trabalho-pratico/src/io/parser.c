@@ -85,49 +85,49 @@ void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
     char reservations_file[256];
     snprintf(reservations_file, sizeof(reservations_file), "%s/reservations.csv", dataset_path);
   
-    printf("\nA inicializar ficheiro de erros de aeroportos...\n");
+    //printf("\nA inicializar ficheiro de erros de aeroportos...\n");
     init_airports_errors_file();
     FILE *airports_errors = fopen("resultados/airports_errors.csv", "a");
 
-    printf("\nA carregar os aeroportos de: %s", airports_file);
+    //printf("\nA carregar os aeroportos de: %s", airports_file);
     read_csv(8, airports_file, process_valid_line_airports, catalog_manager, airports_errors);
     fclose(airports_errors);
-    printf("\nTodos os aeroportos válidos foram carregados!\n");
+    //printf("\nTodos os aeroportos válidos foram carregados!\n");
 
-    printf("\nA inicializar ficheiro de erros de aeronaves...\n");
+    //printf("\nA inicializar ficheiro de erros de aeronaves...\n");
     init_aircrafts_errors_file();
     FILE *aircrafts_errors = fopen("resultados/aircrafts_errors.csv", "a");
 
-    printf("\nA carregar as aeronaves de: %s", aircrafts_file);
+    //printf("\nA carregar as aeronaves de: %s", aircrafts_file);
     read_csv(6, aircrafts_file, process_valid_line_aircrafts, catalog_manager, aircrafts_errors);
     fclose(aircrafts_errors);
-    printf("\nTodas as aeronaves válidas foram carregadas!\n");
+    //printf("\nTodas as aeronaves válidas foram carregadas!\n");
 
-    printf("\nA inicializar ficheiro de erros de voos...\n");
+    //printf("\nA inicializar ficheiro de erros de voos...\n");
     init_flights_errors_file();
     FILE *flights_errors = fopen("resultados/flights_errors.csv", "a");
 
-    printf("\nA carregar os voos de: %s", flights_file);
+    //printf("\nA carregar os voos de: %s", flights_file);
     read_csv(12, flights_file, process_valid_line_flights, catalog_manager, flights_errors);
     fclose(flights_errors);
-    printf("\nTodos os voos válidos foram carregados!\n");
+    //printf("\nTodos os voos válidos foram carregados!\n");
 
-    printf("\nA inicializar ficheiro de erros de passageiros...\n");
+    //printf("\nA inicializar ficheiro de erros de passageiros...\n");
     init_passengers_errors_file();
     FILE *passengers_errors = fopen("resultados/passengers_errors.csv", "a");
 
-    printf("\nA carregar os passageiros de: %s", passengers_file);
+    //printf("\nA carregar os passageiros de: %s", passengers_file);
     read_csv(10, passengers_file, process_valid_line_passengers, catalog_manager, passengers_errors);
     fclose(passengers_errors);
-    printf("\nTodos os passageiros válidos foram carregados!\n");
+    //printf("\nTodos os passageiros válidos foram carregados!\n");
 
-    printf("\nA inicializar ficheiro de erros de reservas...\n");
+    //printf("\nA inicializar ficheiro de erros de reservas...\n");
     init_reservations_errors_file();
     FILE *reservations_errors = fopen("resultados/reservations_errors.csv", "a");
 
-    printf("\nA carregar as reservas de: %s", reservations_file);
+    //printf("\nA carregar as reservas de: %s", reservations_file);
     read_csv(8, reservations_file, process_valid_line_reservations, catalog_manager, reservations_errors);
     fclose(reservations_errors);
-    printf("\nTodos as reservas válidas foram carregadas!\n");
+    //printf("\nTodos as reservas válidas foram carregadas!\n");
 
 }
