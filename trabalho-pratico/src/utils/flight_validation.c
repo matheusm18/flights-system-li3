@@ -24,8 +24,10 @@ bool validate_flight_id_flight(const char *flight_id) {
 
 //======== Logical validation: Flights
 
-bool validate_destination_different_origin(const char *origin, const char *destination) {
+bool validate_destination_origin(const char *origin, const char *destination) {
     if (!origin || !destination) return false;
+    
+    if (!validate_code_airport(origin) || !validate_code_airport(destination)) return false;
     return (strcmp(origin, destination) != 0);
 }
 
@@ -94,7 +96,7 @@ bool validate_flight_logical(const char *origin, const char *destination, long d
                              const char *actual_arrival_str) {
     
     // validar se origin e destination são diferentes
-    if (!validate_destination_different_origin(origin, destination)) return false;
+    if (!validate_destination_origin(origin, destination)) return false;
     
     // validar se arrival >= departure e actual_arrival >= actual_departure
     if (!validate_temporal_consistency(status, departure, arrival, actual_departure, actual_arrival)) return false;

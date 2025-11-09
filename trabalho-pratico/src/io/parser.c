@@ -6,16 +6,35 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-void remove_quotation_marks(char *s) {
-    if (!s) return;
-    
-    size_t len = strlen(s);
-    if (len >= 2 && s[0] == '"' && s[len - 1] == '"') {
-        for (size_t i = 1; i < len - 1; i++) {
-            s[i - 1] = s[i];
+void parse_csv_line(char *line, char *fields[], int max_fields, int *num_fields) {
+    int i = 0;
+    char *ptr = line;
+
+    while (*ptr && i < max_fields) {
+        // SEMPRE começa com aspas
+        if (*ptr != '"') {
+            break;
         }
-        s[len - 2] = '\0';
+        
+        ptr++; // pula a primeira aspas
+        fields[i++] = ptr; // guarda o início do campo no array de campos
+        
+        // procura a aspas de fecho
+        while (*ptr && !(*ptr == '"' && (*(ptr+1) == ',' || *(ptr+1) == '\0' || *(ptr+1) == '\r' || *(ptr+1) == '\n'))) {
+            ptr++;
+        }
+        
+        if (*ptr == '"') {
+            *ptr = '\0'; // termina string
+            ptr++;
+            if (*ptr == ',') ptr++; // pula vírgula
+        
+        } else {
+            // aspas não fechada
+            break;
+        }
     }
+    *num_fields = i;
 }
 
 void read_csv(int fields_length, const char *filename, void (*callback)(char **fields, int num_fields, void* user_data, FILE* errors_file), void* user_data, FILE* errors_file) {
@@ -25,31 +44,25 @@ void read_csv(int fields_length, const char *filename, void (*callback)(char **f
         return;
     }
 
-    char line[1024];
+    char line[100000];
     int first_line = 1;
-
-    while (fgets(line, sizeof(line), fp)) {  // lê uma linha: a string lida de fp será armazenada em line(buffer, uma área temporária de armazenamento), lê um número máximo de caracteres
+    
+    while (fgets(line, sizeof(line), fp)) { 
         if (first_line) {
             first_line = 0;
             continue;
         }
+        
+        line[strcspn(line, "\r\n")] = '\0'; // remove newline characters
 
-        line[strcspn(line, "\r\n")] = '\0'; // remover \n do final da string na posição devolvida por strcspn
-
-        char *fields[fields_length];
+        char *fields[fields_length];  // array de strings
         int num_fields = 0;
-        char *token = strtok(line, "\""); // delimitar com aspas duplas
 
-        while (token && num_fields < fields_length) {
-            if (!(token[0] == ',' && token[1] == '\0')) { // verifica se não é a virgula entre os dados
-                remove_quotation_marks(token);
-                fields[num_fields++] = token;
-            }
-            token = strtok(NULL, "\"");
-        }
+        parse_csv_line(line, fields, fields_length, &num_fields);
 
-        if (callback)
+        if (num_fields == fields_length && callback) {
             callback(fields, num_fields, user_data, errors_file);
+        }
     }
 
     fclose(fp);
@@ -104,7 +117,7 @@ void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
     FILE *passengers_errors = fopen("resultados/passengers_errors.csv", "a");
 
     printf("\nA carregar os passageiros de: %s", passengers_file);
-    read_csv(9, passengers_file, process_valid_line_passengers, catalog_manager, passengers_errors);
+    read_csv(10, passengers_file, process_valid_line_passengers, catalog_manager, passengers_errors);
     fclose(passengers_errors);
     printf("\nTodos os passageiros válidos foram carregados!\n");
 
