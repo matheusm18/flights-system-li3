@@ -41,7 +41,7 @@ Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* ident
     return g_hash_table_lookup(manager->aircraft_by_identifier, identifier); 
 } 
 
-void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager){
+void aircrafts_counter_increment(char* aircraft_id, AircraftCatalog* manager){
     if (!manager || !aircraft_id || !*aircraft_id) return;
     
     gpointer stored_key = NULL;

@@ -201,7 +201,7 @@ void init_passengers_errors_file() {
         perror("Erro ao criar ficheiro passengers_errors.csv");
         return;
     }
-    fprintf(f, "\"document_number\",\"first_name\",\"last_name\",\"dob\",\"nationality\",\"gender\",\"email\",\"phone\",\"address\",\"photo\"\n");
+    fprintf(f, "\"document number\",\"first name\",\"last name\",\"dob\",\"nationality\",\"gender\",\"email\",\"phone\",\"address\",\"photo\"\n");
     fclose(f);
 }
 
@@ -236,6 +236,7 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
                 phone,
                 address,
                 photo);
+        return;
     }
 }
 
@@ -246,7 +247,7 @@ void init_reservations_errors_file() {
         perror("Erro ao criar ficheiro reservations_errors.csv");
         return;
     }
-    fprintf(f, "\"reservation_id\",\"flight_ids\",\"document_number\",\"seat\",\"price\",\"extra_luggage\",\"priority_boarding\",\"qr_code\"\n");
+    fprintf(f, "\"reservation id\",\"flight ids\",\"document number\",\"seat\",\"price\",\"extra luggage\",\"priority boarding\",\"qr code\"\n");
     fclose(f);
 }
 
@@ -276,5 +277,6 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
                 extra_luggage,
                 priority_boarding,
                 qr_code);
+        return;
     }
 }

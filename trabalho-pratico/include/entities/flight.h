@@ -14,6 +14,6 @@ long get_flight_actual_departure(const Flight* f);
 const char* get_flight_id(const Flight* flight);
 const char* get_flight_origin(const Flight* f);
 const char* get_flight_status(const Flight* f);
-const char* get_aircraft_id_from_flight(const Flight* f);
+char* get_aircraft_id_from_flight(const Flight* f);
 
 #endif

@@ -81,7 +81,7 @@ const char* get_flight_id(const Flight* flight) {
     return flight->flight_id;
 }
 
-const char* get_aircraft_id_from_flight(const Flight* flight) {
+char* get_aircraft_id_from_flight(const Flight* flight) {
     if (flight == NULL || flight->aircraft == NULL) {
         return NULL;
     }

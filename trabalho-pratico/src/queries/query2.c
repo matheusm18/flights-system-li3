@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
 struct aircraft_count{
     char* aircraft_id;
     int flight_count;
@@ -34,7 +33,7 @@ GHashTable* filter_aircraft_by_manufacturer (GHashTable* precalculated_counts, c
         
         if (manufacturer_filter && *manufacturer_filter) {
             const char* manufacturer = get_aircraft_manufacturer(aircraft);
-            if(!manufacturer || strcmp(manufacturer, manufacturer_filter) != 0){
+            if(!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0){
                 continue;
             }
         }

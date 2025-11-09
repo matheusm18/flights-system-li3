@@ -9,10 +9,8 @@
 //======== Syntactic validation: Passengers
 
 bool validate_passenger_document_number(const char *document_number){
-    if (document_number == NULL) {
-        return false;
-    }
-
+    if (document_number == NULL) return false;
+    
     // tem de ter obrigatoriamente 9 dígitos
     if (strlen(document_number) != 9){
         return false;
