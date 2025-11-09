@@ -206,7 +206,7 @@ void init_passengers_errors_file() {
 }
 
 void process_valid_line_passengers(char **fields, int num_fields, void* user_data, FILE *errors_file) {
-    //CatalogManager* manager = (CatalogManager*) user_data;
+    CatalogManager* manager = (CatalogManager*) user_data;
 
     char *document_number = fields[0];
     char *first_name = fields[1];
@@ -238,6 +238,14 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
                 photo);
         return;
     }
+
+    int dob_dt = string_to_date(dob);
+
+    Passenger* passenger = create_passenger(document_number, first_name, last_name, dob_dt, nationality, gender);
+    
+    if (passenger != NULL) {
+        passenger_catalog_add(get_passengers_from_catalog_manager(manager), passenger);
+    }
 }
 
 void init_reservations_errors_file() {
@@ -252,7 +260,9 @@ void init_reservations_errors_file() {
 }
 
 void process_valid_line_reservations(char **fields, int num_fields, void* user_data, FILE *errors_file) {
-    //CatalogManager* manager = (CatalogManager*) user_data;
+    CatalogManager* manager = (CatalogManager*) user_data;
+    FlightCatalog* flight_catalog = get_flights_from_catalog_manager(manager);
+    PassengerCatalog* passenger_catalog = get_passengers_from_catalog_manager(manager);
     
     char *reservation_id = fields[0];
     char *flight_ids = fields[1];
@@ -264,8 +274,8 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     char *qr_code = fields[7];
 
     if (!validate_reservation_id(reservation_id) ||
-        !validate_flight_ids_reservation(flight_ids) ||
-        !validate_document_number_reservation(document_number)) {
+        !validate_flight_ids_reservation(flight_ids, flight_catalog) ||
+        !validate_document_number_reservation(document_number, passenger_catalog)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",

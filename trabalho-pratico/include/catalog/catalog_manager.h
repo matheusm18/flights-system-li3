@@ -17,6 +17,6 @@ AirportCatalog* get_airports_from_catalog_manager(const CatalogManager* manager)
 AircraftCatalog* get_aircrafts_from_catalog_manager(const CatalogManager* manager);
 FlightCatalog* get_flights_from_catalog_manager(const CatalogManager* manager);
 PassengerCatalog* get_passengers_from_catalog_manager(const CatalogManager* manager);
-ReservationCatalog* get_passenger_from_catalog_manager(const CatalogManager* manager);
+ReservationCatalog* get_reservations_from_catalog_manager(const CatalogManager* manager);
 
 #endif

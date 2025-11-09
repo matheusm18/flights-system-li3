@@ -39,6 +39,27 @@ Flight* get_flight_by_flight_id_from_catalog(FlightCatalog* manager, const char*
     return g_hash_table_lookup(manager->flights_by_flight_id, flight_id); // retorna null se n existir
 }
 
+const char* flight_catalog_get_origin(const FlightCatalog* manager, const char* flight_id) {
+    if (manager == NULL || flight_id == NULL) return NULL;
+
+    Flight* f = g_hash_table_lookup(manager->flights_by_flight_id, flight_id);
+
+    if (!f) return NULL;
+
+    return get_flight_origin(f);
+}
+
+const char* flight_catalog_get_destination(const FlightCatalog* manager, const char* flight_id) {
+    if (manager == NULL || flight_id == NULL) return NULL;
+
+    Flight* f = g_hash_table_lookup(manager->flights_by_flight_id, flight_id);
+    
+    if (!f) return NULL;
+
+    return get_flight_destination(f);
+}
+
+
 int flight_catalog_get_count(FlightCatalog* manager) {
     if (manager == NULL) {
         return 0;

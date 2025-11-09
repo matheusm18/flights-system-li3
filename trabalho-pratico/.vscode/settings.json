@@ -18,6 +18,10 @@
         "catalog_manager.h": "c",
         "flight_validation.h": "c",
         "date_validation.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "ctype.h": "c",
+        "passenger_validation.h": "c",
+        "compare": "c",
+        "type_traits": "c"
     }
 }

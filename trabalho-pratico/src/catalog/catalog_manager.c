@@ -15,7 +15,7 @@ CatalogManager* catalog_manager_create() {
     manager->airport_catalog = airport_catalog_create();
     manager->aircraft_catalog = aircraft_catalog_create();
     manager->flight_catalog = flight_catalog_create();
-    //manager->passenger_catalog = passenger_catalog_create();
+    manager->passenger_catalog = passenger_catalog_create();
     //manager->reservation_catalog = reservation_catalog_create();
     return manager;
 }
@@ -24,7 +24,7 @@ void catalog_manager_destroy(CatalogManager* manager) {
     airport_catalog_destroy(manager->airport_catalog);
     aircraft_catalog_destroy(manager->aircraft_catalog);
     flight_catalog_destroy(manager->flight_catalog);
-    //passenger_catalog_destroy(manager->passenger_catalog);
+    passenger_catalog_destroy(manager->passenger_catalog);
     //reservation_catalog_destroy(manager->reservation_catalog);
     free(manager);
 }
@@ -45,6 +45,6 @@ PassengerCatalog* get_passengers_from_catalog_manager(const CatalogManager* mana
     return manager->passenger_catalog;
 }
 
-ReservationCatalog* get_passenger_from_catalog_manager(const CatalogManager* manager) {
+ReservationCatalog* get_reservations_from_catalog_manager(const CatalogManager* manager) {
     return manager->reservation_catalog;
 }

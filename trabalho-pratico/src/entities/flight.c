@@ -71,6 +71,12 @@ const char* get_flight_origin(const Flight* f) {
     return f->origin;
 }
 
+const char* get_flight_destination(const Flight* f) {
+    if (!f) return NULL;
+    return f->destination;
+}
+
+
 const char* get_flight_status(const Flight* f) {
     if (!f) return NULL;
     return f->status;
