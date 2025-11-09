@@ -75,8 +75,7 @@ bool validate_passenger_email(const char *email){
 }
 
 bool validate_passenger_birth_date(const char *dob){
-    if (!validate_date(dob)){
-        return false;
-    }
+    if (!validate_date(dob)) return false;
+    
     return true;
 }

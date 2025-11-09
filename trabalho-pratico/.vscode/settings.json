@@ -16,6 +16,8 @@
         "aircraft_catalog.h": "c",
         "glib.h": "c",
         "catalog_manager.h": "c",
-        "flight_validation.h": "c"
+        "flight_validation.h": "c",
+        "date_validation.h": "c",
+        "stdbool.h": "c"
     }
 }

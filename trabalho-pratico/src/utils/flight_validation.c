@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include "utils/date.h"
 #include "utils/date_validation.h"
 #include "utils/airport_validation.h"
 #include "utils/aircraft_validation.h"
@@ -21,58 +22,85 @@ bool validate_flight_id_flight(const char *flight_id) {
     return true;
 }
 
-bool validate_arrivals_and_departures_flight(const char *datetime) {
-    if (!datetime || strlen(datetime) != 16) return false;
-    char date[11]; // "YYYY-MM-DD" + '\0'
-    char time[6];  // "HH:MM" + '\0'
-    if (sscanf(datetime, "%10s %5s", date, time) != 2) return false;
-    return (validate_date(date) && validate_time(time));
+//======== Logical validation: Flights
+
+bool validate_destination_different_origin(const char *origin, const char *destination) {
+    if (!origin || !destination) return false;
+    return (strcmp(origin, destination) != 0);
 }
 
-bool validate_actual_arrivals_and_departures_flight(const char *datetime1, const char *datetime2) {
-    if (strcmp(datetime2, "N/A") == 0) return true;
-    if (!validate_arrivals_and_departures_flight(datetime2)) return false;
-    if (strcmp(datetime1, datetime2) == 0) return true;
-    return validate_previous_date(datetime1, datetime2);
+// valida se arrival >= departure e actual_arrival >= actual_departure
+bool validate_temporal_consistency(long departure, long arrival, long actual_departure, long actual_arrival) {
+    // arrival não pode ser anterior a departure
+    if (compare_datetimes(arrival, departure) < 0) return false;
+    
+    // actual_arrival não pode ser anterior a actual_departure
+    if (compare_datetimes(actual_arrival, actual_departure) < 0) return false;
+    
+    return true;
 }
 
-bool validate_status_flight(const char *status, const char *departure, const char *arrival, const char *act_departure, const char *act_arrival) {
+bool validate_cancelled_status(const char *status, const char *actual_departure_str, const char *actual_arrival_str) {
+    if (!status || strcmp(status, "Cancelled") != 0) return true; // só valida se for Cancelled
+    
+    return (actual_departure_str && actual_arrival_str && strcmp(actual_departure_str, "N/A") == 0 && strcmp(actual_arrival_str, "N/A") == 0);
+}
+
+// valida status "Delayed" (actual não pode ser anterior a scheduled)
+bool validate_delayed_status(const char *status, long scheduled_departure, long scheduled_arrival, long actual_departure, long actual_arrival) {
+    if (!status || strcmp(status, "Delayed") != 0) return true; // só valida se for Delayed
+    
+    // actual_departure não pode ser anterior a scheduled_departure
+    // compare_datetimes retorna <0 quando a primeira data é menor que a segunda
+    if (compare_datetimes(actual_departure, scheduled_departure) < 0) return false;
+    
+    // actual_arrival não pode ser anterior a scheduled_arrival  
+    if (compare_datetimes(actual_arrival, scheduled_arrival) < 0) return false;
+    
+    return true;
+}
+
+// validação completa de status
+bool validate_status_flight_new(const char *status, long scheduled_departure, long scheduled_arrival, long actual_departure, long actual_arrival,
+                                const char *actual_departure_str, const char *actual_arrival_str) {
+
     if (!status) return false;
 
-    if (strcmp(status, "On Time") == 0) return true;
+    if (strcmp(status, "On Time") == 0) {
+        return true;
+    }
 
     else if (strcmp(status, "Delayed") == 0) {
-        return (validate_previous_date(departure, act_departure) && validate_previous_date(arrival, act_arrival));
+        return validate_delayed_status(status, scheduled_departure, scheduled_arrival, actual_departure, actual_arrival);
     }
 
     else if (strcmp(status, "Cancelled") == 0) {
-        return (strcmp(act_departure, "N/A") == 0 && strcmp(act_arrival, "N/A") == 0);
+        return validate_cancelled_status(status, actual_departure_str, actual_arrival_str);
     }
 
     return false;
 }
 
-bool validate_origin_flight(const char *origin) {
-    return validate_code_airport(origin);
+bool validate_aircraft_flight(const char *aircraft, AircraftCatalog* aircraft_catalog) {
+    return (get_aircraft_by_identifier(aircraft_catalog, aircraft) != NULL);
 }
 
-bool validate_destination_flight(const char *origin, const char *destination) {
-    validate_code_airport(destination);
-
-    if (strcmp(origin, destination) == 0) return false;
+// Validação completa de um voo (lógica)
+bool validate_flight_logical(const char *origin, const char *destination, long departure, long arrival, long actual_departure, long actual_arrival,
+                             const char *status, const char *aircraft, AircraftCatalog* aircraft_catalog, const char *actual_departure_str,
+                             const char *actual_arrival_str) {
+    
+    // validar se origin e destination são diferentes
+    if (!validate_destination_different_origin(origin, destination)) return false;
+    
+    // validar se arrival >= departure e actual_arrival >= actual_departure
+    if (!validate_temporal_consistency(departure, arrival, actual_departure, actual_arrival)) return false;
+    
+    // verificar se aircraft existe no catálogo
+    if (!validate_aircraft_flight(aircraft, aircraft_catalog)) return false;
+    
+    // validar status
+    if (!validate_status_flight_new(status, departure, arrival, actual_departure, actual_arrival, actual_departure_str, actual_arrival_str)) return false;
+    
     return true;
 }
-
-bool validate_aircraft_flight(const char *aircraft) {
-    return true;
-}
-
-/*
-bool validate_gate_flight(const char *gate) {
-    if (!gate || (strlen(gate) != 1 && strlen(gate) != 2)) return false;
-    for (int i = 0; gate[i]; i++) {
-        if (gate[i] < '0' || gate[i] > '9') return false;
-    }
-    return true;
-}
-*/

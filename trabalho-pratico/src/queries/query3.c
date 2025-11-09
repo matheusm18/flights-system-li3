@@ -12,8 +12,8 @@
 #include "utils/date.h"
 
 typedef struct {
-    Date* start;
-    Date* end;
+    int start_date; // YYYYMMDD
+    int end_date;   // YYYYMMDD
     GHashTable* counts; // key = strdup(origin) -> value = int*
 } FlightCounts;
 
@@ -30,17 +30,16 @@ void count_number_flights(gpointer key, gpointer value, gpointer user_data) {
 
     if (!flight) return;
 
-    DateTime* actual_dt = get_flight_actual_departure(flight);
-    if (!actual_dt) return;
-
-    Date* actual_date = &actual_dt->date_part; // para obter date em vez de datetime
+    // Obter actual_departure como long e extrair a parte da data
+    long actual_departure_dt = get_flight_actual_departure(flight);
+    int actual_date = get_date_part(actual_departure_dt);  // YYYYMMDD
 
     const char* origin = get_flight_origin(flight);
     const char* status = get_flight_status(flight);
 
     if (!origin || is_cancelled(status)) return;
-    
-    if (date_compare(actual_date, counter->start) < 0 || date_compare(actual_date, counter->end) > 0) return;
+
+    if (compare_dates(actual_date, counter->start_date) < 0 || compare_dates(actual_date, counter->end_date) > 0) return;
 
     /* usamos g_hash_table_steal() para atualizar o contador sem recriar a chave.
        se usassemos g_hash_table_replace(),  a cada incremento teriamos o g_free() + g_strdup()
@@ -119,25 +118,17 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
 
     if (!flight_manager || !start_date_str || !end_date_str || !output_path) return;
 
-    Date* start = date_create_from_string(start_date_str);
-    Date* end = date_create_from_string(end_date_str);
-
-    if (!start || !end) {
-        write_empty_result(output_path);
-        if (start) date_destroy(start);
-        if (end) date_destroy(end);
-        return;
-    }
+    // converter strings de data para int (YYYYMMDD)
+    int start_date = string_to_date(start_date_str);
+    int end_date = string_to_date(end_date_str);
 
     GHashTable* counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-    FlightCounts flight_counts = {.start = start, .end = end, .counts = counts};
+    FlightCounts flight_counts = {.start_date = start_date, .end_date = end_date, .counts = counts};
 
     GHashTable* flights = get_flight_catalog(flight_manager);
     if (!flights) {
         write_empty_result(output_path);
         g_hash_table_destroy(counts);
-        date_destroy(start);
-        date_destroy(end);
         return;
     }
 
@@ -154,6 +145,4 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     }
 
     g_hash_table_destroy(counts);
-    date_destroy(start);
-    date_destroy(end);
 }

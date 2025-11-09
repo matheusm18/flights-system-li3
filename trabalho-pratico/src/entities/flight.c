@@ -5,10 +5,10 @@
 
 struct flight {
     char* flight_id;
-    DateTime* departure;
-    DateTime* actual_departure;
-    DateTime* arrival;
-    DateTime* actual_arrival;
+    long departure;
+    long actual_departure;
+    long arrival;
+    long actual_arrival;
     char* gate;
     char* status;
     char* origin;
@@ -19,10 +19,10 @@ struct flight {
 };
 
 Flight* create_flight(const char* flight_id,
-                      DateTime* departure,
-                      DateTime* actual_departure,
-                      DateTime* arrival,
-                      DateTime* actual_arrival,
+                      long departure,
+                      long actual_departure,
+                      long arrival,
+                      long actual_arrival,
                       const char* gate,
                       const char* status,
                       const char* origin,
@@ -59,16 +59,10 @@ void destroy_flight(Flight* f) {
     free(f->aircraft);
     free(f->airline);
 
-    datetime_destroy(f->departure);
-    datetime_destroy(f->actual_departure);
-    datetime_destroy(f->arrival);
-    datetime_destroy(f->actual_arrival);
-
     free(f);
 }
 
-DateTime* get_flight_actual_departure(const Flight* f) {
-    if (!f) return NULL;
+long get_flight_actual_departure(const Flight* f) {
     return f->actual_departure;
 }
 

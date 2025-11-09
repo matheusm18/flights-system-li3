@@ -6,7 +6,6 @@
 #include "utils/date.h"
 #include <stdbool.h>
 
-int compare_datetime(const DateTime* a, const DateTime* b);
 int is_cancelled(const char* status);
 void count_number_flights(gpointer key, gpointer value, gpointer user_data);
 void write_empty_result(const char* output_path) ;

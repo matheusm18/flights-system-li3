@@ -18,7 +18,6 @@ bool validate_reservation_id(const char *reservation_id) {
     return true;
 }
 
-// lógica ainda não está terminada, ver como fazer e delimitar
 bool validate_flight_ids_reservation(const char *flight_ids) {
     if (!flight_ids) return false;
 

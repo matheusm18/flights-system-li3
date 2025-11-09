@@ -135,10 +135,9 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
     char *airline = fields[10];
     char *tracking_url = fields[11];
 
-    if (!validate_flight_id_flight(flight_id) || !validate_arrivals_and_departures_flight(departure) || !validate_actual_arrivals_and_departures_flight(departure, actual_departure) ||
-        !validate_arrivals_and_departures_flight(arrival) || !validate_actual_arrivals_and_departures_flight(arrival, actual_arrival) ||
-        !validate_status_flight(status, departure, arrival, actual_departure, actual_arrival) || !validate_origin_flight(origin) || !validate_destination_flight(origin, destination) ||
-        !validate_aircraft_flight(aircraft) || !get_aircraft_by_identifier(aircraft_catalog, aircraft)) {
+    // validações sintática
+    if (!validate_flight_id_flight(flight_id) || !validate_datetime(departure) || !validate_datetime(actual_departure) ||
+        !validate_datetime(arrival) || !validate_datetime(actual_arrival)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -157,12 +156,34 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         return;
     }
 
-    Flight* flight = create_flight(flight_id,
-        datetime_create_from_string(departure),
-        datetime_create_from_string(actual_departure),
-        datetime_create_from_string(arrival),
-        datetime_create_from_string(actual_arrival),
-        gate, status, origin, destination, aircraft, airline);        
+    long departure_dt = string_to_datetime(departure);
+    long actual_departure_dt = string_to_datetime(actual_departure);
+    long arrival_dt = string_to_datetime(arrival);
+    long actual_arrival_dt = string_to_datetime(actual_arrival);
+
+    // validações lógica
+    if (!validate_flight_logical(origin, destination, departure_dt, arrival_dt, actual_departure_dt, actual_arrival_dt,
+                                 status, aircraft, aircraft_catalog, actual_departure, actual_arrival)) {
+
+        fprintf(errors_file,
+                "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                flight_id,
+                departure,
+                actual_departure,
+                arrival,
+                actual_arrival,
+                gate,
+                status,
+                origin,
+                destination,
+                aircraft,
+                airline,
+                tracking_url);
+        return;
+    }
+
+    Flight* flight = create_flight(flight_id, departure_dt, actual_departure_dt, arrival_dt, actual_arrival_dt, gate, status, origin, destination, 
+                                   aircraft, airline);        
 
     if (flight != NULL) {
         flight_catalog_add(get_flights_from_catalog_manager(manager), flight);
@@ -172,7 +193,6 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         }
     }
 }
-
 
 void init_passengers_errors_file() {
     const char *output_path = "resultados/passengers_errors.csv";

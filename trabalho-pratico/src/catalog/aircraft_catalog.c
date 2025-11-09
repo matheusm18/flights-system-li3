@@ -5,7 +5,7 @@
 
 struct aircraft_catalog {
     GHashTable* aircraft_by_identifier;
-        GHashTable* flight_counts;
+    GHashTable* flight_counts;
 };
 
 AircraftCatalog* aircraft_catalog_create() {
