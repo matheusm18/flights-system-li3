@@ -121,6 +121,7 @@ void init_flights_errors_file() {
 void process_valid_line_flights(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     CatalogManager* manager = (CatalogManager*) user_data;
     AircraftCatalog* aircraft_catalog = get_aircrafts_from_catalog_manager(manager);
+    AirportCatalog* airport_catalog = get_airports_from_catalog_manager(manager);
 
     char *flight_id = fields[0];
     char *departure = fields[1];
@@ -192,6 +193,10 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
 
         if (strcmp(status, "Cancelled") != 0) {
             aircrafts_counter_increment(get_aircraft_id_from_flight(flight), aircraft_catalog);
+            long actual_departure = get_flight_actual_departure(flight);
+            int date = get_date_part(actual_departure);
+            const char* flight_origin = get_flight_origin(flight);
+            airport_flights_counter_increment(flight_origin, date, airport_catalog);
         }
     }
 }

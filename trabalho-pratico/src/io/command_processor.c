@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 void process_commands(const char* commands_file, CatalogManager* catalog_manager, int* command_counter) {
     
@@ -24,6 +25,8 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
         char manufacturer[100];
         int N;
         char start_date[20], end_date[20];
+        clock_t inicio, fim;
+        double tempo_gasto;
 
         // remover o '\n' no final da string
         line[strcspn(line, "\r\n")] = '\0';
@@ -63,7 +66,11 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
             case 3:
 
                 if (sscanf(line, "%d %19s %19s", &query, start_date, end_date) == 3) {
+                    inicio = clock();
                     execute_query3(get_flights_from_catalog_manager(catalog_manager), get_airports_from_catalog_manager(catalog_manager), start_date, end_date, output_path);
+                    fim = clock();
+                    tempo_gasto = ((double)(fim-inicio))/CLOCKS_PER_SEC;
+                    printf("tempo gasto %f\n", tempo_gasto);
                 }
                 break;
 

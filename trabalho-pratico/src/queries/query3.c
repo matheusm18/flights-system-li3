@@ -11,53 +11,47 @@
 #include "entities/airport.h"
 #include "utils/date.h"
 
-typedef struct {
-    int start_date; // YYYYMMDD
-    int end_date;   // YYYYMMDD
-    GHashTable* counts; // key = strdup(origin) -> value = int*
-} FlightCounts;
 
-int is_cancelled(const char* status) {
-    if (!status) return 0;
-    return g_strcmp0(status, "Cancelled") == 0;
-}
+GHashTable* filter_by_date_range(GHashTable* precalculated_data, int start_date, int end_date) {
+    if (!precalculated_data) return NULL;
 
-// callback para cada entry na hashtable de flights
-void count_number_flights(gpointer key, gpointer value, gpointer user_data) {
-    (void) key;
-    FlightCounts* counter = (FlightCounts*) user_data;
-    Flight* flight = (Flight*) value;
+    GHashTable* result = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    
+    GHashTableIter iter;
+    gpointer key, value;
+    
+    g_hash_table_iter_init(&iter, precalculated_data);
 
-    if (!flight) return;
-
-    // Obter actual_departure como long e extrair a parte da data
-    long actual_departure_dt = get_flight_actual_departure(flight);
-    int actual_date = get_date_part(actual_departure_dt);  // YYYYMMDD
-
-    const char* origin = get_flight_origin(flight);
-    const char* status = get_flight_status(flight);
-
-    if (!origin || is_cancelled(status)) return;
-
-    if (compare_dates(actual_date, counter->start_date) < 0 || compare_dates(actual_date, counter->end_date) > 0) return;
-
-    /* usamos g_hash_table_steal() para atualizar o contador sem recriar a chave.
-       se usassemos g_hash_table_replace(),  a cada incremento teriamos o g_free() + g_strdup()
-       o steal remove a entrada sem libertar a memória, permitindo reinserir a mesma chave existente.
-    */
-
-    gpointer stored_key = NULL;
-    gpointer stored_val = NULL;
-
-    // se existir a chave vai incrementar, se não existir entao a função retornou NULL e devemos inserir diretamente
-    if (g_hash_table_lookup_extended(counter->counts, origin, &stored_key, &stored_val)) {
-        int new_count = GPOINTER_TO_INT(stored_val) + 1;
-        g_hash_table_steal(counter->counts, stored_key);
-        g_hash_table_insert(counter->counts, stored_key, GINT_TO_POINTER(new_count));
-    } else {
-        g_hash_table_insert(counter->counts, g_strdup(origin), GINT_TO_POINTER(1));
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        const char* composite_key = (const char*)key; // "YYYYMMDD:AIRPORT_CODE"
+        int count = GPOINTER_TO_INT(value);
+        
+        // Extrair data e airport code da chave
+        int date;
+        char airport_code[16];
+        if (sscanf(composite_key, "%d:%15s", &date, airport_code) != 2) {
+            continue;
+        }
+        
+        // Filtrar por intervalo de datas
+        if (compare_dates(date, start_date) < 0 || compare_dates(date, end_date) > 0) continue;
+        
+        // Acumular contagens por aeroporto
+        gpointer stored_key = NULL;
+        gpointer stored_val = NULL;
+        
+        if (g_hash_table_lookup_extended(result, airport_code, &stored_key, &stored_val)) {
+            int new_count = GPOINTER_TO_INT(stored_val) + count;
+            g_hash_table_steal(result, stored_key);
+            g_hash_table_insert(result, stored_key, GINT_TO_POINTER(new_count));
+        } else {
+            g_hash_table_insert(result, g_strdup(airport_code), GINT_TO_POINTER(count));
+        }
     }
+    
+    return result;
 }
+
 
 void write_empty_result(const char* output_path) {
     FILE* out = fopen(output_path, "w");
@@ -122,27 +116,33 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
     int start_date = string_to_date(start_date_str);
     int end_date = string_to_date(end_date_str);
 
-    GHashTable* counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-    FlightCounts flight_counts = {.start_date = start_date, .end_date = end_date, .counts = counts};
-
-    GHashTable* flights = get_flight_catalog(flight_manager);
-    if (!flights) {
+    GHashTable* precalculated_data = get_flights_by_origin(airport_manager);
+    
+    if (!precalculated_data || g_hash_table_size(precalculated_data) == 0) {
         write_empty_result(output_path);
-        g_hash_table_destroy(counts);
         return;
     }
 
-    // para cada voo na hash table flights executa a funcao count number flights e passa o ponteiro &flight_counts
-    g_hash_table_foreach(flights, count_number_flights, &flight_counts);
+    GHashTable* filtered_counts = filter_by_date_range(precalculated_data, start_date, end_date);
 
+    if (!filtered_counts || g_hash_table_size(filtered_counts) == 0) {
+        write_empty_result(output_path);
+        if (filtered_counts) {
+            g_hash_table_destroy(filtered_counts);
+        }
+        return;
+    }
+
+    // Encontrar melhor aeroporto
     const char* best_code = NULL;
     int best_count = 0;
+    find_best_airport(filtered_counts, &best_code, &best_count);
 
-    find_best_airport(counts, &best_code, &best_count);
-
+    // Escrever resultado
     if (!write_result(output_path, airport_manager, best_code, best_count)) {
         write_empty_result(output_path);
     }
 
-    g_hash_table_destroy(counts);
+    g_hash_table_destroy(filtered_counts);
 }
+

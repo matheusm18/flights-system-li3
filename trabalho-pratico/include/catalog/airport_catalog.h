@@ -11,5 +11,7 @@ void airport_catalog_destroy(AirportCatalog* manager);
 void airport_catalog_add(AirportCatalog* manager, Airport* airport);
 Airport* get_airport_by_code(AirportCatalog* manager, const char* code);
 int airport_catalog_get_count(AirportCatalog* manager);
+void airport_flights_counter_increment(const char* origin, int date, AirportCatalog* manager);
+GHashTable* get_flights_by_origin(AirportCatalog* manager) ;
 
 #endif

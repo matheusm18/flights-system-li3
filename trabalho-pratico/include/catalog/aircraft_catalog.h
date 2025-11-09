@@ -13,4 +13,5 @@ Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* ident
 void aircrafts_counter_increment(char* aircraft_id, AircraftCatalog* manager);
 GHashTable* get_aircraft_flights_counter(AircraftCatalog* manager);
 
+
 #endif

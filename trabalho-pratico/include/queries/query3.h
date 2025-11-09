@@ -6,8 +6,8 @@
 #include "utils/date.h"
 #include <stdbool.h>
 
-int is_cancelled(const char* status);
-void count_number_flights(gpointer key, gpointer value, gpointer user_data);
+
+GHashTable* filter_by_date_range(GHashTable* precalculated_data, int start_date, int end_date);
 void write_empty_result(const char* output_path) ;
 void find_best_airport(GHashTable* counts, const char** best_code, int* best_count);
 bool write_result(const char* output_path, AirportCatalog* airport_manager, const char* best_code, int best_count);
