@@ -12,7 +12,7 @@ struct airport_catalog {
 AirportCatalog* airport_catalog_create() {
     AirportCatalog* manager = malloc(sizeof(AirportCatalog));
     manager->airports_by_code = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) destroy_airport);
-    manager->flights_by_airport = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    manager->flights_by_airport = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_destroy);
 
     return manager;
 }
@@ -53,20 +53,17 @@ int airport_catalog_get_count(AirportCatalog* manager) {
 
 void airport_flights_counter_increment(const char* origin, int date, AirportCatalog* manager) {
     if (!manager || !origin || !*origin) return;
-    
-    // Criar chave composta "YYYYMMDD:AIRPORT_CODE"
-    char key[20];
-    snprintf(key, sizeof(key), "%d:%s", date, origin);
-    
-    gpointer stored_key = NULL;
-    gpointer stored_val = NULL;
 
-    if (g_hash_table_lookup_extended(manager->flights_by_airport, key, &stored_key, &stored_val)) {
-        g_hash_table_steal(manager->flights_by_airport, stored_key);
-        g_hash_table_insert(manager->flights_by_airport, stored_key, GINT_TO_POINTER(GPOINTER_TO_INT(stored_val) + 1));
-    } else {
-        g_hash_table_insert(manager->flights_by_airport, g_strdup(key), GINT_TO_POINTER(1));
+
+    GHashTable* dates = g_hash_table_lookup(manager->flights_by_airport, origin);
+    if (!dates) {
+        dates = g_hash_table_new(g_direct_hash, g_direct_equal);
+        g_hash_table_insert(manager->flights_by_airport, g_strdup(origin), dates);
     }
+    
+    // Aumentar o counter para uma data em específico
+    int current = GPOINTER_TO_INT(g_hash_table_lookup(dates, GINT_TO_POINTER(date)));
+    g_hash_table_insert(dates, GINT_TO_POINTER(date), GINT_TO_POINTER(current + 1));
 }
 
 GHashTable* get_flights_by_origin(AirportCatalog* manager) {

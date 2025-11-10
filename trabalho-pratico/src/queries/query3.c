@@ -15,42 +15,40 @@
 GHashTable* filter_by_date_range(GHashTable* precalculated_data, int start_date, int end_date) {
     if (!precalculated_data) return NULL;
 
-    GHashTable* result = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    GHashTable* result = g_hash_table_new(g_str_hash, g_str_equal);
     
-    GHashTableIter iter;
-    gpointer key, value;
+    GHashTableIter airport_iter;
+    gpointer airport_key, dates_hash;
     
-    g_hash_table_iter_init(&iter, precalculated_data);
+    g_hash_table_iter_init(&airport_iter, precalculated_data);
 
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        const char* composite_key = (const char*)key; // "YYYYMMDD:AIRPORT_CODE"
-        int count = GPOINTER_TO_INT(value);
+    while (g_hash_table_iter_next(&airport_iter, &airport_key, &dates_hash)) {
+        const char* airport_code = (const char*)airport_key;
+        GHashTable* dates = (GHashTable*)dates_hash;
         
-        // Extrair data e airport code da chave
-        int date;
-        char airport_code[16];
-        if (sscanf(composite_key, "%d:%15s", &date, airport_code) != 2) {
-            continue;
+        int total_count = 0;
+        
+        GHashTableIter date_iter;
+        gpointer date_key, count_value;
+        g_hash_table_iter_init(&date_iter, dates);
+        
+        // Soma contadores 
+        while (g_hash_table_iter_next(&date_iter, &date_key, &count_value)) {
+            int date = GPOINTER_TO_INT(date_key);
+            
+            if (date >= start_date && date <= end_date) {
+                total_count += GPOINTER_TO_INT(count_value);
+            }
         }
         
-        // Filtrar por intervalo de datas
-        if (compare_dates(date, start_date) < 0 || compare_dates(date, end_date) > 0) continue;
-        
-        // Acumular contagens por aeroporto
-        gpointer stored_key = NULL;
-        gpointer stored_val = NULL;
-        
-        if (g_hash_table_lookup_extended(result, airport_code, &stored_key, &stored_val)) {
-            int new_count = GPOINTER_TO_INT(stored_val) + count;
-            g_hash_table_steal(result, stored_key);
-            g_hash_table_insert(result, stored_key, GINT_TO_POINTER(new_count));
-        } else {
-            g_hash_table_insert(result, g_strdup(airport_code), GINT_TO_POINTER(count));
+        if (total_count > 0) {
+            g_hash_table_insert(result, (gpointer)airport_code, GINT_TO_POINTER(total_count));
         }
     }
     
     return result;
 }
+
 
 
 void write_empty_result(const char* output_path) {
