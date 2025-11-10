@@ -20,6 +20,7 @@ AirportCatalog* airport_catalog_create() {
 void airport_catalog_destroy(AirportCatalog* manager) {
     if (manager != NULL) {
         g_hash_table_destroy(manager->airports_by_code);
+        g_hash_table_destroy(manager->flights_by_airport);
         free(manager);
     }
 }
@@ -54,17 +55,23 @@ int airport_catalog_get_count(AirportCatalog* manager) {
 void airport_flights_counter_increment(const char* origin, int date, AirportCatalog* manager) {
     if (!manager || !origin || !*origin) return;
 
-
     GHashTable* dates = g_hash_table_lookup(manager->flights_by_airport, origin);
     if (!dates) {
         dates = g_hash_table_new(g_direct_hash, g_direct_equal);
         g_hash_table_insert(manager->flights_by_airport, g_strdup(origin), dates);
     }
-    
-    // Aumentar o counter para uma data em específico
-    int current = GPOINTER_TO_INT(g_hash_table_lookup(dates, GINT_TO_POINTER(date)));
+
+    gpointer val = g_hash_table_lookup(dates, GINT_TO_POINTER(date));
+    int current;
+    if (val != NULL) {
+        current = GPOINTER_TO_INT(val);
+    } else {
+        current = 0;
+    }
+
     g_hash_table_insert(dates, GINT_TO_POINTER(date), GINT_TO_POINTER(current + 1));
 }
+
 
 GHashTable* get_flights_by_origin(AirportCatalog* manager) {
     if (!manager) return NULL;

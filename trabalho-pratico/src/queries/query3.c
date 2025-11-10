@@ -11,11 +11,10 @@
 #include "entities/airport.h"
 #include "utils/date.h"
 
-
 GHashTable* filter_by_date_range(GHashTable* precalculated_data, int start_date, int end_date) {
     if (!precalculated_data) return NULL;
 
-    GHashTable* result = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable* result = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
     
     GHashTableIter airport_iter;
     gpointer airport_key, dates_hash;
@@ -42,14 +41,12 @@ GHashTable* filter_by_date_range(GHashTable* precalculated_data, int start_date,
         }
         
         if (total_count > 0) {
-            g_hash_table_insert(result, (gpointer)airport_code, GINT_TO_POINTER(total_count));
+            g_hash_table_insert(result, g_strdup(airport_code), GINT_TO_POINTER(total_count));
         }
     }
     
     return result;
 }
-
-
 
 void write_empty_result(const char* output_path) {
     FILE* out = fopen(output_path, "w");
@@ -86,9 +83,9 @@ bool write_result(const char* output_path, AirportCatalog* airport_manager, cons
     if (!best_code) {
         fprintf(out, "\n");
     } else {
-        const char* name;
-        const char* city;
-        const char* country;
+        const char* name = "";
+        const char* city = "";
+        const char* country = "";
 
         if (airport_manager) {
             Airport* airport = get_airport_by_code(airport_manager, best_code);
@@ -125,9 +122,8 @@ void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manag
 
     if (!filtered_counts || g_hash_table_size(filtered_counts) == 0) {
         write_empty_result(output_path);
-        if (filtered_counts) {
-            g_hash_table_destroy(filtered_counts);
-        }
+        if (filtered_counts) g_hash_table_destroy(filtered_counts);
+    
         return;
     }
 
