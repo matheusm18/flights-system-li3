@@ -15,16 +15,15 @@ int string_to_date(const char* str) {
 }
 
 long string_to_datetime(const char* str) {
-    if (!str) return 0;
+    if (!str || str[0] == 'N') return -1; // "N/A"
 
-    if (strcmp(str, "N/A") == 0) return -1; // tratamento especial para 'N/A'
+    int y = (str[0]-'0')*1000 + (str[1]-'0')*100 + (str[2]-'0')*10 + (str[3]-'0');
+    int m = (str[5]-'0')*10 + (str[6]-'0');
+    int d = (str[8]-'0')*10 + (str[9]-'0');
+    int h = (str[11]-'0')*10 + (str[12]-'0');
+    int min = (str[14]-'0')*10 + (str[15]-'0');
     
-    int year, month, day, hour, minute;
-    int scanned = sscanf(str, "%d-%d-%d %d:%d", &year, &month, &day, &hour, &minute);
-    
-    if (scanned != 5) return 0;
-    
-    return year * 100000000L + month * 1000000L + day * 10000L + hour * 100L + minute; // O 'L' força o cálculo a ser feito em long (evita overflow)
+    return y*100000000L + m*1000000L + d*10000L + h*100 + min;// O 'L' força o cálculo a ser feito em long (evita overflow)
 }
 
 int get_date_part(long datetime) {

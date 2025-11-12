@@ -77,4 +77,3 @@ GHashTable* get_flights_by_origin(AirportCatalog* manager) {
     if (!manager) return NULL;
     return manager->flights_by_airport;
 }
-

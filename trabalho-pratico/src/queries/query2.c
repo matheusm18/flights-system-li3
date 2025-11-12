@@ -13,34 +13,41 @@ struct aircraft_count{
     int flight_count;
 };
 
-GHashTable* filter_aircraft_by_manufacturer (GHashTable* precalculated_counts, const char* manufacturer_filter, AircraftCatalog* aircraft_catalog){
-    if (!precalculated_counts) return NULL;
+// função que irá filtrar e construir o array de AircraftCount
+int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, const char* manufacturer_filter, AircraftCount** out_array) {
+    int total_aircrafts = get_total_aircrafts_in_catalog(aircraft_catalog);
+    if (total_aircrafts == 0) {
+        *out_array = NULL;
+        return 0;
+    }
 
-    GHashTable* result = g_hash_table_new_full(g_str_hash,g_str_equal, g_free, NULL);
+    AircraftCount* array = malloc(sizeof(AircraftCount) * total_aircrafts);
+    if (!array) {
+        *out_array = NULL;
+        return 0;
+    }
 
-    GHashTableIter i; 
+    GHashTableIter iter;
     gpointer key, value;
+    int index = 0;
 
-    g_hash_table_iter_init(&i, precalculated_counts);
-
-    // Filtro, só passa o necessário
-    while (g_hash_table_iter_next(&i, &key, &value)) {
-        const char* aircraft_id = (const char*)key; 
-        Aircraft* aircraft = get_aircraft_by_identifier(aircraft_catalog, aircraft_id);
-
+    g_hash_table_iter_init(&iter, aircraft_catalog_get_aircrafts(aircraft_catalog));
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Aircraft* aircraft = (Aircraft*)value;
         if (!aircraft) continue;
 
-        
         if (manufacturer_filter && *manufacturer_filter) {
             const char* manufacturer = get_aircraft_manufacturer(aircraft);
-            if(!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0){
-                continue;
-            }
+            if (!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0) continue;
         }
 
-        g_hash_table_insert(result, g_strdup(aircraft_id), GINT_TO_POINTER(GPOINTER_TO_INT(value)));
+        array[index].aircraft_id = g_strdup(get_aircraft_identifier(aircraft));
+        array[index].flight_count = get_aircraft_flight_count(aircraft);
+        index++;
     }
-    return result;
+
+    *out_array = array;
+    return index; // número de aeronaves no array
 }
 
 int compare_aircraft_counts(const void* a, const void* b) {
@@ -55,28 +62,12 @@ int compare_aircraft_counts(const void* a, const void* b) {
     return strcmp(ac1->aircraft_id, ac2->aircraft_id);
 }
 
-AircraftCount* convert_and_sort(GHashTable* counts, int* number_of_aircrafts) {
-    *number_of_aircrafts = g_hash_table_size(counts);
-    AircraftCount* array = malloc(sizeof(AircraftCount) * (*number_of_aircrafts));
-    
-    GHashTableIter i;
-    gpointer key, value;
-    int index = 0;
-    
-    g_hash_table_iter_init(&i, counts);
-    while (g_hash_table_iter_next(&i, &key, &value)) {
-        array[index].aircraft_id = g_strdup((const char*)key);
-        array[index].flight_count = GPOINTER_TO_INT(value);
-        index++;
+void write_top_n_aircraft(FILE* output_file, AircraftCatalog* aircraft_catalog, AircraftCount* array, int number_of_aircrafts, int N) {
+    if (!array || number_of_aircrafts == 0) {
+        fprintf(output_file, "\n");
+        return;
     }
-    
-    qsort(array, *number_of_aircrafts, sizeof(AircraftCount), compare_aircraft_counts);
-    
-    return array;
-}
 
-
-void write_top_n_to_file(AircraftCount* sorted_array, int number_of_aircrafts, int N, AircraftCatalog* aircraft_catalog, FILE* output_file) {
     int limit;
     if (N > 0 && N < number_of_aircrafts) {
         limit = N;
@@ -84,19 +75,19 @@ void write_top_n_to_file(AircraftCount* sorted_array, int number_of_aircrafts, i
         limit = number_of_aircrafts;
     }
 
-    for (int i = 0; i < limit; i++) {
-        const char* aircraft_id = sorted_array[i].aircraft_id;
-        int flight_count = sorted_array[i].flight_count;
+     if (number_of_aircrafts > 0) qsort(array, number_of_aircrafts, sizeof(AircraftCount), compare_aircraft_counts);
 
-        Aircraft* aircraft = get_aircraft_by_identifier(aircraft_catalog, aircraft_id);
-        
-        if (aircraft) {            
-            fprintf(output_file, "%s,%s,%s,%d\n", aircraft_id, get_aircraft_manufacturer(aircraft), get_aircraft_model(aircraft), flight_count);
+    for (int i = 0; i < limit; i++) {
+        Aircraft* a = get_aircraft_by_identifier(aircraft_catalog, array[i].aircraft_id);
+        if (a) {
+            fprintf(output_file, "%s,%s,%s,%d\n", array[i].aircraft_id, get_aircraft_manufacturer(a), get_aircraft_model(a), array[i].flight_count);
         }
     }
 }
 
 void free_aircraft_count_array(AircraftCount* array, int count) {
+    if (!array) return;
+
     for (int i = 0; i < count; i++) {
         free(array[i].aircraft_id);
     }
@@ -111,48 +102,12 @@ void execute_query2(FlightCatalog* flight_manager, AircraftCatalog* aircraft_man
         return;
     }
 
-    GHashTable* precalculated_counts = get_aircraft_flights_counter(aircraft_manager);
+    AircraftCount* array = NULL;
+    int count = filter_build_aircraft_count_array(aircraft_manager, manufacturer, &array);
 
-    if (!precalculated_counts) {
-        fprintf(output_file, "\n");
-        fclose(output_file);
-        return;
-    }
+    write_top_n_aircraft(output_file, aircraft_manager, array, count, n);
 
-    GHashTable* counts_to_use = NULL;
-    bool need_to_free = false;
+    free_aircraft_count_array(array, count);
 
-    if(manufacturer && *manufacturer){
-        // Existe o filtro, temos de filtrar na precalculated
-        counts_to_use = filter_aircraft_by_manufacturer(precalculated_counts, manufacturer, aircraft_manager);
-        need_to_free = true;
-        
-    }
-    else{
-        counts_to_use = precalculated_counts;
-        need_to_free = false;
-    }
-
-    if (!counts_to_use || g_hash_table_size(counts_to_use) == 0) {
-        fprintf(output_file, "\n");
-        if (need_to_free && counts_to_use) {
-            g_hash_table_destroy(counts_to_use);
-        }
-        fclose(output_file);
-        return;
-    }
-
-    int number_of_aircrafts;
-    AircraftCount* sorted_array = convert_and_sort(counts_to_use, &number_of_aircrafts);
-
-    write_top_n_to_file(sorted_array, number_of_aircrafts, n, aircraft_manager, output_file);
-
-    free_aircraft_count_array(sorted_array, number_of_aircrafts);
-
-    // Só liberta se foi criada uma nova HashTable
-    if (need_to_free) {
-        g_hash_table_destroy(counts_to_use);
-    }
     fclose(output_file);
-
 }

@@ -5,13 +5,11 @@
 
 struct aircraft_catalog {
     GHashTable* aircraft_by_identifier;
-    GHashTable* flight_counts;
 };
 
 AircraftCatalog* aircraft_catalog_create() {
     AircraftCatalog* manager = malloc(sizeof(AircraftCatalog));
     manager->aircraft_by_identifier = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) destroy_aircraft);
-    manager->flight_counts = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
     return manager;
 }
@@ -19,7 +17,6 @@ AircraftCatalog* aircraft_catalog_create() {
 void aircraft_catalog_destroy(AircraftCatalog* manager){
     if (manager != NULL) {
         g_hash_table_destroy(manager->aircraft_by_identifier);
-        g_hash_table_destroy(manager->flight_counts);
         free(manager);
     }
 }
@@ -41,28 +38,25 @@ Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* ident
     return g_hash_table_lookup(manager->aircraft_by_identifier, identifier); 
 } 
 
-void aircrafts_counter_increment(char* aircraft_id, AircraftCatalog* manager){
+void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager) {
     if (!manager || !aircraft_id || !*aircraft_id) return;
-    
-    gpointer stored_key = NULL;
-    gpointer stored_val = NULL;
 
-     // Usa lookup_extended para reutilizar a chave existente
-    if (g_hash_table_lookup_extended(manager->flight_counts, aircraft_id, &stored_key, &stored_val)) {
-        int new_count = GPOINTER_TO_INT(stored_val) + 1;
-        // Steal remove sem libertar a chave, depois reinsere a MESMA chave
-        g_hash_table_steal(manager->flight_counts, stored_key);
-        g_hash_table_insert(manager->flight_counts, stored_key, GINT_TO_POINTER(new_count));
-    } else {
-        // Primeira vez - cria nova chave
-        g_hash_table_insert(manager->flight_counts, g_strdup(aircraft_id), GINT_TO_POINTER(1));
+    Aircraft* aircraft = get_aircraft_by_identifier(manager, aircraft_id);
+    if (aircraft != NULL) {
+        // incrementa o contador diretamente na entidade
+        aircraft_increment_flight_count(aircraft);
     }
 }
 
-GHashTable* get_aircraft_flights_counter(AircraftCatalog* manager) {
-    if (!manager) return NULL;
-    return manager->flight_counts;
+GHashTable* aircraft_catalog_get_aircrafts(AircraftCatalog* catalog) {
+    if (!catalog) return NULL;
+    return catalog->aircraft_by_identifier;
 }
 
+
+int get_total_aircrafts_in_catalog(AircraftCatalog* catalog) {
+    if (!catalog) return 0;
+    return g_hash_table_size(catalog->aircraft_by_identifier);
+}
 
 

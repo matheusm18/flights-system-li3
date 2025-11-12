@@ -9,5 +9,7 @@ void destroy_aircraft(Aircraft* a);
 const char* get_aircraft_identifier(const Aircraft* a);
 const char* get_aircraft_manufacturer(const Aircraft* a);
 const char* get_aircraft_model(const Aircraft* a);
+int get_aircraft_flight_count(const Aircraft* a);
+void aircraft_increment_flight_count(Aircraft* aircraft);
 
 #endif

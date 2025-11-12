@@ -9,6 +9,7 @@ struct aircraft {
     int year;
     int capacity;
     int range;
+    int flight_count;
 };
 
 Aircraft* create_aircraft(const char* identifier, const char* manufacturer, const char* model, int year, int capacity, int range) {
@@ -22,6 +23,7 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
     aircraft->year = year;
     aircraft->capacity = capacity;
     aircraft->range = range;
+    aircraft->flight_count = 0;
 
     return aircraft;
 }
@@ -37,19 +39,28 @@ void destroy_aircraft(Aircraft* a) {
     }
 }
 
-const char* get_aircraft_identifier(const Aircraft* a){ 
+const char* get_aircraft_identifier(const Aircraft* a) { 
     if (a == NULL) return NULL;
     return a->identifier; 
 }
 
-const char* get_aircraft_manufacturer(const Aircraft* a){
+const char* get_aircraft_manufacturer(const Aircraft* a) {
     if (a == NULL) return NULL;
     return a->manufacturer;
 }
 
-const char* get_aircraft_model(const Aircraft* a){
+const char* get_aircraft_model(const Aircraft* a) {
     if (a == NULL) return NULL;
     return a->model;
 }
 
+int get_aircraft_flight_count(const Aircraft* a) {
+    if (a == NULL) return 0;
+    return a->flight_count;
+}
 
+void aircraft_increment_flight_count(Aircraft* aircraft) {
+    if (aircraft != NULL) {
+        aircraft->flight_count++;
+    }
+}
