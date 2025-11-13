@@ -95,7 +95,7 @@ void free_aircraft_count_array(AircraftCount* array, int count) {
 }
 
 //======= Top N aeronaves com mais voos
-void execute_query2(FlightCatalog* flight_manager, AircraftCatalog* aircraft_manager, int n, const char* manufacturer, const char* output_path) {
+void execute_query2(AircraftCatalog* aircraft_manager, int n, const char* manufacturer, const char* output_path) {
     FILE* output_file = fopen(output_path, "w");
     if (output_file == NULL) {
         perror("Erro ao abrir ficheiro de output");

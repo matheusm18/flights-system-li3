@@ -143,6 +143,7 @@ int compare_files(const char* actual_file, const char* expected_file, int *line_
 
 // executar grupos de queries e medir tempos
 void execute_query_groups(const char* csv_files_path, int *query_counts, QueryStats *stats, CatalogManager* catalog_manager) {
+    (void) csv_files_path;
     
     int command_counter = 1;
 

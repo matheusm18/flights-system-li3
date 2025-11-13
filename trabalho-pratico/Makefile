@@ -9,7 +9,7 @@ UTILS_DIR   = $(SRC_DIR)/utils
 
 # Compilador
 CC     = gcc
-CFLAGS = -Wall -Iinclude `pkg-config --cflags glib-2.0`
+CFLAGS = -fno-omit-frame-pointer -Wall -Wextra -O3 -g -Iinclude `pkg-config --cflags glib-2.0`
 LDFLAGS= `pkg-config --libs glib-2.0` -lm
 
 MAIN_PROGRAM = programa-principal
@@ -51,3 +51,5 @@ $(TESTS_DIR)/%.o: $(TESTS_DIR)/%.c
 # Limpeza
 clean:
 	rm -f $(MAIN_PROGRAM) $(TEST_PROGRAM) $(OBJS_APP) $(OBJS_MAIN) $(OBJS_TEST)
+
+.PHONY: all clean

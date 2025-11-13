@@ -53,12 +53,12 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
                 
                 // tentar com fabricante primeiro
                 if (sscanf(line, "%d %d %99s", &query, &N, manufacturer) == 3) {
-                    execute_query2(get_flights_from_catalog_manager(catalog_manager), get_aircrafts_from_catalog_manager(catalog_manager), N, manufacturer, output_path);
+                    execute_query2(get_aircrafts_from_catalog_manager(catalog_manager), N, manufacturer, output_path);
                 } 
 
                 // tentar sem fabricante
                 else if (sscanf(line, "%d %d", &query, &N) == 2) {
-                    execute_query2(get_flights_from_catalog_manager(catalog_manager), get_aircrafts_from_catalog_manager(catalog_manager), N, NULL, output_path);
+                    execute_query2(get_aircrafts_from_catalog_manager(catalog_manager), N, NULL, output_path);
                 }
                 break;
 

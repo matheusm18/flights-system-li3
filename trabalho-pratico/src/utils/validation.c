@@ -28,6 +28,7 @@ void init_aircrafts_errors_file() {
 }
 
 void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data, FILE *errors_file) {
+    (void) num_fields;
     CatalogManager* manager = (CatalogManager*) user_data;
 
     char *identifier = fields[0];
@@ -73,6 +74,7 @@ void init_airports_errors_file() {
 }
 
 void process_valid_line_airports(char **fields, int num_fields, void* user_data, FILE *errors_file) {
+    (void) num_fields;
     CatalogManager* manager = (CatalogManager*) user_data;
 
     char *code = fields[0];
@@ -119,6 +121,7 @@ void init_flights_errors_file() {
 }
 
 void process_valid_line_flights(char **fields, int num_fields, void* user_data, FILE *errors_file) {
+    (void) num_fields;
     CatalogManager* manager = (CatalogManager*) user_data;
     AircraftCatalog* aircraft_catalog = get_aircrafts_from_catalog_manager(manager);
     AirportCatalog* airport_catalog = get_airports_from_catalog_manager(manager);
@@ -213,6 +216,7 @@ void init_passengers_errors_file() {
 }
 
 void process_valid_line_passengers(char **fields, int num_fields, void* user_data, FILE *errors_file) {
+    (void) num_fields;
     CatalogManager* manager = (CatalogManager*) user_data;
 
     char *document_number = fields[0];
@@ -267,6 +271,7 @@ void init_reservations_errors_file() {
 }
 
 void process_valid_line_reservations(char **fields, int num_fields, void* user_data, FILE *errors_file) {
+    (void) num_fields;
     CatalogManager* manager = (CatalogManager*) user_data;
     FlightCatalog* flight_catalog = get_flights_from_catalog_manager(manager);
     PassengerCatalog* passenger_catalog = get_passengers_from_catalog_manager(manager);
