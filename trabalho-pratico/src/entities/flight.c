@@ -29,12 +29,9 @@ Flight* create_flight(const char* flight_id, long departure, long actual_departu
     
     Flight* flight = malloc(sizeof(Flight));
     if (!flight) return NULL;
-
-<<<<<<< HEAD
+    
     strncpy(flight->flight_id, flight_id, 7);
-=======
-    strncpy(flight->flight_id, flight_id, 8);
->>>>>>> origin/main
+    
     flight->flight_id[7] = '\0';
 
     //flight->departure = departure;
