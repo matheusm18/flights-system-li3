@@ -6,13 +6,11 @@
 
 struct airport_catalog {
     GHashTable* airports_by_code;
-    GHashTable* flights_by_airport;
 };
 
 AirportCatalog* airport_catalog_create() {
     AirportCatalog* manager = malloc(sizeof(AirportCatalog));
     manager->airports_by_code = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) destroy_airport);
-    manager->flights_by_airport = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_destroy);
 
     return manager;
 }
@@ -20,7 +18,6 @@ AirportCatalog* airport_catalog_create() {
 void airport_catalog_destroy(AirportCatalog* manager) {
     if (manager != NULL) {
         g_hash_table_destroy(manager->airports_by_code);
-        g_hash_table_destroy(manager->flights_by_airport);
         free(manager);
     }
 }
@@ -34,6 +31,29 @@ void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     }
 }
 
+<<<<<<< HEAD
+void airport_catalog_sort_all_flights(AirportCatalog* catalog) {
+    if (!catalog) return;
+
+    GHashTableIter iter;
+    gpointer key, value;
+    g_hash_table_iter_init(&iter, catalog->airports_by_code);
+
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Airport* airport = (Airport*) value;
+        if (airport_get_departing_flights(airport)) {
+            g_ptr_array_sort(airport_get_departing_flights(airport), compare_flight_actual_departure);
+        }
+    }
+}
+
+GHashTable* airport_catalog_get_airports(AirportCatalog* catalog) {
+    if (!catalog) return NULL;
+    return catalog->airports_by_code;
+}
+
+=======
+>>>>>>> origin/main
 Airport* get_airport_by_code(AirportCatalog* manager, const char* code) {
     if (manager == NULL || code == NULL) {
         return NULL;
@@ -48,31 +68,4 @@ int airport_catalog_get_count(AirportCatalog* manager) {
     }
 
     return g_hash_table_size(manager->airports_by_code);
-}
-
-
-void airport_flights_counter_increment(const char* origin, int date, AirportCatalog* manager) {
-    if (!manager || !origin || !*origin) return;
-
-    GHashTable* dates = g_hash_table_lookup(manager->flights_by_airport, origin);
-    if (!dates) {
-        dates = g_hash_table_new(g_direct_hash, g_direct_equal);
-        g_hash_table_insert(manager->flights_by_airport, g_strdup(origin), dates);
-    }
-
-    gpointer val = g_hash_table_lookup(dates, GINT_TO_POINTER(date));
-    int current;
-    if (val != NULL) {
-        current = GPOINTER_TO_INT(val);
-    } else {
-        current = 0;
-    }
-
-    g_hash_table_insert(dates, GINT_TO_POINTER(date), GINT_TO_POINTER(current + 1));
-}
-
-
-GHashTable* get_flights_by_origin(AirportCatalog* manager) {
-    if (!manager) return NULL;
-    return manager->flights_by_airport;
 }

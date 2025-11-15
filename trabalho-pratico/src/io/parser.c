@@ -1,6 +1,7 @@
 #include "io/parser.h"
 #include "utils/validation.h"
 #include "catalog/catalog_manager.h"
+#include "catalog/airport_catalog.h"
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -110,6 +111,7 @@ void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
     //printf("\nA carregar os voos de: %s", flights_file);
     read_csv(12, flights_file, process_valid_line_flights, catalog_manager, flights_errors);
     fclose(flights_errors);
+    airport_catalog_sort_all_flights(get_airports_from_catalog_manager(catalog_manager)); // ordenar voos por actual_departure para query3
     //printf("\nTodos os voos válidos foram carregados!\n");
 
     //printf("\nA inicializar ficheiro de erros de passageiros...\n");

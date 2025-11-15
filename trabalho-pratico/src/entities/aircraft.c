@@ -19,7 +19,11 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
     Aircraft* aircraft = malloc(sizeof(Aircraft));
     if (aircraft == NULL) return NULL;
 
+<<<<<<< HEAD
+    strncpy(aircraft->identifier, identifier, 8);
+=======
     strncpy(aircraft->identifier, identifier, 9);
+>>>>>>> origin/main
     aircraft->identifier[8] = '\0';
     aircraft->manufacturer = strdup(manufacturer);
     aircraft->model = strdup(model);
@@ -41,6 +45,12 @@ void destroy_aircraft(Aircraft* a) {
     }
 }
 
+void aircraft_increment_flight_count(Aircraft* aircraft) {
+    if (aircraft != NULL) {
+        aircraft->flight_count++;
+    }
+}
+
 const char* get_aircraft_identifier(const Aircraft* a) { 
     if (a == NULL) return NULL;
     return a->identifier; 
@@ -59,10 +69,4 @@ const char* get_aircraft_model(const Aircraft* a) {
 int get_aircraft_flight_count(const Aircraft* a) {
     if (a == NULL) return 0;
     return a->flight_count;
-}
-
-void aircraft_increment_flight_count(Aircraft* aircraft) {
-    if (aircraft != NULL) {
-        aircraft->flight_count++;
-    }
 }

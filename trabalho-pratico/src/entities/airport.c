@@ -11,6 +11,8 @@ struct airport {
     //double longitude;
     //char icao[5];
     char type;
+
+    GPtrArray* departing_flights;
 };
 
 Airport* create_airport(const char *code, const char* name, const char* city, const char* country, const char* latitude, const char* longitude, const char* icao, const char* type) {
@@ -21,7 +23,7 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
     Airport* airport = malloc(sizeof(Airport));
     if (airport == NULL) return NULL;
     
-    strncpy(airport->code, code, 4);
+    strncpy(airport->code, code, 3);
     airport->code[3] = '\0';
     airport->name = strdup(name);
     airport->city = strdup(city);
@@ -31,6 +33,8 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
     //strncpy(airport->icao, icao, 5);
     airport->type = get_airport_type_char(type);
     
+    airport->departing_flights = g_ptr_array_new();
+
     return airport;
 }
 
@@ -41,6 +45,10 @@ void destroy_airport(Airport* a) {
         free(a->city);
         free(a->country);
 
+        if (a->departing_flights != NULL) {
+            g_ptr_array_free(a->departing_flights, TRUE); // libera o array de ponteiros
+        }
+
         free(a);
     }
 }
@@ -50,6 +58,33 @@ const char* airport_type_to_string(char type) {
     else if (type == 'M') return "medium_airport";
     else if (type == 'L') return "large_airport";
     else return "unknown";
+}
+
+// adiciona voo à lista de voos do aeroporto
+void airport_add_departing_flight(Airport* airport, Flight* flight) {
+    if (!airport || !flight) return;
+    g_ptr_array_add(airport->departing_flights, flight);
+}
+
+/*
+   Comparador para qsort: ordena voos pelo actual_departure.
+   Cancelados ou "N/A" (representados como -1) ficam no final.
+*/
+int compare_flight_actual_departure(const void* a, const void* b) {
+    Flight* f1 = *(Flight**)a;
+    Flight* f2 = *(Flight**)b;
+
+    long dt1 = get_flight_actual_departure(f1);
+    long dt2 = get_flight_actual_departure(f2);
+
+    // coloca voos cancelados (actual_departure == -1) no final
+    if (dt1 <= 0 && dt2 <= 0) return 0;
+    if (dt1 <= 0) return 1;   // f1 vai para o fim
+    if (dt2 <= 0) return -1;  // f2 vai para o fim
+
+    if (dt1 < dt2) return -1;
+    if (dt1 > dt2) return 1;
+    return 0;
 }
 
 const char* get_airport_code(const Airport* airport) {
@@ -82,4 +117,11 @@ char get_airport_type_char(const char* type_str) {
     else if (strcmp(type_str, "medium_airport") == 0) return 'M';
     else if (strcmp(type_str, "large_airport") == 0) return 'L';
     else return 'U'; // unknown
+}
+
+// getter para voos
+GPtrArray* airport_get_departing_flights(Airport* airport) {
+    if (airport == NULL) return NULL;
+    
+    else return airport->departing_flights;
 }

@@ -65,7 +65,7 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
             case 3:
 
                 if (sscanf(line, "%d %19s %19s", &query, start_date, end_date) == 3) {
-                    execute_query3(get_flights_from_catalog_manager(catalog_manager), get_airports_from_catalog_manager(catalog_manager), start_date, end_date, output_path);
+                    execute_query3(get_airports_from_catalog_manager(catalog_manager), start_date, end_date, output_path);
                 }
                 break;
 

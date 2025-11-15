@@ -11,76 +11,11 @@
 #include "entities/airport.h"
 #include "utils/date.h"
 
-GHashTable* filter_by_date_range(GHashTable* precalculated_data, int start_date, int end_date) {
-    if (!precalculated_data) return NULL;
-
-    GHashTable* result = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-    
-    GHashTableIter airport_iter;
-    gpointer airport_key, dates_hash;
-    
-    g_hash_table_iter_init(&airport_iter, precalculated_data);
-
-    while (g_hash_table_iter_next(&airport_iter, &airport_key, &dates_hash)) {
-        const char* airport_code = (const char*)airport_key;
-        GHashTable* dates = (GHashTable*)dates_hash;
-        
-        int total_count = 0;
-        
-        GHashTableIter date_iter;
-        gpointer date_key, count_value;
-        g_hash_table_iter_init(&date_iter, dates);
-        
-        // Soma contadores 
-        while (g_hash_table_iter_next(&date_iter, &date_key, &count_value)) {
-            int date = GPOINTER_TO_INT(date_key);
-            
-            if (date >= start_date && date <= end_date) {
-                total_count += GPOINTER_TO_INT(count_value);
-            }
-        }
-        
-        if (total_count > 0) {
-            g_hash_table_insert(result, g_strdup(airport_code), GINT_TO_POINTER(total_count));
-        }
-    }
-    
-    return result;
-}
-
-void write_empty_result(const char* output_path) {
-    FILE* out = fopen(output_path, "w");
-    if (out) {
-        fprintf(out, "\n");
-        fclose(out);
-    }
-}
-
-void find_best_airport(GHashTable* counts, const char** best_code, int* best_count) {
-    *best_code = NULL;
-    *best_count = 0;
-    
-    GHashTableIter iter;
-    gpointer key, value;
-    
-    g_hash_table_iter_init(&iter, counts);
-
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        const char* code = (const char*) key;
-        int count = GPOINTER_TO_INT(value);
-        
-        if (count > *best_count || (count == *best_count && (*best_code == NULL || strcmp(code, *best_code) < 0))) {
-            *best_code = code;
-            *best_count = count;
-        }
-    }
-}
-
 bool write_result(const char* output_path, AirportCatalog* airport_manager, const char* best_code, int best_count) {
     FILE* out = fopen(output_path, "w");
     if (!out) return false;
 
-    if (!best_code) {
+    if (!best_code || best_count == 0) {
         fprintf(out, "\n");
     } else {
         const char* name = "";
@@ -103,40 +38,51 @@ bool write_result(const char* output_path, AirportCatalog* airport_manager, cons
     return true;
 }
 
-void execute_query3(FlightCatalog* flight_manager, AirportCatalog* airport_manager, const char* start_date_str, const char* end_date_str, const char* output_path) {
+//======= Aeroporto com mais partidas num intervalo de datas
+void execute_query3(AirportCatalog* airport_manager, const char* start_date_str, const char* end_date_str, const char* output_path) {
 
-    if (!flight_manager || !start_date_str || !end_date_str || !output_path) return;
+    if (!airport_manager || !start_date_str || !end_date_str || !output_path) return;
 
     // converter strings de data para int (YYYYMMDD)
     int start_date = string_to_date(start_date_str);
-    int end_date = string_to_date(end_date_str);
+    int end_date   = string_to_date(end_date_str);
 
-    GHashTable* precalculated_data = get_flights_by_origin(airport_manager);
-    
-    if (!precalculated_data || g_hash_table_size(precalculated_data) == 0) {
-        write_empty_result(output_path);
-        return;
-    }
-
-    GHashTable* filtered_counts = filter_by_date_range(precalculated_data, start_date, end_date);
-
-    if (!filtered_counts || g_hash_table_size(filtered_counts) == 0) {
-        write_empty_result(output_path);
-        if (filtered_counts) g_hash_table_destroy(filtered_counts);
-    
-        return;
-    }
-
-    // Encontrar melhor aeroporto
     const char* best_code = NULL;
     int best_count = 0;
-    find_best_airport(filtered_counts, &best_code, &best_count);
 
-    // Escrever resultado
-    if (!write_result(output_path, airport_manager, best_code, best_count)) {
-        write_empty_result(output_path);
+    GHashTableIter iter;
+    gpointer key, value;
+
+    g_hash_table_iter_init(&iter, airport_catalog_get_airports(airport_manager)); // todos os aeroportos
+
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Airport* airport = (Airport*) value;
+        int count = 0;
+        GPtrArray* flights = airport_get_departing_flights(airport);
+
+        if (flights != NULL) {
+            for (guint i = 0; i < flights->len; i++) {
+                Flight* flight = g_ptr_array_index(flights, i);
+                long adt = get_flight_actual_departure(flight);
+
+                if (adt <= 0) break; // voo cancelado ou "N/A", está ordenado -> podemos parar
+
+                int flight_date = get_date_part(adt);
+
+                if (flight_date > end_date) break;    // array ordenado -> podemos parar
+                if (flight_date >= start_date) count++; // dentro do intervalo
+            }
+
+        }
+
+        // atualiza melhor aeroporto
+        if (best_code == NULL || count > best_count ||
+            (count == best_count && strcmp(get_airport_code(airport), best_code) < 0)) {
+            best_code = get_airport_code(airport);
+            best_count = count;
+        }
     }
 
-    g_hash_table_destroy(filtered_counts);
+    // escreve resultado
+    write_result(output_path, airport_manager, best_code, best_count);
 }
-

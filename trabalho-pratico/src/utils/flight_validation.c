@@ -90,7 +90,7 @@ bool validate_aircraft_flight(const char *aircraft, AircraftCatalog* aircraft_ca
     return (get_aircraft_by_identifier(aircraft_catalog, aircraft) != NULL);
 }
 
-// Validação completa de um voo (lógica)
+// validação completa de um voo (lógica)
 bool validate_flight_logical(const char *origin, const char *destination, long departure, long arrival, long actual_departure, long actual_arrival,
                              const char *status, const char *aircraft, AircraftCatalog* aircraft_catalog, const char *actual_departure_str,
                              const char *actual_arrival_str) {

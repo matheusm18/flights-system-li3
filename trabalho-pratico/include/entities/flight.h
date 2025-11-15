@@ -10,6 +10,7 @@ Flight* create_flight(const char* flight_id, long departure, long actual_departu
 
 void destroy_flight(Flight* f);
 
+// getters
 long get_flight_actual_departure(const Flight* f);
 const char* get_flight_id(const Flight* flight);
 const char* get_flight_origin(const Flight* f);

@@ -15,7 +15,6 @@ struct reservation {
     char* qr_code;
 };
 
-// passar o contador para poder alocar a memória? não estou a ver outra maneira
 Reservation* create_reservation(const char* reservation_id, char** flight_ids,const char* document_number, const char* seat, double price, int extra_luggage, int priority_boarding) {
 
     Reservation* reservation = malloc(sizeof(Reservation));

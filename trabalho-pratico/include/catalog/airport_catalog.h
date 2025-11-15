@@ -9,9 +9,11 @@ typedef struct airport_catalog AirportCatalog;
 AirportCatalog* airport_catalog_create(void);
 void airport_catalog_destroy(AirportCatalog* manager);
 void airport_catalog_add(AirportCatalog* manager, Airport* airport);
+void airport_catalog_sort_all_flights(AirportCatalog* catalog);
+
+// getters
+GHashTable* airport_catalog_get_airports(AirportCatalog* catalog);
 Airport* get_airport_by_code(AirportCatalog* manager, const char* code);
 int airport_catalog_get_count(AirportCatalog* manager);
-void airport_flights_counter_increment(const char* origin, int date, AirportCatalog* manager);
-GHashTable* get_flights_by_origin(AirportCatalog* manager) ;
 
 #endif

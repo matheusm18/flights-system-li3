@@ -230,11 +230,11 @@ int main(int argc, char **argv) {
     Discrepancy discrepancies[500];
     int discrepancy_count = 0;
 
-    catalog_manager_destroy(catalog_manager);
-
     // comparar resultados
 
     compare_all_outputs(expected_output_path, query_counts, stats, discrepancies, &discrepancy_count);
+
+    catalog_manager_destroy(catalog_manager);
 
     // memória final
     struct rusage r_usage;

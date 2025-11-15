@@ -13,6 +13,7 @@ typedef struct CatalogManager CatalogManager;
 CatalogManager* catalog_manager_create(void);
 void catalog_manager_destroy(CatalogManager* manager);
 
+// getters
 AirportCatalog* get_airports_from_catalog_manager(const CatalogManager* manager);
 AircraftCatalog* get_aircrafts_from_catalog_manager(const CatalogManager* manager);
 FlightCatalog* get_flights_from_catalog_manager(const CatalogManager* manager);

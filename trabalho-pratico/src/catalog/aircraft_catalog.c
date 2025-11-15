@@ -53,10 +53,7 @@ GHashTable* aircraft_catalog_get_aircrafts(AircraftCatalog* catalog) {
     return catalog->aircraft_by_identifier;
 }
 
-
 int get_total_aircrafts_in_catalog(AircraftCatalog* catalog) {
     if (!catalog) return 0;
     return g_hash_table_size(catalog->aircraft_by_identifier);
 }
-
-
