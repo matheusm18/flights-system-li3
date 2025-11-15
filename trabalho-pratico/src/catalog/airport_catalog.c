@@ -31,7 +31,6 @@ void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     }
 }
 
-<<<<<<< HEAD
 void airport_catalog_sort_all_flights(AirportCatalog* catalog) {
     if (!catalog) return;
 
@@ -52,8 +51,6 @@ GHashTable* airport_catalog_get_airports(AirportCatalog* catalog) {
     return catalog->airports_by_code;
 }
 
-=======
->>>>>>> origin/main
 Airport* get_airport_by_code(AirportCatalog* manager, const char* code) {
     if (manager == NULL || code == NULL) {
         return NULL;
