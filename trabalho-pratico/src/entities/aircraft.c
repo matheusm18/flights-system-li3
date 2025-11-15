@@ -19,11 +19,8 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
     Aircraft* aircraft = malloc(sizeof(Aircraft));
     if (aircraft == NULL) return NULL;
 
-<<<<<<< HEAD
     strncpy(aircraft->identifier, identifier, 8);
-=======
-    strncpy(aircraft->identifier, identifier, 9);
->>>>>>> origin/main
+
     aircraft->identifier[8] = '\0';
     aircraft->manufacturer = strdup(manufacturer);
     aircraft->model = strdup(model);
