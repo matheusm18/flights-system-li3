@@ -20,9 +20,9 @@ void execute_query1(AirportCatalog* manager, const char* airport_code, const cha
         const char* name = get_airport_name(airport);
         const char* city = get_airport_city(airport);
         const char* country = get_airport_country(airport);
-        const char* type = get_airport_type(airport);
+        char type = get_airport_type(airport);
         
-        fprintf(output_file, "%s,%s,%s,%s,%s\n", code, name, city, country, type);
+        fprintf(output_file, "%s,%s,%s,%s,%s\n", code, name, city, country, airport_type_to_string(type));
     }
     else {
         fprintf(output_file,"\n");

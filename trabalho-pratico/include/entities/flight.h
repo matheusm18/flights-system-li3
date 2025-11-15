@@ -5,8 +5,8 @@
 
 typedef struct flight Flight;
 
-Flight* create_flight(const char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival,
-                      const char* gate, const char* status, const char* origin, const char* destination, const char* aircraft, const char* airline);
+Flight* create_flight(const char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival, const char* gate, const char* status, 
+                      const char* origin, const char* destination, const char* aircraft, const char* airline);
 
 void destroy_flight(Flight* f);
 

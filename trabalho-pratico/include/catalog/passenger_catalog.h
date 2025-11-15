@@ -8,7 +8,7 @@ typedef struct passenger_catalog PassengerCatalog;
 
 PassengerCatalog* passenger_catalog_create();
 void passenger_catalog_destroy(PassengerCatalog* manager);
-void passenger_catalog_add(PassengerCatalog* manager, Passenger* passenger);
-Passenger* get_passenger_by_dnumber(PassengerCatalog* manager, const char* dnumber);
+void passenger_catalog_add(PassengerCatalog* manager, int document_number);
+int passenger_catalog_dnumber_exists(PassengerCatalog* manager, int document_number);
 
 #endif

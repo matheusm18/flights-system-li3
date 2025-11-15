@@ -250,6 +250,10 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
         return;
     }
 
+    // para esta fase em vez de criar o passageiro e armazenar no catálogo, vamos só armazenar o document number para a validação das reservas
+    int document_number_int = atoi(document_number);
+    passenger_catalog_add(get_passengers_from_catalog_manager(manager), document_number_int);
+    /*
     int dob_dt = string_to_date(dob);
 
     Passenger* passenger = create_passenger(document_number, first_name, last_name, dob_dt, nationality, gender);
@@ -257,6 +261,7 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
     if (passenger != NULL) {
         passenger_catalog_add(get_passengers_from_catalog_manager(manager), passenger);
     }
+    */
 }
 
 void init_reservations_errors_file() {
@@ -287,7 +292,8 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
 
     if (!validate_reservation_id(reservation_id) ||
         !validate_flight_ids_reservation(flight_ids, flight_catalog) ||
-        !validate_document_number_reservation(document_number, passenger_catalog)) {
+        !validate_passenger_document_number(document_number) || // verifica formato
+        !validate_document_number_reservation(document_number, passenger_catalog)) { // verifica existência
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -301,4 +307,28 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
                 qr_code);
         return;
     }
+
+    /*
+    // conversão flight_ids
+    char flight_id1[10];
+    char flight_id2[10] = ""; // vazio se não existir
+    int num_flights = 1;
+
+    if (strlen(flight_ids) > 12) { // string com 2 voos
+        strncpy(flight_id1, flight_ids + 2, 7); // copia ID1
+        flight_id1[7] = '\0';
+        strncpy(flight_id2, flight_ids + 12, 7); // copia ID2
+        flight_id2[7] = '\0';
+        num_flights = 2;
+    } else {
+        strncpy(flight_id1, flight_ids + 2, 7); // copia ID1
+        flight_id1[7] = '\0';
+    }
+
+    char* flights[2];
+    flights[0] = flight_id1;
+    flights[1] = (num_flights == 2) ? flight_id2 : NULL;
+
+    Reservation* res = create_reservation(reservation_id, flights, document_number, seat, atof(price), atoi(extra_luggage), atoi(priority_boarding));
+    */
 }

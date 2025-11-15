@@ -65,7 +65,7 @@ bool validate_flight_ids_reservation(const char *flight_ids, FlightCatalog* mana
 }
 
 bool validate_document_number_reservation(const char *document_number, PassengerCatalog* manager) {
-    return (get_passenger_by_dnumber(manager, document_number) != NULL);
+    return (passenger_catalog_dnumber_exists(manager, atoi(document_number)));
 }
 
 /*

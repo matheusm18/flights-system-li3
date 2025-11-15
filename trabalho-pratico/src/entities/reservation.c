@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+// não está em comentario porque nem se quer criamos reservas para já
 struct reservation {
     char* reservation_id;
     char** flight_ids;
@@ -11,11 +12,11 @@ struct reservation {
     double price;
     bool extra_luggage;
     bool priority_boarding;
-    // qr_code não é armazenado para já
+    char* qr_code;
 };
 
 // passar o contador para poder alocar a memória? não estou a ver outra maneira
-Reservation* create_reservation(const char* reservation_id, char** flight_ids,const char* document_number, const char* seat, double price, int extra_luggage, int priority_boarding, int flight_count) {
+Reservation* create_reservation(const char* reservation_id, char** flight_ids,const char* document_number, const char* seat, double price, int extra_luggage, int priority_boarding) {
 
     Reservation* reservation = malloc(sizeof(Reservation));
     if (reservation == NULL) return NULL;
@@ -27,28 +28,32 @@ Reservation* create_reservation(const char* reservation_id, char** flight_ids,co
     reservation->extra_luggage = extra_luggage;
     reservation->priority_boarding = priority_boarding;
 
-    reservation->flight_ids = malloc(flight_count * sizeof(char*));
+    reservation->flight_ids = malloc(2 * sizeof(char*));
 
-    for (int i = 0; i < flight_count; i++) {
-        reservation->flight_ids[i] = strdup(flight_ids[i]);
+    for (int i = 0; i < 2; i++) {
+        if (flight_ids[i] != NULL) {
+            reservation->flight_ids[i] = strdup(flight_ids[i]);
+        } else {
+            reservation->flight_ids[i] = NULL; // NULL para indicar que não há mais voos
+        }
     }
 
     return reservation;
 }
 
 void destroy_reservation(Reservation* r) {
-    if (r != NULL) {
+    if (r == NULL) return;
 
-        free(r->reservation_id);
+    free(r->reservation_id);
+    free(r->document_number);
+    free(r->seat);
 
-        if (r->flight_ids) {
-            for (int i = 0; r->flight_ids[i] != NULL; i++) free(r->flight_ids[i]);
-            free(r->flight_ids);
+    if (r->flight_ids) {
+        for (int i = 0; i < 2 && r->flight_ids[i] != NULL; i++) {
+            free(r->flight_ids[i]);
         }
-
-        free(r->document_number);
-        free(r->seat);
-
-        free(r);
+        free(r->flight_ids);
     }
+
+    free(r);
 }

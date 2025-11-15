@@ -24,6 +24,7 @@
         "compare": "c",
         "type_traits": "c",
         "parser.h": "c",
-        "aircraft.h": "c"
+        "aircraft.h": "c",
+        "passenger.h": "c"
     }
 }

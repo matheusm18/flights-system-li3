@@ -4,60 +4,59 @@
 #include <string.h>
 
 struct flight {
-    char* flight_id;
-    long departure;
+    char flight_id[8];
+    //long departure;
     long actual_departure;
-    long arrival;
-    long actual_arrival;
-    char* gate;
+    //long arrival;
+    //long actual_arrival;
+    //char* gate;
     char* status;
     char* origin;
     char* destination;
     char* aircraft;
-    char* airline;
-    // tracking_url não é armazenado para já
+    //char* airline;
+    //char* tracking_url;
 };
 
-Flight* create_flight(const char* flight_id,
-                      long departure,
-                      long actual_departure,
-                      long arrival,
-                      long actual_arrival,
-                      const char* gate,
-                      const char* status,
-                      const char* origin,
-                      const char* destination,
-                      const char* aircraft,
-                      const char* airline) {
+Flight* create_flight(const char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival, const char* gate, const char* status, 
+                      const char* origin, const char* destination, const char* aircraft, const char* airline) {
 
+    (void) departure;
+    (void) arrival;
+    (void) actual_arrival;
+    (void) gate;
+    (void) airline;
+    
     Flight* flight = malloc(sizeof(Flight));
     if (!flight) return NULL;
 
-    flight->flight_id = strdup(flight_id);
-    flight->departure = departure;
-    flight->actual_departure = actual_departure;
-    flight->arrival = arrival;
-    flight->actual_arrival = actual_arrival;
+    strncpy(flight->flight_id, flight_id, 8);
+    flight->flight_id[7] = '\0';
 
-    flight->gate = strdup(gate);
+    //flight->departure = departure;
+    flight->actual_departure = actual_departure;
+    //flight->arrival = arrival;
+    //flight->actual_arrival = actual_arrival;
+
+    //flight->gate = strdup(gate);
     flight->status = strdup(status);
     flight->origin = strdup(origin);
     flight->destination = strdup(destination);
     flight->aircraft = strdup(aircraft);
-    flight->airline = strdup(airline);
+    //flight->airline = strdup(airline);
 
     return flight;
 }
 
 void destroy_flight(Flight* f) {
     if (!f) return;
-    free(f->flight_id);
-    free(f->gate);
+
+    //free(f->gate);
     free(f->status);
     free(f->origin);
-    free(f->destination);
+    //free(f->destination);
     free(f->aircraft);
-    free(f->airline);
+    //free(f->airline);
 
     free(f);
 }
@@ -75,7 +74,6 @@ const char* get_flight_destination(const Flight* f) {
     if (!f) return NULL;
     return f->destination;
 }
-
 
 const char* get_flight_status(const Flight* f) {
     if (!f) return NULL;

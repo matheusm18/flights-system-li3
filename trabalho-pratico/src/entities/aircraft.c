@@ -3,26 +3,29 @@
 #include <string.h>
 
 struct aircraft {
-    char* identifier;
+    char identifier[9];
     char* manufacturer;
     char* model;
-    int year;
-    int capacity;
-    int range;
+    unsigned short year;
+    //unsigned short capacity;
+    //unsigned short range;
     int flight_count;
 };
 
-Aircraft* create_aircraft(const char* identifier, const char* manufacturer, const char* model, int year, int capacity, int range) {
+Aircraft* create_aircraft(const char* identifier, const char* manufacturer, const char* model, unsigned short year, unsigned short capacity, unsigned short range) {
+    (void) capacity;
+    (void) range;
 
     Aircraft* aircraft = malloc(sizeof(Aircraft));
     if (aircraft == NULL) return NULL;
 
-    aircraft->identifier = strdup(identifier);
+    strncpy(aircraft->identifier, identifier, 9);
+    aircraft->identifier[8] = '\0';
     aircraft->manufacturer = strdup(manufacturer);
     aircraft->model = strdup(model);
     aircraft->year = year;
-    aircraft->capacity = capacity;
-    aircraft->range = range;
+    //aircraft->capacity = capacity;
+    //aircraft->range = range;
     aircraft->flight_count = 0;
 
     return aircraft;
@@ -31,7 +34,6 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
 void destroy_aircraft(Aircraft* a) {
     if (a != NULL) {
 
-        free(a->identifier);
         free(a->manufacturer);
         free(a->model);
 

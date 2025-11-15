@@ -34,7 +34,6 @@ void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     }
 }
 
-
 Airport* get_airport_by_code(AirportCatalog* manager, const char* code) {
     if (manager == NULL || code == NULL) {
         return NULL;

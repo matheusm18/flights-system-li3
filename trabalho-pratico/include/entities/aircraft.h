@@ -3,7 +3,7 @@
 
 typedef struct aircraft Aircraft;
 
-Aircraft* create_aircraft(const char* identifier, const char* manufacturer, const char* model, int year, int capacity, int range);
+Aircraft* create_aircraft(const char* identifier, const char* manufacturer, const char* model, unsigned short year, unsigned short capacity, unsigned short range);
 
 void destroy_aircraft(Aircraft* a);
 const char* get_aircraft_identifier(const Aircraft* a);

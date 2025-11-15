@@ -5,7 +5,6 @@
 
 struct flight_catalog {
     GHashTable* flights_by_flight_id;
-    GHashTable* flights_by_origin;
 };
 
 FlightCatalog* flight_catalog_create() {
@@ -59,7 +58,6 @@ const char* flight_catalog_get_destination(const FlightCatalog* manager, const c
     return get_flight_destination(f);
 }
 
-
 int flight_catalog_get_count(FlightCatalog* manager) {
     if (manager == NULL) {
         return 0;
@@ -72,6 +70,3 @@ GHashTable* get_flight_catalog(FlightCatalog* manager) {
     if (!manager) return NULL;
     return manager->flights_by_flight_id;
 }
-
-
-
