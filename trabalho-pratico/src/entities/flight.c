@@ -55,7 +55,7 @@ void destroy_flight(Flight* f) {
     //free(f->gate);
     free(f->status);
     free(f->origin);
-    //free(f->destination);
+    free(f->destination);
     free(f->aircraft);
     //free(f->airline);
 
