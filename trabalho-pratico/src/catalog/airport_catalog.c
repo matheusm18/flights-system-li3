@@ -40,9 +40,7 @@ void airport_catalog_sort_all_flights(AirportCatalog* catalog) {
 
     while (g_hash_table_iter_next(&iter, &key, &value)) {
         Airport* airport = (Airport*) value;
-        if (airport_get_departing_flights(airport)) {
-            g_ptr_array_sort(airport_get_departing_flights(airport), compare_flight_actual_departure);
-        }
+        airport_sort_departing_flights(airport);
     }
 }
 
@@ -51,7 +49,7 @@ void airport_catalog_iter_init(const AirportCatalog* catalog, GHashTableIter* it
     g_hash_table_iter_init(iter, catalog->airports_by_code);
 }
 
-Airport* airport_catalog_iter_next(GHashTableIter* iter) {
+const Airport* airport_catalog_iter_next(GHashTableIter* iter) {
     gpointer key, value;
     if (g_hash_table_iter_next(iter, &key, &value))
         return (Airport*) value;
