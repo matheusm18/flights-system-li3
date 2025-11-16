@@ -106,6 +106,11 @@ const Flight* airport_departing_iter_next(const Airport* airport, guint* index) 
     return g_ptr_array_index(flights, (*index)++);
 }
 
+void airport_sort_departing_flights(Airport* airport) {
+    if (!airport || !airport->departing_flights) return;
+    g_ptr_array_sort(airport->departing_flights, compare_flight_actual_departure);
+}
+
 const char* get_airport_code(const Airport* airport) {
     if (airport == NULL) return NULL;
     return airport->code;
@@ -136,11 +141,4 @@ char get_airport_type_char(const char* type_str) {
     else if (strcmp(type_str, "medium_airport") == 0) return 'M';
     else if (strcmp(type_str, "large_airport") == 0) return 'L';
     else return 'U'; // unknown
-}
-
-// getter para voos
-GPtrArray* airport_get_departing_flights(Airport* airport) {
-    if (airport == NULL) return NULL;
-    
-    else return airport->departing_flights;
 }
