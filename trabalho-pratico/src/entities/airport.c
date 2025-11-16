@@ -93,15 +93,14 @@ void airport_departing_iter_init(const Airport* airport, guint* index) {
     *index = 0;  // começa do primeiro voo
 }
 
-// retorna o próximo voo de partida do aeroporto
-// retorna NULL quando terminar
+
 const Flight* airport_departing_iter_next(const Airport* airport, guint* index) {
     if (!airport || !index) return NULL;
 
-    GPtrArray* flights = airport->departing_flights; // ponteiro interno
+    GPtrArray* flights = airport->departing_flights; 
     if (!flights) return NULL;
 
-    if (*index >= flights->len) return NULL;  // acabou
+    if (*index >= flights->len) return NULL;  
 
     return g_ptr_array_index(flights, (*index)++);
 }

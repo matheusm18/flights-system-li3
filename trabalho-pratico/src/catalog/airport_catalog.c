@@ -60,7 +60,7 @@ const Airport* get_airport_by_code(AirportCatalog* manager, const char* code) {
         return NULL;
     }
 
-    return g_hash_table_lookup(manager->airports_by_code, code); // retorna null se n existir
+    return g_hash_table_lookup(manager->airports_by_code, code); 
 }
 
 int airport_catalog_get_count(AirportCatalog* manager) {
