@@ -46,12 +46,19 @@ void airport_catalog_sort_all_flights(AirportCatalog* catalog) {
     }
 }
 
-GHashTable* airport_catalog_get_airports(AirportCatalog* catalog) {
-    if (!catalog) return NULL;
-    return catalog->airports_by_code;
+void airport_catalog_iter_init(const AirportCatalog* catalog, GHashTableIter* iter) {
+    if (!catalog || !iter) return;
+    g_hash_table_iter_init(iter, catalog->airports_by_code);
 }
 
-Airport* get_airport_by_code(AirportCatalog* manager, const char* code) {
+Airport* airport_catalog_iter_next(GHashTableIter* iter) {
+    gpointer key, value;
+    if (g_hash_table_iter_next(iter, &key, &value))
+        return (Airport*) value;
+    return NULL;
+}
+
+const Airport* get_airport_by_code(AirportCatalog* manager, const char* code) {
     if (manager == NULL || code == NULL) {
         return NULL;
     }
