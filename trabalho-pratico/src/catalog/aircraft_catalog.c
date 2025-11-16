@@ -30,6 +30,21 @@ void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
     }
 }
 
+void aircraft_catalog_iter_init(const AircraftCatalog* catalog, GHashTableIter* iter) {
+    if (!catalog || !iter) return;
+    g_hash_table_iter_init(iter, catalog->aircrafts_by_id);
+}
+
+const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter) {
+    gpointer key, value;
+    if (!iter) return NULL;
+
+    if (g_hash_table_iter_next(iter, &key, &value)) {
+        return (const Aircraft*) value;
+    }
+    return NULL;  // acabou
+}
+
 Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
     if (manager == NULL || identifier == NULL) {
         return NULL;
@@ -46,11 +61,6 @@ void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manag
         // incrementa o contador diretamente na entidade
         aircraft_increment_flight_count(aircraft);
     }
-}
-
-GHashTable* aircraft_catalog_get_aircrafts(AircraftCatalog* catalog) {
-    if (!catalog) return NULL;
-    return catalog->aircraft_by_identifier;
 }
 
 int get_total_aircrafts_in_catalog(AircraftCatalog* catalog) {
