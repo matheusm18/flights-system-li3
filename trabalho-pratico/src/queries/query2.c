@@ -28,14 +28,12 @@ int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, const c
     }
 
     GHashTableIter iter;
-    gpointer key, value;
+    aircraft_catalog_iter_init(aircraft_catalog, &iter);
+
+    const Aircraft* aircraft;
     int index = 0;
 
-    g_hash_table_iter_init(&iter, aircraft_catalog_get_aircrafts(aircraft_catalog));
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Aircraft* aircraft = (Aircraft*)value;
-        if (!aircraft) continue;
-
+    while((aircraft = aircraft_catalog_iter_next(&iter)) != NULL) {
         if (manufacturer_filter && *manufacturer_filter) {
             const char* manufacturer = get_aircraft_manufacturer(aircraft);
             if (!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0) continue;
