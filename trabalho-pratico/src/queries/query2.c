@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 struct aircraft_count{
-    char* aircraft_id;
+    const char* aircraft_id;
     int flight_count;
 };
 

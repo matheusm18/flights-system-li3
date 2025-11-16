@@ -11,7 +11,7 @@ void airport_catalog_destroy(AirportCatalog* manager);
 void airport_catalog_add(AirportCatalog* manager, Airport* airport);
 void airport_catalog_sort_all_flights(AirportCatalog* catalog);
 void airport_catalog_iter_init(const AirportCatalog* catalog, GHashTableIter* iter);
-const Airport* airport_catalog_iter_next(GHashTableIter* iter) {
+const Airport* airport_catalog_iter_next(GHashTableIter* iter);
 
 // getters
 const Airport* get_airport_by_code(AirportCatalog* manager, const char* code);

@@ -61,7 +61,7 @@ const char* airport_type_to_string(char type) {
 }
 
 // adiciona voo à lista de voos do aeroporto
-void airport_add_departing_flight(Airport* airport, Flight* flight) {
+void airport_add_departing_flight(const Airport* airport, Flight* flight) {
     if (!airport || !flight) return;
     g_ptr_array_add(airport->departing_flights, flight);
 }

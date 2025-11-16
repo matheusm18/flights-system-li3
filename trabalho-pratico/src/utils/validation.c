@@ -198,7 +198,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
             aircrafts_counter_increment(get_aircraft_id_from_flight(flight), aircraft_catalog);
 
             const char* origin_code = get_flight_origin(flight); // obter o código do aeroporto de origem
-            Airport* airport = get_airport_by_code(airport_catalog, origin_code);
+            const Airport* airport = get_airport_by_code(airport_catalog, origin_code);
 
             if (airport != NULL) {
                 airport_add_departing_flight(airport, flight); // adicionar o voo à lista de partidas do aeroporto

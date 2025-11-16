@@ -23,7 +23,7 @@ bool write_result(const char* output_path, AirportCatalog* airport_manager, cons
         const char* country = "";
 
         if (airport_manager) {
-            Airport* airport = get_airport_by_code(airport_manager, best_code);
+            const Airport* airport = get_airport_by_code(airport_manager, best_code);
             if (airport) {
                 name = get_airport_name(airport);
                 city = get_airport_city(airport);
@@ -50,17 +50,17 @@ void execute_query3(AirportCatalog* airport_manager, const char* start_date_str,
     const char* best_code = NULL;
     int best_count = 0;
 
-    GHashTableIter iter;
+    GHashTableIter airport_iter;
     airport_catalog_iter_init(airport_manager, &airport_iter);
 
-    Airport* airport;
+    const Airport* airport;
     while ((airport = airport_catalog_iter_next(&airport_iter)) != NULL) {
         int count = 0;
 
         guint flight_index;
         airport_departing_iter_init(airport, &flight_index);
 
-        Flight* flight;
+        const Flight* flight;
         while ((flight = airport_departing_iter_next(airport, &flight_index)) != NULL) {
             long adt = get_flight_actual_departure(flight);
             if (adt <= 0) break; // voo cancelado (N/A)

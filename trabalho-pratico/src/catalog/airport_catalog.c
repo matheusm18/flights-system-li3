@@ -51,8 +51,7 @@ void airport_catalog_iter_init(const AirportCatalog* catalog, GHashTableIter* it
 
 const Airport* airport_catalog_iter_next(GHashTableIter* iter) {
     gpointer key, value;
-    if (g_hash_table_iter_next(iter, &key, &value))
-        return (Airport*) value;
+    if (g_hash_table_iter_next(iter, &key, &value)) return (Airport*) value;
     return NULL;
 }
 

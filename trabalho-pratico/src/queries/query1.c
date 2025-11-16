@@ -13,7 +13,7 @@ void execute_query1(AirportCatalog* manager, const char* airport_code, const cha
         return;
     }
     
-    Airport* airport = get_airport_by_code(manager, airport_code);
+    const Airport* airport = get_airport_by_code(manager, airport_code);
     
     if (airport != NULL) {
         const char* code = get_airport_code(airport);

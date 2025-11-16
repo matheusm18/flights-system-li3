@@ -32,7 +32,7 @@ void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
 
 void aircraft_catalog_iter_init(const AircraftCatalog* catalog, GHashTableIter* iter) {
     if (!catalog || !iter) return;
-    g_hash_table_iter_init(iter, catalog->aircrafts_by_id);
+    g_hash_table_iter_init(iter, catalog->aircraft_by_identifier);
 }
 
 const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter) {
@@ -45,7 +45,7 @@ const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter) {
     return NULL;  // acabou
 }
 
-const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
+Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
     if (manager == NULL || identifier == NULL) {
         return NULL;
     }
