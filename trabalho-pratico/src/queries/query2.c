@@ -41,7 +41,7 @@ int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, const c
             if (!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0) continue;
         }
 
-        array[index].aircraft_id = g_strdup(get_aircraft_identifier(aircraft));
+        array[index].aircraft_id = get_aircraft_identifier(aircraft);
         array[index].flight_count = get_aircraft_flight_count(aircraft);
         index++;
     }
@@ -78,20 +78,11 @@ void write_top_n_aircraft(FILE* output_file, AircraftCatalog* aircraft_catalog, 
      if (number_of_aircrafts > 0) qsort(array, number_of_aircrafts, sizeof(AircraftCount), compare_aircraft_counts);
 
     for (int i = 0; i < limit; i++) {
-        Aircraft* a = get_aircraft_by_identifier(aircraft_catalog, array[i].aircraft_id);
+        const Aircraft* a = get_aircraft_by_identifier(aircraft_catalog, array[i].aircraft_id);
         if (a) {
             fprintf(output_file, "%s,%s,%s,%d\n", array[i].aircraft_id, get_aircraft_manufacturer(a), get_aircraft_model(a), array[i].flight_count);
         }
     }
-}
-
-void free_aircraft_count_array(AircraftCount* array, int count) {
-    if (!array) return;
-
-    for (int i = 0; i < count; i++) {
-        free(array[i].aircraft_id);
-    }
-    free(array);
 }
 
 //======= Top N aeronaves com mais voos
@@ -107,7 +98,7 @@ void execute_query2(AircraftCatalog* aircraft_manager, int n, const char* manufa
 
     write_top_n_aircraft(output_file, aircraft_manager, array, count, n);
 
-    free_aircraft_count_array(array, count);
+    free(array);
 
     fclose(output_file);
 }
