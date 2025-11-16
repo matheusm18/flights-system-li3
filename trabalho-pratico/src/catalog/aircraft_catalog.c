@@ -45,7 +45,7 @@ const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter) {
     return NULL;  // acabou
 }
 
-Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
+const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
     if (manager == NULL || identifier == NULL) {
         return NULL;
     }
