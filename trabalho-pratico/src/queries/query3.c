@@ -51,34 +51,31 @@ void execute_query3(AirportCatalog* airport_manager, const char* start_date_str,
     int best_count = 0;
 
     GHashTableIter iter;
-    gpointer key, value;
+    airport_catalog_iter_init(airport_manager, &airport_iter);
 
-    g_hash_table_iter_init(&iter, airport_catalog_get_airports(airport_manager)); // todos os aeroportos
-
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Airport* airport = (Airport*) value;
+    Airport* airport;
+    while ((airport = airport_catalog_iter_next(&airport_iter)) != NULL) {
         int count = 0;
-        GPtrArray* flights = airport_get_departing_flights(airport);
 
-        if (flights != NULL) {
-            for (guint i = 0; i < flights->len; i++) {
-                Flight* flight = g_ptr_array_index(flights, i);
-                long adt = get_flight_actual_departure(flight);
+        guint flight_index;
+        airport_departing_iter_init(airport, &flight_index);
 
-                if (adt <= 0) break; // voo cancelado ou "N/A", está ordenado -> podemos parar
+        Flight* flight;
+        while ((flight = airport_departing_iter_next(airport, &flight_index)) != NULL) {
+            long adt = get_flight_actual_departure(flight);
+            if (adt <= 0) break; // voo cancelado (N/A)
 
-                int flight_date = get_date_part(adt);
-
-                if (flight_date > end_date) break;    // array ordenado -> podemos parar
-                if (flight_date >= start_date) count++; // dentro do intervalo
-            }
-
+            int flight_date = get_date_part(adt);
+            if (flight_date > end_date) break;
+            if (flight_date >= start_date) count++;
         }
+
+        const char* airport_code = get_airport_code(airport);
 
         // atualiza melhor aeroporto
         if (best_code == NULL || count > best_count ||
-            (count == best_count && strcmp(get_airport_code(airport), best_code) < 0)) {
-            best_code = get_airport_code(airport);
+            (count == best_count && strcmp(airport_code, best_code) < 0)) {
+            best_code = airport_code;
             best_count = count;
         }
     }
