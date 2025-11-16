@@ -14,6 +14,7 @@ void airport_add_departing_flight(Airport* airport, Flight* flight);
 int compare_flight_actual_departure(const void* a, const void* b);
 void airport_departing_iter_init(const Airport* airport, guint* index);
 const Flight* airport_departing_iter_next(const Airport* airport, guint* index);
+void airport_sort_departing_flights(Airport* airport);
 
 // getters
 const char* get_airport_code(const Airport* airport);
