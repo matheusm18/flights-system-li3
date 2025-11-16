@@ -12,6 +12,8 @@ void destroy_airport(Airport* airport);
 const char* airport_type_to_string(char type);
 void airport_add_departing_flight(Airport* airport, Flight* flight);
 int compare_flight_actual_departure(const void* a, const void* b);
+void airport_departing_iter_init(const Airport* airport, guint* index);
+const Flight* airport_departing_iter_next(const Airport* airport, guint* index);
 
 // getters
 const char* get_airport_code(const Airport* airport);
@@ -20,6 +22,5 @@ const char* get_airport_city(const Airport* airport);
 const char* get_airport_country(const Airport* airport);
 char get_airport_type(const Airport* airport);
 char get_airport_type_char(const char* type_str);
-GPtrArray* airport_get_departing_flights(Airport* airport);
 
 #endif
