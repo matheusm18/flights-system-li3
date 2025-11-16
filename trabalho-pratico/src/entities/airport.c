@@ -87,6 +87,25 @@ int compare_flight_actual_departure(const void* a, const void* b) {
     return 0;
 }
 
+// inicializa o iterador de voos de partida de um aeroporto
+void airport_departing_iter_init(const Airport* airport, guint* index) {
+    if (!airport || !index) return;
+    *index = 0;  // começa do primeiro voo
+}
+
+// retorna o próximo voo de partida do aeroporto
+// retorna NULL quando terminar
+const Flight* airport_departing_iter_next(const Airport* airport, guint* index) {
+    if (!airport || !index) return NULL;
+
+    GPtrArray* flights = airport->departing_flights; // ponteiro interno
+    if (!flights) return NULL;
+
+    if (*index >= flights->len) return NULL;  // acabou
+
+    return g_ptr_array_index(flights, (*index)++);
+}
+
 const char* get_airport_code(const Airport* airport) {
     if (airport == NULL) return NULL;
     return airport->code;
