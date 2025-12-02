@@ -46,7 +46,7 @@ void destroy_airport(Airport* a) {
         free(a->country);
 
         if (a->departing_flights != NULL) {
-            g_ptr_array_free(a->departing_flights, TRUE); // libera o array de ponteiros
+            g_ptr_array_free(a->departing_flights, TRUE); 
         }
 
         free(a);
@@ -60,16 +60,13 @@ const char* airport_type_to_string(char type) {
     else return "unknown";
 }
 
-// adiciona voo à lista de voos do aeroporto
+
 void airport_add_departing_flight(const Airport* airport, Flight* flight) {
     if (!airport || !flight) return;
     g_ptr_array_add(airport->departing_flights, flight);
 }
 
-/*
-   Comparador para qsort: ordena voos pelo actual_departure.
-   Cancelados ou "N/A" (representados como -1) ficam no final.
-*/
+
 int compare_flight_actual_departure(const void* a, const void* b) {
     Flight* f1 = *(Flight**)a;
     Flight* f2 = *(Flight**)b;
@@ -77,20 +74,19 @@ int compare_flight_actual_departure(const void* a, const void* b) {
     long dt1 = get_flight_actual_departure(f1);
     long dt2 = get_flight_actual_departure(f2);
 
-    // coloca voos cancelados (actual_departure == -1) no final
     if (dt1 <= 0 && dt2 <= 0) return 0;
-    if (dt1 <= 0) return 1;   // f1 vai para o fim
-    if (dt2 <= 0) return -1;  // f2 vai para o fim
+    if (dt1 <= 0) return 1;   
+    if (dt2 <= 0) return -1; 
 
     if (dt1 < dt2) return -1;
     if (dt1 > dt2) return 1;
     return 0;
 }
 
-// inicializa o iterador de voos de partida de um aeroporto
+
 void airport_departing_iter_init(const Airport* airport, guint* index) {
     if (!airport || !index) return;
-    *index = 0;  // começa do primeiro voo
+    *index = 0;
 }
 
 

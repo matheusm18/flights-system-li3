@@ -18,7 +18,7 @@
 
 void init_aircrafts_errors_file() {
     const char *output_path = "resultados/aircrafts_errors.csv";
-    FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
+    FILE *f = fopen(output_path, "w"); 
     if (f == NULL) {
         perror("Erro ao criar ficheiro aircrafts_errors.csv");
         return;
@@ -26,6 +26,7 @@ void init_aircrafts_errors_file() {
     fprintf(f, "\"identifier\",\"manufacturer\",\"model\",\"year\",\"capacity\",\"range\"\n");
     fclose(f);
 }
+
 
 void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     (void) num_fields;
@@ -64,7 +65,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
 
 void init_airports_errors_file() {
     const char *output_path = "resultados/airports_errors.csv";
-    FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
+    FILE *f = fopen(output_path, "w");  
     if (f == NULL) {
         perror("Erro ao criar ficheiro airports_errors.csv");
         return;
@@ -111,7 +112,7 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
 
 void init_flights_errors_file() {
     const char *output_path = "resultados/flights_errors.csv";
-    FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
+    FILE *f = fopen(output_path, "w");  
     if (f == NULL) {
         perror("Erro ao criar ficheiro flights_errors.csv");
         return;
@@ -139,7 +140,6 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
     char *airline = fields[10];
     char *tracking_url = fields[11];
 
-    // validações sintática
     if (!validate_flight_id_flight(flight_id) || !validate_datetime(departure) || !validate_datetime(actual_departure) ||
         !validate_datetime(arrival) || !validate_datetime(actual_arrival)) {
 
@@ -160,14 +160,11 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         return;
     }
 
-    // vamos tratar os casos dos campos com 'N/A' convertendo para -1 no datetime
-
     long departure_dt = string_to_datetime(departure);
     long actual_departure_dt = string_to_datetime(actual_departure);
     long arrival_dt = string_to_datetime(arrival);
     long actual_arrival_dt = string_to_datetime(actual_arrival);
 
-    // validações lógica
     if (!validate_flight_logical(origin, destination, departure_dt, arrival_dt, actual_departure_dt, actual_arrival_dt,
                                  status, aircraft, aircraft_catalog, actual_departure, actual_arrival)) {
 
@@ -197,11 +194,11 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         if (strcmp(status, "Cancelled") != 0) {
             aircrafts_counter_increment(get_aircraft_id_from_flight(flight), aircraft_catalog);
 
-            const char* origin_code = get_flight_origin(flight); // obter o código do aeroporto de origem
+            const char* origin_code = get_flight_origin(flight); 
             const Airport* airport = get_airport_by_code(airport_catalog, origin_code);
 
             if (airport != NULL) {
-                airport_add_departing_flight(airport, flight); // adicionar o voo à lista de partidas do aeroporto
+                airport_add_departing_flight(airport, flight); 
             }
         }
     }
@@ -209,7 +206,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
 
 void init_passengers_errors_file() {
     const char *output_path = "resultados/passengers_errors.csv";
-    FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
+    FILE *f = fopen(output_path, "w"); 
     if (f == NULL) {
         perror("Erro ao criar ficheiro passengers_errors.csv");
         return;
@@ -253,7 +250,6 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
         return;
     }
 
-    // para esta fase em vez de criar o passageiro e armazenar no catálogo, vamos só armazenar o document number para a validação das reservas
     int document_number_int = atoi(document_number);
     passenger_catalog_add(get_passengers_from_catalog_manager(manager), document_number_int);
     /*
@@ -269,7 +265,7 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
 
 void init_reservations_errors_file() {
     const char *output_path = "resultados/reservations_errors.csv";
-    FILE *f = fopen(output_path, "w");  // cria/limpa o ficheiro
+    FILE *f = fopen(output_path, "w");  
     if (f == NULL) {
         perror("Erro ao criar ficheiro reservations_errors.csv");
         return;
@@ -295,8 +291,8 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
 
     if (!validate_reservation_id(reservation_id) ||
         !validate_flight_ids_reservation(flight_ids, flight_catalog) ||
-        !validate_passenger_document_number(document_number) || // verifica formato
-        !validate_document_number_reservation(document_number, passenger_catalog)) { // verifica existência
+        !validate_passenger_document_number(document_number) || 
+        !validate_document_number_reservation(document_number, passenger_catalog)) { 
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",

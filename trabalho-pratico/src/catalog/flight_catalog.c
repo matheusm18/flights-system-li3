@@ -35,7 +35,7 @@ Flight* get_flight_by_flight_id_from_catalog(FlightCatalog* manager, const char*
         return NULL;
     }
 
-    return g_hash_table_lookup(manager->flights_by_flight_id, flight_id); // retorna null se n existir
+    return g_hash_table_lookup(manager->flights_by_flight_id, flight_id); 
 }
 
 const char* flight_catalog_get_origin(const FlightCatalog* manager, const char* flight_id) {

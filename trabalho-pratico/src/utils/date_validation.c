@@ -34,9 +34,9 @@ bool validate_time(const char* time) {
     
     if (strlen(time) != 5 || time[2] != ':') return false;
 
-    // Verificar se todos os caracteres ( exceto : ) são digitos
+    
     for (int i = 0; i < 5; i++) {
-        if (i != 2) {
+        if (i != 2) { ///< // Verifica se todos os caracteres, exceto ':' são digitos
             if (time[i] < '0' || time[i] > '9') return false;
         }
     }
@@ -47,13 +47,12 @@ bool validate_time(const char* time) {
     return (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59);
 }
 
-// valida formato datetime "YYYY-MM-DD HH:MM"
+
 bool validate_datetime(const char* datetime) {
     if (!datetime) return false;
 
-    if (strcmp(datetime, "N/A") == 0) return true; // aceitar 'N/A' como válido
+    if (strcmp(datetime, "N/A") == 0) return true; ///< Aceitar 'N/A' como válido
     
-    // "YYYY-MM-DD HH:MM" = 16 caracteres
     if (strlen(datetime) < 16) return false;
 
     char date_part[11], time_part[6];
@@ -63,6 +62,3 @@ bool validate_datetime(const char* datetime) {
     return validate_date(date_part) && validate_time(time_part);
 }
 
-bool is_date_in_range(int date, int start_date, int end_date) {
-    return date >= start_date && date <= end_date;
-}

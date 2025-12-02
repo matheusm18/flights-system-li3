@@ -18,7 +18,7 @@ bool validate_decimal_cases(const char *str) {
     if (!str) return false;
 
     const char *p = str;
-    if (*p == '-') p++;  // se for negativo, avança
+    if (*p == '-') p++;  
 
     if (*p == '\0') return false; 
 
@@ -27,9 +27,9 @@ bool validate_decimal_cases(const char *str) {
 
     for (; *p != '\0'; p++) {
         if (*p == '.') {
-            if (dot_found) return false;  // haveriam dois pontos
+            if (dot_found) return false;  
             dot_found = true;
-            continue; // avança para a próxima iteração do for
+            continue; 
         }
 
         if (!isdigit((unsigned char) *p)) return false;
@@ -48,10 +48,10 @@ bool validate_latitude_airport(const char *latitude) {
         return false;
 
     char *invalid_start;
-    double value = strtod(latitude, &invalid_start); // converte para double, invalid_start aponta para o primeiro caracter n convertido: "45.0a" aponta para a
+    double value = strtod(latitude, &invalid_start); ///< Converte para double
 
-    // verificar se sobrou lixo no fim da conversão
-    if (*invalid_start != '\0') return false;
+    
+    if (*invalid_start != '\0') return false; ///< Verifica se sobrou "lixo" no fim da conversão
 
     if (value < -90.0 || value > 90.0)
         return false;
@@ -66,9 +66,8 @@ bool validate_longitude_airport(const char *longitude) {
         return false;
 
     char *invalid_start;
-    double value = strtod(longitude, &invalid_start); // converte para double
+    double value = strtod(longitude, &invalid_start); 
 
-    // verificar se sobrou lixo no fim da conversão
     if (*invalid_start != '\0') return false;
 
     if (value < -180.0 || value > 180.0)

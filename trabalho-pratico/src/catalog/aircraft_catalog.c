@@ -14,6 +14,7 @@ AircraftCatalog* aircraft_catalog_create() {
     return manager;
 }
 
+
 void aircraft_catalog_destroy(AircraftCatalog* manager){
     if (manager != NULL) {
         g_hash_table_destroy(manager->aircraft_by_identifier);
@@ -42,7 +43,7 @@ const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter) {
     if (g_hash_table_iter_next(iter, &key, &value)) {
         return (const Aircraft*) value;
     }
-    return NULL;  // acabou
+    return NULL; 
 }
 
 Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
@@ -58,7 +59,6 @@ void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manag
 
     Aircraft* aircraft = get_aircraft_by_identifier(manager, aircraft_id);
     if (aircraft != NULL) {
-        // incrementa o contador diretamente na entidade
         aircraft_increment_flight_count(aircraft);
     }
 }

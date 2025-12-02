@@ -61,3 +61,7 @@ trabalho-pratico/resultados/command*_output.txt
 # Datasets
 trabalho-pratico/dataset*/
 trabalho-pratico/dataset-fase-1*/
+
+# Resultados esperados do programa
+trabalho-pratico/resultados-esperados/*.txt
+trabalho-pratico/resultados-esperados/command*_output.txt
