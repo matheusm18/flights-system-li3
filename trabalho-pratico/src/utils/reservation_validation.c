@@ -20,47 +20,62 @@ bool validate_reservation_id(const char *reservation_id) {
 }
 
 bool validate_flight_ids_reservation(const char *flight_ids, FlightCatalog* manager) {
-    if (!flight_ids || (strlen(flight_ids) != 11 && strlen(flight_ids) != 22)) return false;
+    if (!flight_ids) return false;
 
-    size_t len = strlen(flight_ids);
+    int len = strlen(flight_ids);
+    if (len < 2 || flight_ids[0] != '[' || flight_ids[len - 1] != ']') return false;
 
-    int id_len = 8;
+    char *ids = strdup(flight_ids);
+    char *delims = "[]' ,\""; 
+    char *id1 = strtok(ids, delims);
+    char *id2 = strtok(NULL, delims);
+    char *id3 = strtok(NULL, delims); // para garantir que não há um 3 voo
 
-    char flight_id1 [id_len];
+    if (id1 == NULL || id3 != NULL) {
+        free(ids); 
+        return false; 
+    }
 
-    if (len == 11) {
-        if (flight_ids[0] != '[' || flight_ids[1] != '\'' || flight_ids[9] != '\'' || flight_ids[10] != ']') return false;
+    if (!validate_flight_id_flight(id1)) {
+        free(ids); 
+        return false;
+    }
+
+    Flight* f1 = get_flight_by_flight_id_from_catalog(manager, id1);
+    if (f1 == NULL) { 
+        free(ids); 
+        return false; 
+    }
+
+    if (id2 != NULL) {
+
+        if (!validate_flight_id_flight(id2)) {
+            free(ids); 
+            return false;
+        }
+
+        Flight* f2 = get_flight_by_flight_id_from_catalog(manager, id2);
+
+        if (f2 == NULL) { 
+            free(ids); 
+            return false; 
+        }
+
+        char *dest1 = get_flight_destination(f1);
+        char *orig2 = get_flight_origin(f2);
         
-        for (int i = 0; i < id_len - 1; i ++) {
-            flight_id1[i] = flight_ids[i+2];
+        if (strcmp(dest1, orig2) != 0) {
+            free(dest1); 
+            free(orig2);
+            free(ids);
+            return false; 
         }
 
-        flight_id1[id_len - 1] = '\0';
-
-        if (get_flight_by_flight_id_from_catalog(manager, flight_id1) == NULL) return false;
+        free(dest1); 
+        free(orig2);
     }
 
-    char flight_id2 [id_len];
-
-    if (len == 22) {
-        if (flight_ids[0] != '[' || flight_ids[1] != '\'' || flight_ids[9] != '\'' || flight_ids[10] != ',' || flight_ids[11] != ' ' || flight_ids[12] != '\'' ||
-            flight_ids[20] != '\'' || flight_ids[21] != ']') return false;
-
-        for (int i = 0; i < id_len - 1; i ++) {
-            flight_id1[i] = flight_ids[i+2];
-        }
-
-        flight_id1[id_len - 1] = '\0';
-
-        for (int i = 0; i < id_len - 1; i ++) {
-            flight_id2[i] = flight_ids[i+13];
-        }
-
-        flight_id2[id_len - 1] = '\0';
-
-        if (get_flight_by_flight_id_from_catalog(manager, flight_id1) == NULL || get_flight_by_flight_id_from_catalog(manager, flight_id2) == NULL) return false;
-        if (strcmp(flight_catalog_get_destination(manager, flight_id1), flight_catalog_get_origin(manager, flight_id2)) != 0) return false;
-    }
+    free(ids);
     return true;
 }
 

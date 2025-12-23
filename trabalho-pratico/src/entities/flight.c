@@ -4,7 +4,7 @@
 #include <string.h>
 
 struct flight {
-    char flight_id[8];
+    char *flight_id;
     //long departure;
     long actual_departure;
     //long arrival;
@@ -18,7 +18,7 @@ struct flight {
     //char* tracking_url;
 };
 
-Flight* create_flight(const char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival, const char* gate, const char* status, 
+Flight* create_flight(char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival, const char* gate, const char* status, 
                       const char* origin, const char* destination, const char* aircraft, const char* airline) {
 
     (void) departure;
@@ -30,9 +30,7 @@ Flight* create_flight(const char* flight_id, long departure, long actual_departu
     Flight* flight = malloc(sizeof(Flight));
     if (!flight) return NULL;
     
-    strncpy(flight->flight_id, flight_id, 7);
-    
-    flight->flight_id[7] = '\0';
+    flight->flight_id = strdup(flight_id);
 
     //flight->departure = departure;
     flight->actual_departure = actual_departure;

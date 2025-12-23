@@ -167,7 +167,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
 
     if (!validate_flight_logical(origin, destination, departure_dt, arrival_dt, actual_departure_dt, actual_arrival_dt,
                                  status, aircraft, aircraft_catalog, actual_departure, actual_arrival)) {
-                              
+
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 flight_id,
@@ -332,5 +332,6 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
         token = strtok(NULL,delims);
     }
     free(clean_ids);
+
     //Reservation* res = create_reservation(reservation_id, flights, document_number, seat, atof(price), atoi(extra_luggage), atoi(priority_boarding));
 }
