@@ -51,20 +51,6 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
 void destroy_airport(Airport* airport);
 
 /**
- * @brief Converte um código de tipo de aeroporto (char) para string.
- * 
- * Esta função converte o código interno de tipo de aeroporto (S, M, L)
- * para sua representação em string.
- * 
- * @param type Caractere representando o tipo ('S', 'M', 'L').
- * 
- * @return String contendo o tipo completo ("small_airport", "medium_airport",
- *         "large_airport"), ou "unknown" se o tipo não for reconhecido.
- * 
- */
-const char* airport_type_to_string(char type);
-
-/**
  * @brief Adiciona um voo à lista de partidas do aeroporto.
  * 
  * Esta função adiciona um ponteiro para um objeto Flight ao array de voos
@@ -155,7 +141,7 @@ void airport_sort_departing_flights(Airport* airport);
  * @param airport Ponteiro para o objeto Airport.
  * @return String que contêm o código, ou NULL se airport for NULL.
  */
-const char* get_airport_code(const Airport* airport);
+char* get_airport_code(const Airport* airport);
 
 /**
  * @brief Obtém o nome de um aeroporto.
@@ -163,7 +149,7 @@ const char* get_airport_code(const Airport* airport);
  * @param airport Ponteiro para o objeto Airport.
  * @return String que contêm o nome do aeroporto, ou NULL se airport for NULL.
  */
-const char* get_airport_name(const Airport* airport);
+char* get_airport_name(const Airport* airport);
 
 /**
  * @brief Obtém a cidade de um aeroporto.
@@ -171,7 +157,7 @@ const char* get_airport_name(const Airport* airport);
  * @param airport Ponteiro para o objeto Airport.
  * @return String que contêm a cidade, ou NULL se airport for NULL.
  */
-const char* get_airport_city(const Airport* airport);
+char* get_airport_city(const Airport* airport);
 
 /**
  * @brief Obtém o país de um aeroporto.
@@ -179,16 +165,18 @@ const char* get_airport_city(const Airport* airport);
  * @param airport Ponteiro para o objeto Airport.
  * @return String que contêm o país, ou NULL se airport for NULL.
  */
-const char* get_airport_country(const Airport* airport);
+char* get_airport_country(const Airport* airport);
 
 /**
- * @brief Obtém o tipo de um aeroporto (como caractere).
- * 
- * @param airport Ponteiro para o objeto Airport.
- * @return Caractere que representa o tipo ('S', 'M', 'L'), ou '\0' se airport for NULL.
- * 
+ * @brief Obtém a representação em string do tipo de um aeroporto.
+ * * Esta função acede ao campo de tipo da estrutura Airport ('S', 'M', 'L')
+ * e retorna a string descritiva correspondente.
+ * * @note A string retornada é alocada dinamicamente (strdup). 
+ * O chamador é responsável por fazer free() da memória.
+ * * @param airport Ponteiro para a entidade Airport (não deve ser NULL).
+ * * @return String contendo o tipo ("small_airport", "medium_airport", "large_airport") ou "unknown".
  */
-char get_airport_type(const Airport* airport);
+char* get_airport_type(const Airport* airport);
 
 /**
  * @brief Converte uma string de tipo de aeroporto para código interno (char).
@@ -201,6 +189,6 @@ char get_airport_type(const Airport* airport);
  * @return Caractere que contêm o tipo ('S', 'M', 'L'), ou 'U' (unknown) se não reconhecido.
  * 
  */
-char get_airport_type_char(const char* type_str);
+char airport_type_to_char(const char* type_str);
 
 #endif

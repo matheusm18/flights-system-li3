@@ -6,27 +6,20 @@
 #include <stdio.h>
 
 //==== Listar o resumo de um aeroporto, consoante o identificador recebido por argumento.
-void execute_query1(AirportCatalog* manager, const char* airport_code, const char* output_path) {
-    FILE* output_file = fopen(output_path, "w");
-    if (output_file == NULL) {
-        perror("Erro ao abrir ficheiro de output");
-        return;
-    }
+QueryResult* execute_query1(AirportCatalog* manager, char* airport_code) {
     
     const Airport* airport = get_airport_by_code(manager, airport_code);
+    QueryResult *res = create_query_result();
     
     if (airport != NULL) {
-        const char* code = get_airport_code(airport);
-        const char* name = get_airport_name(airport);
-        const char* city = get_airport_city(airport);
-        const char* country = get_airport_country(airport);
-        char type = get_airport_type(airport);
+        char** tokens = malloc(5 * sizeof(char*));
+        tokens[0] = get_airport_code(airport);
+        tokens[1] = get_airport_name(airport);
+        tokens[2] = get_airport_city(airport);
+        tokens[3] = get_airport_country(airport);
+        tokens[4] = get_airport_type(airport);
         
-        fprintf(output_file, "%s,%s,%s,%s,%s\n", code, name, city, country, airport_type_to_string(type));
+        add_line_to_result(res, tokens, 5);
     }
-    else {
-        fprintf(output_file,"\n");
-    }
-    
-    fclose(output_file);
+    return res;
 }

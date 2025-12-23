@@ -66,24 +66,24 @@ long get_flight_actual_departure(const Flight* f) {
     return f->actual_departure;
 }
 
-const char* get_flight_origin(const Flight* f) {
+char* get_flight_origin(const Flight* f) {
     if (!f) return NULL;
-    return f->origin;
+    return strdup(f->origin);
 }
 
-const char* get_flight_destination(const Flight* f) {
+char* get_flight_destination(const Flight* f) {
     if (!f) return NULL;
-    return f->destination;
+    return strdup(f->destination);
 }
 
-const char* get_flight_status(const Flight* f) {
+char* get_flight_status(const Flight* f) {
     if (!f) return NULL;
-    return f->status;
+    return strdup(f->status);
 }
 
-const char* get_flight_id(const Flight* flight) {
+char* get_flight_id(const Flight* flight) {
     if (flight == NULL) return NULL;
-    return flight->flight_id;
+    return strdup(flight->flight_id);
 }
 
 char* get_aircraft_id_from_flight(const Flight* flight) {
@@ -91,5 +91,5 @@ char* get_aircraft_id_from_flight(const Flight* flight) {
         return NULL;
     }
     
-    return flight->aircraft;
+    return strdup(flight->aircraft);
 }

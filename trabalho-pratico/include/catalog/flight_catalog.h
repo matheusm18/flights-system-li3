@@ -94,7 +94,7 @@ Flight* get_flight_by_flight_id_from_catalog(FlightCatalog* manager, const char*
  * 
  * @see get_flight_origin
  */
-const char* flight_catalog_get_origin(const FlightCatalog* manager, const char* flight_id);
+char* flight_catalog_get_origin(const FlightCatalog* manager, const char* flight_id);
 
 /**
  * @brief Obtém o destino de um voo através do seu identificador.
@@ -110,7 +110,7 @@ const char* flight_catalog_get_origin(const FlightCatalog* manager, const char* 
  * 
  * @see get_flight_destination
  */
-const char* flight_catalog_get_destination(const FlightCatalog* manager, const char* flight_id);
+char* flight_catalog_get_destination(const FlightCatalog* manager, const char* flight_id);
 
 /**
  * @brief Obtém o número total de voos no catálogo.
@@ -124,23 +124,5 @@ const char* flight_catalog_get_destination(const FlightCatalog* manager, const c
  * 
  */
 int flight_catalog_get_count(FlightCatalog* manager);
-
-/**
- * @brief Obtém a tabela hash interna do catálogo de voos.
- * 
- * Esta função retorna o ponteiro direto para a GHashTable que armazena
- * os voos. Deve ser usada com cuidado, pois permite acesso direto à
- * estrutura interna do catálogo.
- * 
- * @param manager Ponteiro para o catálogo de voos.
- * 
- * @return Ponteiro para a GHashTable interna, ou NULL se manager for NULL.
- * 
- * @note Esta função expõe a implementação interna. Modificações diretas
- *       na tabela hash devem ser feitas com cuidado para não comprometer
- *       a integridade do catálogo.
- * 
- */
-GHashTable* get_flight_catalog(FlightCatalog* manager);
 
 #endif

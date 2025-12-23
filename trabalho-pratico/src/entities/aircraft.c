@@ -48,19 +48,19 @@ void aircraft_increment_flight_count(Aircraft* aircraft) {
     }
 }
 
-const char* get_aircraft_identifier(const Aircraft* a) { 
+char* get_aircraft_identifier(const Aircraft* a) { 
     if (a == NULL) return NULL;
-    return a->identifier; 
+    return strdup(a->identifier); 
 }
 
-const char* get_aircraft_manufacturer(const Aircraft* a) {
+char* get_aircraft_manufacturer(const Aircraft* a) {
     if (a == NULL) return NULL;
-    return a->manufacturer;
+    return strdup(a->manufacturer);
 }
 
-const char* get_aircraft_model(const Aircraft* a) {
+char* get_aircraft_model(const Aircraft* a) {
     if (a == NULL) return NULL;
-    return a->model;
+    return strdup(a->model);
 }
 
 int get_aircraft_flight_count(const Aircraft* a) {

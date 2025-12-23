@@ -1,8 +1,9 @@
 #ifndef QUERY1_H
 #define QUERY1_H
 
+#include "queries/query_result.h"
 #include "catalog/airport_catalog.h"
 
-void execute_query1(AirportCatalog* manager, const char* airport_code, const char* output_path);
+QueryResult* execute_query1(AirportCatalog* manager, char* airport_code);
 
 #endif

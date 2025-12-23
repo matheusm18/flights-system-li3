@@ -192,14 +192,17 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         flight_catalog_add(get_flights_from_catalog_manager(manager), flight);
 
         if (strcmp(status, "Cancelled") != 0) {
-            aircrafts_counter_increment(get_aircraft_id_from_flight(flight), aircraft_catalog);
+            char * temp_aircraft_id = get_aircraft_id_from_flight(flight);
+            aircrafts_counter_increment(temp_aircraft_id, aircraft_catalog);
+            free(temp_aircraft_id);
 
-            const char* origin_code = get_flight_origin(flight); 
+            char* origin_code = get_flight_origin(flight); 
             const Airport* airport = get_airport_by_code(airport_catalog, origin_code);
 
             if (airport != NULL) {
                 airport_add_departing_flight(airport, flight); 
             }
+            free(origin_code);
         }
     }
 }

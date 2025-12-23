@@ -3,18 +3,19 @@
 #include "entities/aircraft.h"
 #include "catalog/flight_catalog.h"
 #include "entities/flight.h"
+#include "utils/utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
 
 struct aircraft_count{
-    const char* aircraft_id;
+    char* aircraft_id;
     int flight_count;
 };
 
 // função que irá filtrar e construir o array de AircraftCount
-int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, const char* manufacturer_filter, AircraftCount** out_array) {
+int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, char* manufacturer_filter, AircraftCount** out_array) {
     int total_aircrafts = get_total_aircrafts_in_catalog(aircraft_catalog);
     if (total_aircrafts == 0) {
         *out_array = NULL;
@@ -35,7 +36,7 @@ int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, const c
 
     while((aircraft = aircraft_catalog_iter_next(&iter)) != NULL) {
         if (manufacturer_filter && *manufacturer_filter) {
-            const char* manufacturer = get_aircraft_manufacturer(aircraft);
+            char* manufacturer = get_aircraft_manufacturer(aircraft);
             if (!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0) continue;
         }
 
@@ -84,19 +85,41 @@ void write_top_n_aircraft(FILE* output_file, AircraftCatalog* aircraft_catalog, 
 }
 
 //======= Top N aeronaves com mais voos
-void execute_query2(AircraftCatalog* aircraft_manager, int n, const char* manufacturer, const char* output_path) {
-    FILE* output_file = fopen(output_path, "w");
-    if (output_file == NULL) {
-        perror("Erro ao abrir ficheiro de output");
-        return;
-    }
+QueryResult* execute_query2(AircraftCatalog* aircraft_manager, int n, char* manufacturer) {
 
     AircraftCount* array = NULL;
-    int count = filter_build_aircraft_count_array(aircraft_manager, manufacturer, &array);
+    int number_of_aircrafts = filter_build_aircraft_count_array(aircraft_manager, manufacturer, &array);
 
-    write_top_n_aircraft(output_file, aircraft_manager, array, count, n);
+    // determinar o limite real (N ou o total disponível)
+    int limit = (n < number_of_aircrafts) ? n : number_of_aircrafts;
 
-    free(array);
+    QueryResult* res = create_query_result();
 
-    fclose(output_file);
+    if (number_of_aircrafts > 0) qsort(array, number_of_aircrafts, sizeof(AircraftCount), compare_aircraft_counts);
+
+    // construir as linhas de resultado (tokens)
+    for (int i = 0; i < limit; i++) {
+
+        const Aircraft* a = get_aircraft_by_identifier(aircraft_manager, array[i].aircraft_id);
+        
+        if (a) {
+            // 4 tokens: id, fabricante, modelo, contagem
+            char** tokens = malloc(4 * sizeof(char*));
+            
+            tokens[0] = strdup(array[i].aircraft_id);
+            tokens[1] = get_aircraft_manufacturer(a);
+            tokens[2] = get_aircraft_model(a);
+            tokens[3] = int_to_string(array[i].flight_count);
+
+            add_line_to_result(res, tokens, 4);
+        }
+    }
+
+    // libertar memoria
+    if (array) {
+        for (int i = 0; i < number_of_aircrafts; i++) free(array[i].aircraft_id); 
+        free(array);
+    }
+
+    return res;
 }

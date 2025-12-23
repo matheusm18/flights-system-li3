@@ -69,7 +69,7 @@ void aircraft_increment_flight_count(Aircraft* aircraft);
  * @return String que contêm o identificador da aeronave, ou NULL se a for NULL.
  * 
  */
-const char* get_aircraft_identifier(const Aircraft* a);
+char* get_aircraft_identifier(const Aircraft* a);
 
 /**
  * @brief Obtém o nome do fabricante de uma aeronave.
@@ -81,7 +81,7 @@ const char* get_aircraft_identifier(const Aircraft* a);
  * @return String que contêm o nome do fabricante, ou NULL se a for NULL.
  * 
  */
-const char* get_aircraft_manufacturer(const Aircraft* a);
+char* get_aircraft_manufacturer(const Aircraft* a);
 
 /**
  * @brief Obtém o modelo de uma aeronave.
@@ -92,7 +92,7 @@ const char* get_aircraft_manufacturer(const Aircraft* a);
  * 
  * @return String que contêm o modelo da aeronave, ou NULL se a for NULL.
  */
-const char* get_aircraft_model(const Aircraft* a);
+char* get_aircraft_model(const Aircraft* a);
 
 /**
  * @brief Obtém o número de voos realizados por uma aeronave.

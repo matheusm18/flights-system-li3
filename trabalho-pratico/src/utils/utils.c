@@ -12,3 +12,14 @@ char *lower_string(const char *str) {
      }
      return copy;
 }
+
+char* int_to_string(int value) {
+
+    char buffer[32];
+
+    // snprintf é seguro porque nunca escreve mais do que o tamanho do buffer
+    snprintf(buffer, sizeof(buffer), "%d", value);
+
+    // strdup aloca memória na heap exatamente do tamanho da string gerada
+    return strdup(buffer);
+}

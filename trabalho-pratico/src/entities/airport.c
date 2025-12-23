@@ -31,7 +31,7 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
     //airport->latitude = atof(latitude);
     //airport->longitude = atof(longitude);
     //strncpy(airport->icao, icao, 5);
-    airport->type = get_airport_type_char(type);
+    airport->type = airport_type_to_char(type);
     
     airport->departing_flights = g_ptr_array_new();
 
@@ -52,14 +52,6 @@ void destroy_airport(Airport* a) {
         free(a);
     }
 }
-
-const char* airport_type_to_string(char type) {
-    if (type == 'S') return "small_airport";
-    else if (type == 'M') return "medium_airport";
-    else if (type == 'L') return "large_airport";
-    else return "unknown";
-}
-
 
 void airport_add_departing_flight(const Airport* airport, Flight* flight) {
     if (!airport || !flight) return;
@@ -106,32 +98,34 @@ void airport_sort_departing_flights(Airport* airport) {
     g_ptr_array_sort(airport->departing_flights, compare_flight_actual_departure);
 }
 
-const char* get_airport_code(const Airport* airport) {
+char* get_airport_code(const Airport* airport) {
     if (airport == NULL) return NULL;
-    return airport->code;
+    return strdup(airport->code);
 }
 
-const char* get_airport_name(const Airport* airport) {
+char* get_airport_name(const Airport* airport) {
     if (airport == NULL) return NULL;
-    return airport->name;
+    return strdup(airport->name);
 }
 
-const char* get_airport_city(const Airport* airport) {
+char* get_airport_city(const Airport* airport) {
     if (airport == NULL) return NULL;
-    return airport->city;
+    return strdup(airport->city);
 }
 
-const char* get_airport_country(const Airport* airport) {
+char* get_airport_country(const Airport* airport) {
     if (airport == NULL) return NULL;
-    return airport->country;
+    return strdup(airport->country);
 }
 
-char get_airport_type(const Airport* airport) {
-    if (airport == NULL) return '\0';
-    return airport->type;
+char* get_airport_type(const Airport* airport) {
+    if (airport->type == 'S') return strdup("small_airport");
+    else if (airport->type == 'M') return strdup("medium_airport");
+    else if (airport->type == 'L') return strdup("large_airport");
+    else return strdup("unknown");
 }
 
-char get_airport_type_char(const char* type_str) {
+char airport_type_to_char(const char* type_str) {
     if (strcmp(type_str, "small_airport") == 0) return 'S';
     else if (strcmp(type_str, "medium_airport") == 0) return 'M';
     else if (strcmp(type_str, "large_airport") == 0) return 'L';

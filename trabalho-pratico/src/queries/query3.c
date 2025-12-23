@@ -10,44 +10,20 @@
 #include "entities/flight.h"
 #include "entities/airport.h"
 #include "utils/date.h"
-
-bool write_result(const char* output_path, AirportCatalog* airport_manager, const char* best_code, int best_count) {
-    FILE* out = fopen(output_path, "w");
-    if (!out) return false;
-
-    if (!best_code || best_count == 0) {
-        fprintf(out, "\n");
-    } else {
-        const char* name = "";
-        const char* city = "";
-        const char* country = "";
-
-        if (airport_manager) {
-            const Airport* airport = get_airport_by_code(airport_manager, best_code);
-            if (airport) {
-                name = get_airport_name(airport);
-                city = get_airport_city(airport);
-                country = get_airport_country(airport);
-            }
-        }
-
-        fprintf(out, "%s,%s,%s,%s,%d\n", best_code, name, city, country, best_count);
-    }
-
-    fclose(out);
-    return true;
-}
+#include "utils/utils.h"
 
 //======= Aeroporto com mais partidas num intervalo de datas
-void execute_query3(AirportCatalog* airport_manager, const char* start_date_str, const char* end_date_str, const char* output_path) {
+QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_str, char* end_date_str) {
 
-    if (!airport_manager || !start_date_str || !end_date_str || !output_path) return;
+    if (!airport_manager || !start_date_str || !end_date_str) return NULL;
+
+    QueryResult* res = create_query_result();
 
     // converter strings de data para int (YYYYMMDD)
     int start_date = string_to_date(start_date_str);
     int end_date   = string_to_date(end_date_str);
 
-    const char* best_code = NULL;
+    char* best_code = NULL;
     int best_count = 0;
 
     GHashTableIter airport_iter;
@@ -70,16 +46,38 @@ void execute_query3(AirportCatalog* airport_manager, const char* start_date_str,
             if (flight_date >= start_date) count++;
         }
 
-        const char* airport_code = get_airport_code(airport);
+        char* current_code = get_airport_code(airport);
 
         // atualiza melhor aeroporto
-        if (best_code == NULL || count > best_count ||
-            (count == best_count && strcmp(airport_code, best_code) < 0)) {
-            best_code = airport_code;
+        if (best_code == NULL || count > best_count || (count == best_count && strcmp(current_code, best_code) < 0)) {
+            
+            if (best_code != NULL) free(best_code);
+
+            best_code = current_code;
             best_count = count;
+        }
+        else free(current_code);
+    }
+
+    if (best_code != NULL && best_count > 0) {
+        const Airport* best_airport = get_airport_by_code(airport_manager, best_code);
+        
+        if (best_airport) {
+            char** tokens = malloc(5 * sizeof(char*));
+            
+            tokens[0] = best_code;
+            tokens[1] = get_airport_name(best_airport);
+            tokens[2] = get_airport_city(best_airport);
+            tokens[3] = get_airport_country(best_airport);
+            tokens[4] = int_to_string(best_count); // função auxiliar da "utils.c" que já aloca memória para a string
+
+            add_line_to_result(res, tokens, 5);
+
+            best_code = NULL;
         }
     }
 
-    // escreve resultado
-    write_result(output_path, airport_manager, best_code, best_count);
+    if (best_code != NULL) free(best_code);
+
+    return res;
 }
