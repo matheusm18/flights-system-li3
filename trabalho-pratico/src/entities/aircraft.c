@@ -9,7 +9,6 @@ struct aircraft {
     unsigned short year;
     //unsigned short capacity;
     //unsigned short range;
-    int flight_count;
 };
 
 Aircraft* create_aircraft(const char* identifier, const char* manufacturer, const char* model, unsigned short year, unsigned short capacity, unsigned short range) {
@@ -27,7 +26,6 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
     aircraft->year = year;
     //aircraft->capacity = capacity;
     //aircraft->range = range;
-    aircraft->flight_count = 0;
 
     return aircraft;
 }
@@ -39,12 +37,6 @@ void destroy_aircraft(Aircraft* a) {
         free(a->model);
 
         free(a);
-    }
-}
-
-void aircraft_increment_flight_count(Aircraft* aircraft) {
-    if (aircraft != NULL) {
-        aircraft->flight_count++;
     }
 }
 
@@ -61,9 +53,4 @@ char* get_aircraft_manufacturer(const Aircraft* a) {
 char* get_aircraft_model(const Aircraft* a) {
     if (a == NULL) return NULL;
     return strdup(a->model);
-}
-
-int get_aircraft_flight_count(const Aircraft* a) {
-    if (a == NULL) return 0;
-    return a->flight_count;
 }

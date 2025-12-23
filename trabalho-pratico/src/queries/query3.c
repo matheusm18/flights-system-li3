@@ -29,24 +29,25 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
     GHashTableIter airport_iter;
     airport_catalog_iter_init(airport_manager, &airport_iter);
 
-    const Airport* airport;
-    while ((airport = airport_catalog_iter_next(&airport_iter)) != NULL) {
+    const AirportData* data;
+    while ((data = airport_catalog_iter_next(&airport_iter)) != NULL) {
+        const Airport* airport = get_airport_from_data(data);
+        char* current_code = get_airport_code(airport);
         int count = 0;
-
         guint flight_index;
-        airport_departing_iter_init(airport, &flight_index);
+
+        airport_catalog_departing_iter_init(&flight_index);
 
         const Flight* flight;
-        while ((flight = airport_departing_iter_next(airport, &flight_index)) != NULL) {
+        while ((flight = airport_catalog_departing_iter_next(data, &flight_index)) != NULL) {
             long adt = get_flight_actual_departure(flight);
+            
             if (adt <= 0) break; // voo cancelado (N/A)
 
             int flight_date = get_date_part(adt);
             if (flight_date > end_date) break;
             if (flight_date >= start_date) count++;
         }
-
-        char* current_code = get_airport_code(airport);
 
         // atualiza melhor aeroporto
         if (best_code == NULL || count > best_count || (count == best_count && strcmp(current_code, best_code) < 0)) {

@@ -200,8 +200,9 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
             const Airport* airport = get_airport_by_code(airport_catalog, origin_code);
 
             if (airport != NULL) {
-                airport_add_departing_flight(airport, flight); 
+                airport_catalog_add_flight(airport_catalog, origin_code, flight); 
             }
+            
             free(origin_code);
         }
     }

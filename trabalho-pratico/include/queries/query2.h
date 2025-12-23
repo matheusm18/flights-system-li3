@@ -17,7 +17,6 @@ QueryResult* execute_query2(AircraftCatalog* aircraft_manager, int n, char* manu
 
 int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, char* manufacturer, AircraftCount** out_array);
 int compare_aircraft_counts(const void* a, const void* b);
-void write_top_n_aircraft(FILE* output_file, AircraftCatalog* aircraft_catalog, AircraftCount* array, int number_of_aircrafts, int N);
 void free_aircraft_count_array(AircraftCount* array, int count);
 
 

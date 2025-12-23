@@ -11,8 +11,6 @@ struct airport {
     //double longitude;
     //char icao[5];
     char type;
-
-    GPtrArray* departing_flights;
 };
 
 Airport* create_airport(const char *code, const char* name, const char* city, const char* country, const char* latitude, const char* longitude, const char* icao, const char* type) {
@@ -32,8 +30,6 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
     //airport->longitude = atof(longitude);
     //strncpy(airport->icao, icao, 5);
     airport->type = airport_type_to_char(type);
-    
-    airport->departing_flights = g_ptr_array_new();
 
     return airport;
 }
@@ -45,57 +41,8 @@ void destroy_airport(Airport* a) {
         free(a->city);
         free(a->country);
 
-        if (a->departing_flights != NULL) {
-            g_ptr_array_free(a->departing_flights, TRUE); 
-        }
-
         free(a);
     }
-}
-
-void airport_add_departing_flight(const Airport* airport, Flight* flight) {
-    if (!airport || !flight) return;
-    g_ptr_array_add(airport->departing_flights, flight);
-}
-
-
-int compare_flight_actual_departure(const void* a, const void* b) {
-    Flight* f1 = *(Flight**)a;
-    Flight* f2 = *(Flight**)b;
-
-    long dt1 = get_flight_actual_departure(f1);
-    long dt2 = get_flight_actual_departure(f2);
-
-    if (dt1 <= 0 && dt2 <= 0) return 0;
-    if (dt1 <= 0) return 1;   
-    if (dt2 <= 0) return -1; 
-
-    if (dt1 < dt2) return -1;
-    if (dt1 > dt2) return 1;
-    return 0;
-}
-
-
-void airport_departing_iter_init(const Airport* airport, guint* index) {
-    if (!airport || !index) return;
-    *index = 0;
-}
-
-
-const Flight* airport_departing_iter_next(const Airport* airport, guint* index) {
-    if (!airport || !index) return NULL;
-
-    GPtrArray* flights = airport->departing_flights; 
-    if (!flights) return NULL;
-
-    if (*index >= flights->len) return NULL;  
-
-    return g_ptr_array_index(flights, (*index)++);
-}
-
-void airport_sort_departing_flights(Airport* airport) {
-    if (!airport || !airport->departing_flights) return;
-    g_ptr_array_sort(airport->departing_flights, compare_flight_actual_departure);
 }
 
 char* get_airport_code(const Airport* airport) {

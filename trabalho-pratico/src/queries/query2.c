@@ -31,17 +31,23 @@ int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, char* m
     GHashTableIter iter;
     aircraft_catalog_iter_init(aircraft_catalog, &iter);
 
-    const Aircraft* aircraft;
+    const AircraftData* data;
     int index = 0;
 
-    while((aircraft = aircraft_catalog_iter_next(&iter)) != NULL) {
+    while((data = aircraft_catalog_iter_next(&iter)) != NULL) {
+        const Aircraft* aircraft = get_aircraft_from_data(data);
+
         if (manufacturer_filter && *manufacturer_filter) {
             char* manufacturer = get_aircraft_manufacturer(aircraft);
-            if (!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0) continue;
+            if (!manufacturer || g_strcmp0(manufacturer, manufacturer_filter) != 0) {
+                free(manufacturer);
+                continue;
+            }
+            free(manufacturer);
         }
 
         array[index].aircraft_id = get_aircraft_identifier(aircraft);
-        array[index].flight_count = get_aircraft_flight_count(aircraft);
+        array[index].flight_count = get_aircraft_flight_count(data);
         index++;
     }
 
@@ -59,29 +65,6 @@ int compare_aircraft_counts(const void* a, const void* b) {
     
     // caso de empate 
     return strcmp(ac1->aircraft_id, ac2->aircraft_id);
-}
-
-void write_top_n_aircraft(FILE* output_file, AircraftCatalog* aircraft_catalog, AircraftCount* array, int number_of_aircrafts, int N) {
-    if (!array || number_of_aircrafts == 0) {
-        fprintf(output_file, "\n");
-        return;
-    }
-
-    int limit;
-    if (N > 0 && N < number_of_aircrafts) {
-        limit = N;
-    } else {
-        limit = number_of_aircrafts;
-    }
-
-     if (number_of_aircrafts > 0) qsort(array, number_of_aircrafts, sizeof(AircraftCount), compare_aircraft_counts);
-
-    for (int i = 0; i < limit; i++) {
-        const Aircraft* a = get_aircraft_by_identifier(aircraft_catalog, array[i].aircraft_id);
-        if (a) {
-            fprintf(output_file, "%s,%s,%s,%d\n", array[i].aircraft_id, get_aircraft_manufacturer(a), get_aircraft_model(a), array[i].flight_count);
-        }
-    }
 }
 
 //======= Top N aeronaves com mais voos

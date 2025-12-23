@@ -4,6 +4,7 @@
 #include <glib.h>
 #include "entities/aircraft.h"
 
+typedef struct aircraft_data AircraftData;
 typedef struct aircraft_catalog AircraftCatalog;
 
 /**
@@ -101,7 +102,7 @@ void aircraft_catalog_iter_init(const AircraftCatalog* catalog, GHashTableIter* 
  *       percorrer todo o catálogo.
  * 
  */
-const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter);
+const AircraftData* aircraft_catalog_iter_next(GHashTableIter* iter);
 
 /**
  * @brief Obtém uma aeronave do catálogo pelo seu identificador.
@@ -120,7 +121,7 @@ const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter);
  *       apenas de leitura, considere usar uma versão que retorne const Aircraft*.
  * 
  */
-Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier);
+const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier);
 
 /**
  * @brief Incrementa o contador de voos de uma aeronave específica.
@@ -143,6 +144,8 @@ Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* ident
  */
 void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager);
 
+int get_aircraft_flight_count(const AircraftData* data);
+
 /**
  * @brief Obtém o número total de aeronaves no catálogo.
  * 
@@ -155,5 +158,7 @@ void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manag
  * 
  */
 int get_total_aircrafts_in_catalog(AircraftCatalog* catalog);
+
+const Aircraft* get_aircraft_from_data(const AircraftData* data);
 
 #endif

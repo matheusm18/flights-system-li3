@@ -3,21 +3,33 @@
 #include <string.h>
 #include "entities/aircraft.h"
 
-struct aircraft_catalog {
-    GHashTable* aircraft_by_identifier;
+struct aircraft_data {
+    Aircraft* aircraft;
+    int flight_count;
 };
+
+struct aircraft_catalog {
+    GHashTable* aircraft_data_by_identifier;
+};
+
+void destroy_aircraft_data(gpointer data) {
+    AircraftData* ad = (AircraftData*)data;
+    if (ad != NULL) {
+        destroy_aircraft(ad->aircraft);
+        free(ad);
+    }
+}
 
 AircraftCatalog* aircraft_catalog_create() {
     AircraftCatalog* manager = malloc(sizeof(AircraftCatalog));
-    manager->aircraft_by_identifier = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) destroy_aircraft);
+    manager->aircraft_data_by_identifier = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) destroy_aircraft_data);
 
     return manager;
 }
 
-
 void aircraft_catalog_destroy(AircraftCatalog* manager){
     if (manager != NULL) {
-        g_hash_table_destroy(manager->aircraft_by_identifier);
+        g_hash_table_destroy(manager->aircraft_data_by_identifier);
         free(manager);
     }
 }
@@ -27,43 +39,53 @@ void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
     
     const char* identifier = get_aircraft_identifier(aircraft);
     if (identifier != NULL) {
-        g_hash_table_insert(manager->aircraft_by_identifier, g_strdup(identifier), aircraft);
+        AircraftData* data = malloc(sizeof(AircraftData));
+        data->aircraft = aircraft;
+        data->flight_count = 0;
+
+        g_hash_table_insert(manager->aircraft_data_by_identifier, g_strdup(identifier), data);
     }
 }
 
 void aircraft_catalog_iter_init(const AircraftCatalog* catalog, GHashTableIter* iter) {
     if (!catalog || !iter) return;
-    g_hash_table_iter_init(iter, catalog->aircraft_by_identifier);
+    g_hash_table_iter_init(iter, catalog->aircraft_data_by_identifier);
 }
 
-const Aircraft* aircraft_catalog_iter_next(GHashTableIter* iter) {
+const AircraftData* aircraft_catalog_iter_next(GHashTableIter* iter) {
     gpointer key, value;
-    if (!iter) return NULL;
 
-    if (g_hash_table_iter_next(iter, &key, &value)) {
-        return (const Aircraft*) value;
-    }
+    if (g_hash_table_iter_next(iter, &key, &value)) return (const AircraftData*)value;
+    
     return NULL; 
 }
 
-Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
-    if (manager == NULL || identifier == NULL) {
-        return NULL;
-    }
+const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
+    if (manager == NULL || identifier == NULL) return NULL;
 
-    return g_hash_table_lookup(manager->aircraft_by_identifier, identifier); 
+    AircraftData* data = g_hash_table_lookup(manager->aircraft_data_by_identifier,identifier);
+    if (data == NULL) return NULL;
+    else return data->aircraft;
 } 
 
 void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager) {
     if (!manager || !aircraft_id || !*aircraft_id) return;
 
-    Aircraft* aircraft = get_aircraft_by_identifier(manager, aircraft_id);
-    if (aircraft != NULL) {
-        aircraft_increment_flight_count(aircraft);
+    AircraftData* data = g_hash_table_lookup(manager->aircraft_data_by_identifier, aircraft_id);
+    if (data != NULL) {
+        data->flight_count++;
     }
+}
+
+int get_aircraft_flight_count(const AircraftData* data) {
+    return data ? data->flight_count : 0;
 }
 
 int get_total_aircrafts_in_catalog(AircraftCatalog* catalog) {
     if (!catalog) return 0;
-    return g_hash_table_size(catalog->aircraft_by_identifier);
+    return g_hash_table_size(catalog->aircraft_data_by_identifier);
+}
+
+const Aircraft* get_aircraft_from_data(const AircraftData* data) {
+    return data ? data->aircraft : NULL;
 }

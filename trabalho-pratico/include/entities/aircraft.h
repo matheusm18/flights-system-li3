@@ -44,22 +44,6 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
 void destroy_aircraft(Aircraft* a);
 
 /**
- * @brief Incrementa o contador de voos de uma aeronave.
- * 
- * Esta função incrementa em uma unidade o contador de voos realizados
- * por uma aeronave. É chamada sempre que um voo (não cancelado) utilizando
- * esta aeronave é processado.
- * 
- * @param aircraft Ponteiro para o objeto Aircraft.
- * 
- * @return void
- * 
- * @note Se aircraft for NULL, a função não realiza nenhuma operação.
- * 
- */
-void aircraft_increment_flight_count(Aircraft* aircraft);
-
-/**
  * @brief Obtém o identificador de uma aeronave.
  * 
  * Esta função retorna o identificador de uma aeronave.
@@ -93,18 +77,5 @@ char* get_aircraft_manufacturer(const Aircraft* a);
  * @return String que contêm o modelo da aeronave, ou NULL se a for NULL.
  */
 char* get_aircraft_model(const Aircraft* a);
-
-/**
- * @brief Obtém o número de voos realizados por uma aeronave.
- * 
- * Esta função retorna o contador de voos realizados por uma aeronave.
- * Este valor é incrementado através da função aircraft_increment_flight_count().
- * 
- * @param a Ponteiro para o objeto Aircraft.
- * 
- * @return Número de voos realizados pela aeronave, ou 0 se a for NULL.
- * 
- */
-int get_aircraft_flight_count(const Aircraft* a);
 
 #endif
