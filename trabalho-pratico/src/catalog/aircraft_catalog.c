@@ -8,6 +8,10 @@ struct aircraft_data {
     int flight_count;
 };
 
+struct aircraft_iterator {
+    GHashTableIter iter;
+};
+
 struct aircraft_catalog {
     GHashTable* aircraft_data_by_identifier;
 };
@@ -47,18 +51,32 @@ void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
     }
 }
 
-void aircraft_catalog_iter_init(const AircraftCatalog* catalog, GHashTableIter* iter) {
-    if (!catalog || !iter) return;
-    g_hash_table_iter_init(iter, catalog->aircraft_data_by_identifier);
+
+// parte dos iters
+
+AircraftIter* aircraft_catalog_iter_create(const AircraftCatalog* catalog) {
+    if (!catalog) return NULL;
+    
+    AircraftIter* it = malloc(sizeof(AircraftIter));
+    g_hash_table_iter_init(&(it->iter), catalog->aircraft_data_by_identifier);
+    return it;
 }
 
-const AircraftData* aircraft_catalog_iter_next(GHashTableIter* iter) {
+const AircraftData* aircraft_catalog_iter_next(AircraftIter* it) {
     gpointer key, value;
 
-    if (g_hash_table_iter_next(iter, &key, &value)) return (const AircraftData*)value;
-    
-    return NULL; 
+    if (it && g_hash_table_iter_next(&(it->iter), &key, &value)) {
+        return (const AircraftData*)value;
+    }
+    return NULL;
 }
+
+void aircraft_catalog_iter_free(AircraftIter* it) {
+    if (it) free(it);
+}
+
+
+// getters
 
 const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
     if (manager == NULL || identifier == NULL) return NULL;

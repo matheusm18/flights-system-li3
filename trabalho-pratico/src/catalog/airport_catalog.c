@@ -4,8 +4,21 @@
 #include <string.h>
 #include <stdio.h>
 
+// struct do iterador de aeroportos
+struct airport_iterator {
+    GHashTableIter iter;
+};
+
+// struct do iterador de flights (cada aeroporto tem a lista de voos que sairam de lá)
+struct airport_flight_iterator {
+    const AirportData* data;
+    guint current_index;
+};
+
 struct airport_data {
     Airport* airport;
+    int arrival_count;
+    int departure_count;
     GPtrArray* departing_flights;
 };
 
@@ -45,6 +58,8 @@ void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     if (code != NULL) {
         AirportData* data = malloc(sizeof(AirportData));
         data->airport = airport;
+        data->arrival_count = 0;
+        data->departure_count = 0;
         data->departing_flights = g_ptr_array_new();
 
         g_hash_table_insert(manager->airport_data_by_code, g_strdup(code), data);
@@ -78,41 +93,78 @@ int compare_flight_actual_departure(const void* a, const void* b) {
 void airport_catalog_sort_all_flights(AirportCatalog* catalog) {
     if (!catalog) return;
 
-    GHashTableIter iter;
+    GHashTableIter iter; // aqui não usamos o airportIter porque vamos precisar ordenar os dados (airportIter serve mais para as queries)
     gpointer key, value;
     g_hash_table_iter_init(&iter, catalog->airport_data_by_code);
 
     while (g_hash_table_iter_next(&iter, &key, &value)) {
-        AirportData* data = (AirportData*)value;
+        AirportData* data = (AirportData*)value; 
 
-        if (data->departing_flights != NULL && data->departing_flights->len > 0) g_ptr_array_sort(data->departing_flights, compare_flight_actual_departure);
+        if (data->departing_flights && data->departing_flights->len > 1) {
+            g_ptr_array_sort(data->departing_flights, compare_flight_actual_departure);
+        }
     }
 }
 
-void airport_catalog_iter_init(const AirportCatalog* catalog, GHashTableIter* iter) {
-    if (!catalog || !iter) return;
-    g_hash_table_iter_init(iter, catalog->airport_data_by_code);
+void airport_passenger_increment(AirportCatalog* manager, char* airport_code, char type) {
+    if (!manager || !airport_code || !*airport_code) return;
+
+    AirportData* data = g_hash_table_lookup(manager->airport_data_by_code, airport_code);
+    if (data != NULL) {
+        if (type == 'a') data->arrival_count++;
+        if (type == 'd') data->departure_count++;
+    }
 }
 
-const AirportData* airport_catalog_iter_next(GHashTableIter* iter) {
-    gpointer key, value;
+// funções para iterar aeroportos
 
-    if (g_hash_table_iter_next(iter, &key, &value)) {
-        return (AirportData*)value;
+AirportIter* airport_catalog_iter_create(const AirportCatalog* catalog) {
+    if (!catalog) return NULL;
+
+    AirportIter* it = malloc(sizeof(AirportIter));
+    g_hash_table_iter_init(&(it->iter), catalog->airport_data_by_code);
+    return it;
+}
+
+const AirportData* airport_catalog_iter_next(AirportIter* it) {
+    gpointer key, value;
+    if (it && g_hash_table_iter_next(&(it->iter), &key, &value)) {
+        return (const AirportData*)value;
     }
     return NULL;
 }
 
-void airport_catalog_departing_iter_init(guint* index) {
-    *index = 0;
+void airport_catalog_iter_free(AirportIter* it) {
+    if (it) free(it);
 }
 
-const Flight* airport_catalog_departing_iter_next(const AirportData* data, guint* index) {
-    if (!data || !data->departing_flights || *index >= data->departing_flights->len) {
+
+// funções para iterar voos de um aeroporto (query3)
+
+
+AirportFlightIter* airport_flight_iter_create(const AirportData* data) {
+    if (!data) return NULL;
+
+    AirportFlightIter* it = malloc(sizeof(struct airport_flight_iterator));
+    it->data = data;
+    it->current_index = 0;
+    return it;
+}
+
+const Flight* airport_flight_iter_next(AirportFlightIter* it) {
+    if (!it || !it->data->departing_flights || it->current_index >= it->data->departing_flights->len) {
         return NULL;
     }
-    return g_ptr_array_index(data->departing_flights, (*index)++);
+    return g_ptr_array_index(it->data->departing_flights, it->current_index++);
 }
+
+void airport_flight_iter_free(AirportFlightIter* it) {
+    if (it) free(it);
+}
+
+
+// getters
+
 
 const Airport* get_airport_by_code(AirportCatalog* manager, char* code) {
     if (manager == NULL || code == NULL) {
@@ -131,4 +183,22 @@ int airport_catalog_get_count(AirportCatalog* manager) {
 
 const Airport* get_airport_from_data(const AirportData* data) {
     return data ? data->airport : NULL;
+}
+
+int airport_get_arrival_count(AirportCatalog* manager, char* code) {
+    if (manager == NULL || code == NULL) return 0;
+
+    AirportData* data = g_hash_table_lookup(manager->airport_data_by_code, code);
+    if (data == NULL) return 0;
+
+    else return data->arrival_count;
+}
+
+int airport_get_departure_count(AirportCatalog* manager, char* code) {
+    if (manager == NULL || code == NULL) return 0;
+
+    AirportData* data = g_hash_table_lookup(manager->airport_data_by_code, code);
+    if (data == NULL) return 0;
+
+    else return data->departure_count;
 }

@@ -6,7 +6,7 @@ void write_result(const QueryResult* res, const char* output_path, char delimite
     if (res == NULL) return;
 
     FILE* f;
-    if (output_path == NULL) f = stdout; 
+    if (output_path == NULL) f = stdout;
     else {
         f = fopen(output_path, "w");
         if (f == NULL) {

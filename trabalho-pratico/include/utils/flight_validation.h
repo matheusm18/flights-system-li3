@@ -159,4 +159,6 @@ bool validate_flight_logical(const char *origin, const char *destination, long d
                              const char *status, const char *aircraft, AircraftCatalog* aircraft_catalog, const char *actual_departure_str,
                              const char *actual_arrival_str);
 
+bool is_canceled(char *status);
+
 #endif

@@ -5,6 +5,7 @@
 #include "entities/aircraft.h"
 
 typedef struct aircraft_data AircraftData;
+typedef struct aircraft_iterator AircraftIter;
 typedef struct aircraft_catalog AircraftCatalog;
 
 /**
@@ -66,43 +67,12 @@ void aircraft_catalog_destroy(AircraftCatalog* manager);
  */
 void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft);
 
-/**
- * @brief Inicializa um iterador para percorrer o catálogo de aeronaves.
- * 
- * Esta função configura um iterador (GHashTableIter) para permitir a iteração
- * sobre todas as aeronaves no catálogo. O iterador pode ser usado com
- * g_hash_table_iter_next() para aceder sequencialmente a cada aeronave.
- * 
- * @param catalog Ponteiro para o catálogo de aeronaves a ser percorrido.
- * @param iter Ponteiro para a estrutura GHashTableIter a ser inicializada.
- * 
- * @return void
- * 
- * @note Se catalog ou iter forem NULL, a função não realiza nenhuma operação.
- *       Após a inicialização, use g_hash_table_iter_next() para iterar sobre
- *       os elementos do catálogo.
- * 
- */
-void aircraft_catalog_iter_init(const AircraftCatalog* catalog, GHashTableIter* iter);
 
-/**
- * @brief Obtém a próxima aeronave do iterador do catálogo.
- * 
- * Esta função avança o iterador para o próximo elemento da tabela hash e
- * retorna a aeronave correspondente. Deve ser usada em conjunto com
- * aircraft_catalog_iter_init() para percorrer todas as aeronaves do catálogo.
- * 
- * @param iter Ponteiro para o iterador GHashTableIter previamente inicializado.
- * 
- * @return Ponteiro constante para a próxima aeronave (Aircraft) no catálogo,
- *         ou NULL se não houver mais elementos ou se iter for NULL.
- * 
- * @note A aeronave retornada não deve ser modificada (ponteiro constante).
- *       Esta função deve ser chamada repetidamente até retornar NULL para
- *       percorrer todo o catálogo.
- * 
- */
-const AircraftData* aircraft_catalog_iter_next(GHashTableIter* iter);
+AircraftIter* aircraft_catalog_iter_create(const AircraftCatalog* catalog);
+
+const AircraftData* aircraft_catalog_iter_next(AircraftIter* it);
+
+void aircraft_catalog_iter_free(AircraftIter* it);
 
 /**
  * @brief Obtém uma aeronave do catálogo pelo seu identificador.

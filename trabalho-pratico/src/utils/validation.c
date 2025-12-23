@@ -16,53 +16,6 @@
 #include <string.h>
 #include <ctype.h>
 
-void init_aircrafts_errors_file() {
-    const char *output_path = "resultados/aircrafts_errors.csv";
-    FILE *f = fopen(output_path, "w"); 
-    if (f == NULL) {
-        perror("Erro ao criar ficheiro aircrafts_errors.csv");
-        return;
-    }
-    fprintf(f, "\"identifier\",\"manufacturer\",\"model\",\"year\",\"capacity\",\"range\"\n");
-    fclose(f);
-}
-
-
-void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data, FILE *errors_file) {
-    (void) num_fields;
-    CatalogManager* manager = (CatalogManager*) user_data;
-
-    char *identifier = fields[0];
-    char *manufacturer = fields[1];
-    char *model = fields[2];
-    char *year = fields[3];
-    char *capacity = fields[4];
-    char *range = fields[5];
-
-    if (!validate_year_aircraft(year)) {
-
-        fprintf(errors_file,
-                "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
-                identifier,
-                manufacturer,
-                model,
-                year,
-                capacity,
-                range);
-        return;
-    }
-
-    int year_int = atoi(year);
-    int capacity_int = atoi(capacity);
-    int range_int = atoi(range);
-
-    Aircraft* aircraft = create_aircraft(identifier, manufacturer, model, year_int, capacity_int, range_int);
-
-    if (aircraft != NULL) {
-        aircraft_catalog_add(get_aircrafts_from_catalog_manager(manager), aircraft);
-    }
-}
-
 void init_airports_errors_file() {
     const char *output_path = "resultados/airports_errors.csv";
     FILE *f = fopen(output_path, "w");  
@@ -107,6 +60,53 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
     
     if (airport != NULL) {
         airport_catalog_add(get_airports_from_catalog_manager(manager), airport);
+    }
+}
+
+void init_aircrafts_errors_file() {
+    const char *output_path = "resultados/aircrafts_errors.csv";
+    FILE *f = fopen(output_path, "w"); 
+    if (f == NULL) {
+        perror("Erro ao criar ficheiro aircrafts_errors.csv");
+        return;
+    }
+    fprintf(f, "\"identifier\",\"manufacturer\",\"model\",\"year\",\"capacity\",\"range\"\n");
+    fclose(f);
+}
+
+
+void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data, FILE *errors_file) {
+    (void) num_fields;
+    CatalogManager* manager = (CatalogManager*) user_data;
+
+    char *identifier = fields[0];
+    char *manufacturer = fields[1];
+    char *model = fields[2];
+    char *year = fields[3];
+    char *capacity = fields[4];
+    char *range = fields[5];
+
+    if (!validate_year_aircraft(year)) {
+
+        fprintf(errors_file,
+                "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                identifier,
+                manufacturer,
+                model,
+                year,
+                capacity,
+                range);
+        return;
+    }
+
+    int year_int = atoi(year);
+    int capacity_int = atoi(capacity);
+    int range_int = atoi(range);
+
+    Aircraft* aircraft = create_aircraft(identifier, manufacturer, model, year_int, capacity_int, range_int);
+
+    if (aircraft != NULL) {
+        aircraft_catalog_add(get_aircrafts_from_catalog_manager(manager), aircraft);
     }
 }
 
@@ -167,7 +167,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
 
     if (!validate_flight_logical(origin, destination, departure_dt, arrival_dt, actual_departure_dt, actual_arrival_dt,
                                  status, aircraft, aircraft_catalog, actual_departure, actual_arrival)) {
-
+                              
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 flight_id,
@@ -191,18 +191,11 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
     if (flight != NULL) {
         flight_catalog_add(get_flights_from_catalog_manager(manager), flight);
 
-        if (strcmp(status, "Cancelled") != 0) {
-            char * temp_aircraft_id = get_aircraft_id_from_flight(flight);
-            aircrafts_counter_increment(temp_aircraft_id, aircraft_catalog);
-            free(temp_aircraft_id);
+        if (!is_canceled(status)) {
+            aircrafts_counter_increment(aircraft, aircraft_catalog);
 
-            char* origin_code = get_flight_origin(flight); 
-            const Airport* airport = get_airport_by_code(airport_catalog, origin_code);
-
-            if (airport != NULL) {
-                airport_catalog_add_flight(airport_catalog, origin_code, flight); 
-            }
-            
+            char* origin_code = get_flight_origin(flight);
+            airport_catalog_add_flight(airport_catalog, origin, flight);
             free(origin_code);
         }
     }
@@ -281,6 +274,7 @@ void init_reservations_errors_file() {
 void process_valid_line_reservations(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     (void) num_fields;
     CatalogManager* manager = (CatalogManager*) user_data;
+    AirportCatalog* airport_catalog = get_airports_from_catalog_manager(manager);
     FlightCatalog* flight_catalog = get_flights_from_catalog_manager(manager);
     PassengerCatalog* passenger_catalog = get_passengers_from_catalog_manager(manager);
     
@@ -311,27 +305,32 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
         return;
     }
 
-    /*
-    // conversão flight_ids
-    char flight_id1[10];
-    char flight_id2[10] = ""; // vazio se não existir
-    int num_flights = 1;
+    char *clean_ids = strdup(flight_ids);
+    char *delims = "[]' ,\""; // ignorar estes caracteres e parar quando encontrar o flight_id
 
-    if (strlen(flight_ids) > 12) { // string com 2 voos
-        strncpy(flight_id1, flight_ids + 2, 7); // copia ID1
-        flight_id1[7] = '\0';
-        strncpy(flight_id2, flight_ids + 12, 7); // copia ID2
-        flight_id2[7] = '\0';
-        num_flights = 2;
-    } else {
-        strncpy(flight_id1, flight_ids + 2, 7); // copia ID1
-        flight_id1[7] = '\0';
+    char *token = strtok(clean_ids, delims); // extrair cada flight_id individualmente
+
+
+    while (token != NULL) {
+        Flight* flight = get_flight_by_flight_id_from_catalog(flight_catalog, token);
+
+        if (flight != NULL) {
+            char* status = get_flight_status(flight);
+
+            if (status != NULL && !is_canceled(status)) {
+                char* origin = get_flight_origin(flight);
+                char* destination = get_flight_destination(flight);
+
+                airport_passenger_increment(airport_catalog, origin, 'd');
+                airport_passenger_increment(airport_catalog, destination, 'a');
+
+                free(origin);
+                free(destination);
+            }
+            if (status) free(status);
+        }
+        token = strtok(NULL,delims);
     }
-
-    char* flights[2];
-    flights[0] = flight_id1;
-    flights[1] = (num_flights == 2) ? flight_id2 : NULL;
-
-    Reservation* res = create_reservation(reservation_id, flights, document_number, seat, atof(price), atoi(extra_luggage), atoi(priority_boarding));
-    */
+    free(clean_ids);
+    //Reservation* res = create_reservation(reservation_id, flights, document_number, seat, atof(price), atoi(extra_luggage), atoi(priority_boarding));
 }

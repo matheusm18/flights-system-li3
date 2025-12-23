@@ -28,13 +28,11 @@ int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, char* m
         return 0;
     }
 
-    GHashTableIter iter;
-    aircraft_catalog_iter_init(aircraft_catalog, &iter);
-
+    AircraftIter* iter = aircraft_catalog_iter_create(aircraft_catalog);
     const AircraftData* data;
-    int index = 0;
 
-    while((data = aircraft_catalog_iter_next(&iter)) != NULL) {
+    int index = 0;
+    while((data = aircraft_catalog_iter_next(iter)) != NULL) {
         const Aircraft* aircraft = get_aircraft_from_data(data);
 
         if (manufacturer_filter && *manufacturer_filter) {
@@ -51,6 +49,7 @@ int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, char* m
         index++;
     }
 
+    aircraft_catalog_iter_free(iter); // libertar memoria do iterador
     *out_array = array;
     return index; // número de aeronaves no array
 }

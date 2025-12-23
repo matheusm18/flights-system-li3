@@ -29,8 +29,8 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
     while (fgets(line, sizeof(line), file) != NULL) {
         
         int query_id;
-        char query_type_str[5];
-        char delimiter = ',';
+        char query_type_str[16];
+        char delimiter = ';';
 
         // variaveis auxiliares para argumentos
         char arg_str1[100], arg_str2[100]; 

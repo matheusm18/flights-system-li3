@@ -26,20 +26,18 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
     char* best_code = NULL;
     int best_count = 0;
 
-    GHashTableIter airport_iter;
-    airport_catalog_iter_init(airport_manager, &airport_iter);
+    AirportIter* air_it = airport_catalog_iter_create(airport_manager);
 
     const AirportData* data;
-    while ((data = airport_catalog_iter_next(&airport_iter)) != NULL) {
+    while ((data = airport_catalog_iter_next(air_it)) != NULL) {
         const Airport* airport = get_airport_from_data(data);
         char* current_code = get_airport_code(airport);
         int count = 0;
-        guint flight_index;
 
-        airport_catalog_departing_iter_init(&flight_index);
+        AirportFlightIter* f_it = airport_flight_iter_create(data);
 
         const Flight* flight;
-        while ((flight = airport_catalog_departing_iter_next(data, &flight_index)) != NULL) {
+        while ((flight = airport_flight_iter_next(f_it)) != NULL) {
             long adt = get_flight_actual_departure(flight);
             
             if (adt <= 0) break; // voo cancelado (N/A)
@@ -48,6 +46,8 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
             if (flight_date > end_date) break;
             if (flight_date >= start_date) count++;
         }
+
+        airport_flight_iter_free(f_it); // libertar o iterador de voos antes de passar ao próximo aeroporto
 
         // atualiza melhor aeroporto
         if (best_code == NULL || count > best_count || (count == best_count && strcmp(current_code, best_code) < 0)) {
@@ -59,6 +59,8 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
         }
         else free(current_code);
     }
+
+    airport_catalog_iter_free(air_it); // libertar o iterador de aeroportos
 
     if (best_code != NULL && best_count > 0) {
         const Airport* best_airport = get_airport_by_code(airport_manager, best_code);

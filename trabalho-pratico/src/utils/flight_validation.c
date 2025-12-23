@@ -12,13 +12,20 @@
 //======== Syntactic validation: Flights
 
 bool validate_flight_id_flight(const char *flight_id) {
-    if (!flight_id || strlen(flight_id) != 7) return false;
+    if (!flight_id) return false;
+
+    int len = strlen(flight_id);
+
+    if (len < 7 || len > 8) return false;
+
     for (int i = 0; i < 2; i++) {
         if (flight_id[i] < 'A' || flight_id[i] > 'Z') return false;
     }
-    for (int i = 2; i < 7; i++) {
+
+    for (int i = 2; i < len; i++) {
         if (flight_id[i] < '0' || flight_id[i] > '9') return false;
     }
+
     return true;
 }
 
@@ -120,4 +127,8 @@ bool validate_flight_logical(const char *origin, const char *destination, long d
     if (!validate_status_flight_new(status, departure, arrival, actual_departure, actual_arrival, actual_departure_str, actual_arrival_str)) return false;
     
     return true;
+}
+
+bool is_canceled(char *status) {
+    return (strcmp(status,"Cancelled") == 0);
 }

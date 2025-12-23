@@ -56,9 +56,7 @@ bool validate_datetime(const char* datetime) {
     if (strlen(datetime) < 16) return false;
 
     char date_part[11], time_part[6];
-    if (sscanf(datetime, "%10s %5s", date_part, time_part) != 2)
-        return false;
+    if (sscanf(datetime, "%10s %5s", date_part, time_part) != 2) return false;
 
     return validate_date(date_part) && validate_time(time_part);
 }
-

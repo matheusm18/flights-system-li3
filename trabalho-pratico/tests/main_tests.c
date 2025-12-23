@@ -65,7 +65,10 @@ void create_query_files(const char* input_path, int *query_counts) {
         
         if (strlen(line) > 0) {
             int q;
-            if (sscanf(line, "%d", &q) == 1) {
+            char first_token[16];
+            if (sscanf(line, "%15s", first_token) == 1) {
+                q = atoi(first_token);
+                
                 if (q >= 1 && q <= NUM_QUERIES) {
                     if (query_files[q]) {
                         fprintf(query_files[q], "%s\n", line);

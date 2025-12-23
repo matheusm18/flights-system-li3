@@ -4,6 +4,8 @@
 #include <glib.h>
 #include "entities/airport.h"
 
+typedef struct airport_iterator AirportIter;
+typedef struct airport_flight_iterator AirportFlightIter;
 typedef struct airport_data AirportData;
 typedef struct airport_catalog AirportCatalog;
 
@@ -90,30 +92,25 @@ int compare_flight_actual_departure(const void* a, const void* b);
 void airport_catalog_sort_all_flights(AirportCatalog* catalog);
 
 
-/**
- * @brief Inicializa um iterador para percorrer o catálogo de aeroportos.
- * 
- * Esta função configura um iterador (GHashTableIter) para permitir a iteração
- * sobre todos os aeroportos no catálogo. O iterador pode ser usado com
- * airport_catalog_iter_next() para aceder sequencialmente a cada aeroporto.
- * 
- * @param catalog Ponteiro para o catálogo de aeroportos a ser percorrido.
- * @param iter Ponteiro para a estrutura GHashTableIter a ser inicializada.
- * 
- * @return void
- * 
- * @note Se catalog ou iter forem NULL, a função não realiza nenhuma operação.
- *       Após a inicialização, use airport_catalog_iter_next() para iterar
- *       sobre os elementos do catálogo.
- * 
- */
-void airport_catalog_iter_init(const AirportCatalog* catalog, GHashTableIter* iter);
+void airport_passenger_increment(AirportCatalog* manager, char* airport_code, char type);
 
-const AirportData* airport_catalog_iter_next(GHashTableIter* iter);
+// iterar aeroportos
 
-void airport_catalog_departing_iter_init(guint* index);
+AirportIter* airport_catalog_iter_create(const AirportCatalog* catalog);
 
-const Flight* airport_catalog_departing_iter_next(const AirportData* data, guint* index);
+const AirportData* airport_catalog_iter_next(AirportIter* it);
+
+void airport_catalog_iter_free(AirportIter* it);
+
+
+// iterar voos de um aeroporto
+
+AirportFlightIter* airport_flight_iter_create(const AirportData* data);
+
+const Flight* airport_flight_iter_next(AirportFlightIter* it);
+
+void airport_flight_iter_free(AirportFlightIter* it);
+
 
 /**
  * @brief Obtém um aeroporto do catálogo pelo seu código.
@@ -145,5 +142,8 @@ const Airport* get_airport_by_code(AirportCatalog* manager, char* code);
 int airport_catalog_get_count(AirportCatalog* manager);
 
 const Airport* get_airport_from_data(const AirportData* data);
+
+int airport_get_arrival_count(AirportCatalog* manager, char* code);
+int airport_get_departure_count(AirportCatalog* manager, char* code);
 
 #endif
