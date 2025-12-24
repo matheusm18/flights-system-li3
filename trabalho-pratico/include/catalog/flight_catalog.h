@@ -69,7 +69,7 @@ void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id);
 
 void destroy_airline(AirlineStats* a);
 
-int compare_airlines(const void* a, const void* b);
+int compare_airlines(gconstpointer a, gconstpointer b);
 void airline_stats_sort_array(FlightCatalog* manager);
 
 void airline_stats_increment(FlightCatalog* manager, char* airline_id, int delay);

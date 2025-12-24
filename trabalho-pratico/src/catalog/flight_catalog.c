@@ -2,6 +2,7 @@
 #include "entities/flight.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 struct airline_stats {
     char* airline_id;
@@ -61,22 +62,22 @@ void destroy_airline(AirlineStats* a) {
     free(a);
 }
 
-int compare_airlines(const void* a, const void* b) {
-    AirlineStats *as = *(AirlineStats**)a;
-    AirlineStats *bs = *(AirlineStats**)b;
+int compare_airlines(gconstpointer a, gconstpointer b) {
+    const AirlineStats *as = a;
+    const AirlineStats *bs = b;
 
-    // calculo das médias (atraso total / número de voos)
     double mediaA = (double)as->total_delay / as->delayed_flights_count;
     double mediaB = (double)bs->total_delay / bs->delayed_flights_count;
 
-    // primeiro critério
+    // fabs garante que a diferença é sempre positiva
+    if (fabs(mediaA - mediaB) < 0.0005) {
+        // empate nas 3 casas decimais
+        return strcmp(as->airline_id, bs->airline_id);
+    }
+
+    // se não é empate, ordem decrescente
     if (mediaA > mediaB) return -1;
-    if (mediaA < mediaB) return 1;
-
-    // segundo critério
-
-    int result = strcmp(as->airline_id, bs->airline_id);
-    return result;
+    return 1;
 }
 
 void airline_stats_sort_array(FlightCatalog* manager) {
