@@ -116,14 +116,10 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
                 break;
         }
         
+        write_result(result, output_path, delimiter);
         if (result != NULL) {
-            write_result(result, output_path, delimiter);
             destroy_query_result(result); // libertar a memória da struct de resultados
         } 
-        else {
-            FILE* f = fopen(output_path, "w");
-            if (f) fclose(f);
-        }
         
         (*command_counter)++;
     }
