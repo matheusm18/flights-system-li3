@@ -124,6 +124,7 @@ void init_flights_errors_file() {
 void process_valid_line_flights(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     (void) num_fields;
     CatalogManager* manager = (CatalogManager*) user_data;
+    FlightCatalog* flight_catalog = get_flights_from_catalog_manager(manager);
     AircraftCatalog* aircraft_catalog = get_aircrafts_from_catalog_manager(manager);
     AirportCatalog* airport_catalog = get_airports_from_catalog_manager(manager);
 
@@ -189,7 +190,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
                                    aircraft, airline);        
 
     if (flight != NULL) {
-        flight_catalog_add(get_flights_from_catalog_manager(manager), flight);
+        flight_catalog_add(flight_catalog, flight);
 
         if (!is_canceled(status)) {
             aircrafts_counter_increment(aircraft, aircraft_catalog);
@@ -197,6 +198,17 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
             char* origin_code = get_flight_origin(flight);
             airport_catalog_add_flight(airport_catalog, origin, flight);
             free(origin_code);
+        }
+        if (is_delayed(status)) {
+            int delay = get_flight_delay(actual_departure_dt,departure_dt);
+            AirlineStats* stats = get_airline_stats_by_identifier(flight_catalog, airline);
+
+            if (stats == NULL) {
+                flight_catalog_add_airline_stats(flight_catalog, airline);
+                stats = get_airline_stats_by_identifier(flight_catalog, airline);
+            }
+            
+            airline_stats_increment(flight_catalog, airline, delay);
         }
     }
 }

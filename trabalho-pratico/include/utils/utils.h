@@ -10,4 +10,6 @@ char *lower_string(const char *str);
  */
 char* int_to_string(int value);
 
+char* double_to_string(double valor);
+
 #endif

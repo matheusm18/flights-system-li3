@@ -132,3 +132,7 @@ bool validate_flight_logical(const char *origin, const char *destination, long d
 bool is_canceled(char *status) {
     return (strcmp(status,"Cancelled") == 0);
 }
+
+bool is_delayed(char *status) {
+    return (strcmp(status,"Delayed") == 0);
+}

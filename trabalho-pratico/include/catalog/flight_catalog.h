@@ -4,6 +4,7 @@
 #include <glib.h>
 #include "entities/flight.h"
 
+typedef struct airline_stats AirlineStats;
 typedef struct flight_catalog FlightCatalog;
 
 /**
@@ -63,6 +64,15 @@ void flight_catalog_destroy(FlightCatalog* manager);
  *       que a tabela hash tenha sua própria cópia da chave.
  */
 void flight_catalog_add(FlightCatalog* manager, Flight* flight);
+
+void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id);
+
+void destroy_airline(AirlineStats* a);
+
+int compare_airlines(const void* a, const void* b);
+void airline_stats_sort_array(FlightCatalog* manager);
+
+void airline_stats_increment(FlightCatalog* manager, char* airline_id, int delay);
 
 /**
  * @brief Obtém um voo do catálogo pelo seu identificador.
@@ -124,5 +134,14 @@ char* flight_catalog_get_destination(const FlightCatalog* manager, const char* f
  * 
  */
 int flight_catalog_get_count(FlightCatalog* manager);
+
+AirlineStats* get_airline_stats_by_identifier(FlightCatalog* manager, char* airline_id);
+
+AirlineStats* get_airline_stats_from_array(FlightCatalog* manager, int index);
+
+int get_airline_stats_array_length(FlightCatalog* manager);
+char* get_airline_stats_airline(AirlineStats* a);
+int get_airline_stats_flights_count(AirlineStats* a);
+long get_airline_stats_total_delay(AirlineStats* a);
 
 #endif

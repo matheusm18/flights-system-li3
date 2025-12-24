@@ -160,5 +160,6 @@ bool validate_flight_logical(const char *origin, const char *destination, long d
                              const char *actual_arrival_str);
 
 bool is_canceled(char *status);
+bool is_delayed(char *status);
 
 #endif

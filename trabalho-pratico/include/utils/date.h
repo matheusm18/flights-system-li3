@@ -80,4 +80,6 @@ int compare_dates(int date1, int date2);
  */
 int compare_datetimes(long dt1, long dt2);
 
+int get_flight_delay(long actual_departure, long expected_departure);
+
 #endif

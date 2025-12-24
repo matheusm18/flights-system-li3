@@ -23,3 +23,18 @@ char* int_to_string(int value) {
     // strdup aloca memória na heap exatamente do tamanho da string gerada
     return strdup(buffer);
 }
+
+
+
+char* double_to_string(double valor) {
+
+    int tamanho = snprintf(NULL, 0, "%.3f", valor);
+    
+    char* str = malloc(tamanho + 1);
+    
+    if (str != NULL) {
+        snprintf(str, tamanho + 1, "%.3f", valor);
+    }
+    
+    return str;
+}

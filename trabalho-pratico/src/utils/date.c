@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 int string_to_date(const char* str) {
     if (!str || strcmp(str, "N/A") == 0) return -1; ///< Considerar "N/A" como -1
@@ -37,4 +38,32 @@ int compare_datetimes(long dt1, long dt2) {
     if (dt1 < dt2) return -1;
     if (dt1 > dt2) return 1;
     return 0;
+}
+
+
+int get_flight_delay(long actual_departure, long expected_departure) {
+    if (actual_departure <= 0 || expected_departure <= 0) return 0;
+
+    struct tm t_actual_departure = {0}, t_expected_departure = {0};
+
+    t_actual_departure.tm_min  = actual_departure % 100;
+    t_actual_departure.tm_hour = (actual_departure / 100) % 100;
+    t_actual_departure.tm_mday = (actual_departure / 10000) % 100;
+    t_actual_departure.tm_mon  = ((actual_departure / 1000000) % 100) - 1;
+    t_actual_departure.tm_year = (actual_departure / 100000000L) - 1900;
+    t_actual_departure.tm_isdst = -1;
+
+    t_expected_departure.tm_min  = expected_departure % 100;
+    t_expected_departure.tm_hour = (expected_departure / 100) % 100;
+    t_expected_departure.tm_mday = (expected_departure / 10000) % 100;
+    t_expected_departure.tm_mon  = ((expected_departure / 1000000) % 100) - 1;
+    t_expected_departure.tm_year = (expected_departure / 100000000L) - 1900;
+    t_expected_departure.tm_isdst = -1;
+
+    // converter ambos para time_t (segundos)
+    time_t s_actual_departure = mktime(&t_actual_departure);
+    time_t s_expected_departure = mktime(&t_expected_departure);
+
+    // diferença em segundos dividida por 60 (para dar em minutos)
+    return (int)(difftime(s_actual_departure, s_expected_departure) / 60);
 }

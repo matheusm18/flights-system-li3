@@ -100,7 +100,7 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
             case 5: // Top N Companhias Aéreas (arg: N)
 
                 if (sscanf(line, "%*s %d", &arg_int1) == 1) {
-                    //
+                    result = execute_query5(get_flights_from_catalog_manager(catalog_manager),arg_int1);
                 }
                 break;
             

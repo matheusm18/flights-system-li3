@@ -9,7 +9,7 @@
 #include "io/parser.h"
 #include "io/command_processor.h"
 
-#define NUM_QUERIES 3
+#define NUM_QUERIES 6
 
 struct discrepancy {
     int query;
