@@ -5,7 +5,6 @@
 #include <time.h>
 #include <stdbool.h>
 
-
 char* int_to_string(int value) {
 
     char buffer[32];
@@ -146,4 +145,13 @@ int get_flight_delay(long actual_departure, long expected_departure) {
 
     // diferença em segundos dividida por 60 (para dar em minutos)
     return (int)(difftime(s_actual_departure, s_expected_departure) / 60);
+}
+
+bool string_to_bool(const char *str) {
+    if (!str) return false;
+    
+    if (strcasecmp(str, "true") == 0) {
+        return true;
+    }
+    return false;
 }

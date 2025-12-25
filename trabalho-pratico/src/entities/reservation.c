@@ -12,10 +12,10 @@ struct reservation {
     double price;
     bool extra_luggage;
     bool priority_boarding;
-    char* qr_code;
+    //char* qr_code;
 };
 
-Reservation* create_reservation(const char* reservation_id, char** flight_ids,const char* document_number, const char* seat, double price, int extra_luggage, int priority_boarding) {
+Reservation* create_reservation(const char* reservation_id, char** flight_ids, const char* document_number, const char* seat, double price, bool extra_luggage, bool priority_boarding) {
 
     Reservation* reservation = malloc(sizeof(Reservation));
     if (reservation == NULL) return NULL;
@@ -30,10 +30,10 @@ Reservation* create_reservation(const char* reservation_id, char** flight_ids,co
     reservation->flight_ids = malloc(2 * sizeof(char*));
 
     for (int i = 0; i < 2; i++) {
-        if (flight_ids[i] != NULL) {
+        if (flight_ids && flight_ids[i] != NULL) {
             reservation->flight_ids[i] = strdup(flight_ids[i]);
         } else {
-            reservation->flight_ids[i] = NULL; // NULL para indicar que não há mais voos
+            reservation->flight_ids[i] = NULL; 
         }
     }
 
@@ -48,11 +48,18 @@ void destroy_reservation(Reservation* r) {
     free(r->seat);
 
     if (r->flight_ids) {
-        for (int i = 0; i < 2 && r->flight_ids[i] != NULL; i++) {
-            free(r->flight_ids[i]);
+        for (int i = 0; i < 2; i++) {
+            if (r->flight_ids[i] != NULL) {
+                free(r->flight_ids[i]);
+            }
         }
         free(r->flight_ids);
     }
 
     free(r);
+}
+
+char* get_reservation_identifier(const Reservation* r) { 
+    if (r == NULL) return NULL;
+    return strdup(r->reservation_id); 
 }

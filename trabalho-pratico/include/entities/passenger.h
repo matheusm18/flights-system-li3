@@ -5,11 +5,12 @@
 
 typedef struct passenger Passenger;
 
-Passenger* create_passenger(const char* document_number, const char* first_name, const char* last_name, int dob, const char* nationality, const char* gender);
+Passenger* create_passenger(char* document_number, char* first_name, char* last_name, int dob, char* nationality, char* gender);
 
 void destroy_passenger(Passenger* p);
 
 // getters
+
 int get_passenger_dnumber(const Passenger* passenger);
 
 #endif

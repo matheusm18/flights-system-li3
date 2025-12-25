@@ -54,7 +54,7 @@ void airport_catalog_destroy(AirportCatalog* manager) {
 void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
     if (!manager || !airport) return;
     
-    const char* code = get_airport_code(airport);
+    char* code = get_airport_code(airport);
     if (code != NULL) {
         AirportData* data = malloc(sizeof(AirportData));
         data->airport = airport;
@@ -63,6 +63,7 @@ void airport_catalog_add(AirportCatalog* manager, Airport* airport) {
         data->departing_flights = g_ptr_array_new();
 
         g_hash_table_insert(manager->airport_data_by_code, g_strdup(code), data);
+        free(code);
     }
 }
 

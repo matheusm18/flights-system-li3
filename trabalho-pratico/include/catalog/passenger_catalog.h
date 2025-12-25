@@ -40,26 +40,7 @@ PassengerCatalog* passenger_catalog_create();
  */
 void passenger_catalog_destroy(PassengerCatalog* manager);
 
-/**
- * @brief Adiciona um número de documento ao catálogo de passageiros.
- * 
- * Esta função adiciona um número de documento à tabela hash do catálogo,
- * funcionando como um conjunto (set) para permitir verificação rápida de
- * existência. Nesta fase simplificada, apenas o número de documento é
- * armazenado, sem objeto Passenger associado.
- * 
- * @param manager Ponteiro para o catálogo de passageiros.
- * @param document_number Número de documento do passageiro a ser adicionado.
- * 
- * @return void
- * 
- * @note Se manager for NULL, a função não realiza nenhuma operação.
- *       O valor associado à chave é NULL, pois apenas queremos um conjunto
- *       de números de documento válidos. Esta é uma implementação simplificada
- *       para validação de reservas.
- * 
- */
-void passenger_catalog_add(PassengerCatalog* manager, int document_number);
+void passenger_catalog_add(PassengerCatalog* manager, Passenger* passenger);
 
 /**
  * @brief Verifica se um número de documento existe no catálogo.
@@ -78,5 +59,7 @@ void passenger_catalog_add(PassengerCatalog* manager, int document_number);
 
  */
 int passenger_catalog_dnumber_exists(PassengerCatalog* manager, int document_number);
+
+Passenger* get_passenger_by_dnumber(PassengerCatalog* manager, int document_number);
 
 #endif

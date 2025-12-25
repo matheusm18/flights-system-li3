@@ -31,7 +31,7 @@ AircraftCatalog* aircraft_catalog_create() {
     return manager;
 }
 
-void aircraft_catalog_destroy(AircraftCatalog* manager){
+void aircraft_catalog_destroy(AircraftCatalog* manager) {
     if (manager != NULL) {
         g_hash_table_destroy(manager->aircraft_data_by_identifier);
         free(manager);
@@ -41,13 +41,14 @@ void aircraft_catalog_destroy(AircraftCatalog* manager){
 void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
     if (!manager || !aircraft) return;
     
-    const char* identifier = get_aircraft_identifier(aircraft);
+    char* identifier = get_aircraft_identifier(aircraft);
     if (identifier != NULL) {
         AircraftData* data = malloc(sizeof(AircraftData));
         data->aircraft = aircraft;
         data->flight_count = 0;
 
         g_hash_table_insert(manager->aircraft_data_by_identifier, g_strdup(identifier), data);
+        free(identifier);
     }
 }
 

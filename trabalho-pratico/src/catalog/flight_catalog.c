@@ -38,9 +38,10 @@ void flight_catalog_destroy(FlightCatalog* manager) {
 void flight_catalog_add(FlightCatalog* manager, Flight* flight) {
     if (!manager || !flight) return;
     
-    const char* flight_id = get_flight_id(flight);
+    char* flight_id = get_flight_id(flight);
     if (flight_id != NULL) {
         g_hash_table_insert(manager->flights_by_flight_id, g_strdup(flight_id), flight);
+        free(flight_id);
     }
 }
 
