@@ -1,10 +1,10 @@
-#include "utils/reservation_validation.h"
-#include "utils/utils.h"
+#include "validation/reservation_validation.h"
+#include "utils/utils_validation.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "utils/flight_validation.h"
+#include "validation/flight_validation.h"
 
 //======== Syntactic validation: Reservations
 

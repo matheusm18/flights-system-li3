@@ -1,13 +1,12 @@
-#include "utils/flight_validation.h"
+#include "validation/flight_validation.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include "utils/date.h"
-#include "utils/date_validation.h"
-#include "utils/airport_validation.h"
-#include "utils/aircraft_validation.h"
+#include "utils/utils_validation.h"
+#include "validation/airport_validation.h"
+#include "validation/aircraft_validation.h"
 
 //======== Syntactic validation: Flights
 

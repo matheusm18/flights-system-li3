@@ -1,16 +1,15 @@
-#include "utils/validation.h"
+#include "validation/validate_entities.h"
 
 #include "catalog/catalog_manager.h"
 #include "catalog/airport_catalog.h"
 #include "catalog/aircraft_catalog.h"
 #include "catalog/flight_catalog.h"
-#include "utils/aircraft_validation.h"
-#include "utils/airport_validation.h"
-#include "utils/date_validation.h"
-#include "utils/flight_validation.h"
-#include "utils/passenger_validation.h"
-#include "utils/reservation_validation.h"
-#include "utils/date.h"
+#include "validation/aircraft_validation.h"
+#include "validation/airport_validation.h"
+#include "validation/flight_validation.h"
+#include "validation/passenger_validation.h"
+#include "validation/reservation_validation.h"
+#include "utils/utils_validation.h"
 
 #include <stdlib.h>
 #include <string.h>

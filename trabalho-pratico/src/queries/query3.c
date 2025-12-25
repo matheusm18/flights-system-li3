@@ -9,8 +9,7 @@
 #include "catalog/airport_catalog.h"
 #include "entities/flight.h"
 #include "entities/airport.h"
-#include "utils/date.h"
-#include "utils/utils.h"
+#include "utils/utils_validation.h"
 
 //======= Aeroporto com mais partidas num intervalo de datas
 QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_str, char* end_date_str) {

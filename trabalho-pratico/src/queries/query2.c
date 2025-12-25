@@ -3,7 +3,7 @@
 #include "entities/aircraft.h"
 #include "catalog/flight_catalog.h"
 #include "entities/flight.h"
-#include "utils/utils.h"
+#include "utils/utils_validation.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
