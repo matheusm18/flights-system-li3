@@ -6,6 +6,7 @@
 #include "utils/date.h"
 #include <stdbool.h>
 
+void prepare_airline_stats_for_sorting(FlightCatalog* flight_manager);
 QueryResult* execute_query5(FlightCatalog* flight_manager, int N);
 
 #endif

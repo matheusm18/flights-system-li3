@@ -69,10 +69,12 @@ void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id);
 
 void destroy_airline(AirlineStats* a);
 
-int compare_airlines(gconstpointer a, gconstpointer b);
+int compare_airlines(const void* a, const void* b);
 void airline_stats_sort_array(FlightCatalog* manager);
 
 void airline_stats_increment(FlightCatalog* manager, char* airline_id, int delay);
+
+void set_airline_stats_media(AirlineStats* s, double media);
 
 /**
  * @brief Obtém um voo do catálogo pelo seu identificador.
@@ -143,5 +145,6 @@ int get_airline_stats_array_length(FlightCatalog* manager);
 char* get_airline_stats_airline(AirlineStats* a);
 int get_airline_stats_flights_count(AirlineStats* a);
 long get_airline_stats_total_delay(AirlineStats* a);
+double get_airline_stats_media(AirlineStats* a);
 
 #endif

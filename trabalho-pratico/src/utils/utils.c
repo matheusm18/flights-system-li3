@@ -24,8 +24,6 @@ char* int_to_string(int value) {
     return strdup(buffer);
 }
 
-
-
 char* double_to_string(double valor) {
 
     int tamanho = snprintf(NULL, 0, "%.3f", valor);

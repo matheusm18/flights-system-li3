@@ -8,6 +8,7 @@ struct airline_stats {
     char* airline_id;
     long total_delay;
     int delayed_flights_count;
+    double media;
 };
 
 struct flight_catalog {
@@ -50,6 +51,7 @@ void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id) 
     stats->airline_id = strdup(airline_id);
     stats->total_delay = 0;
     stats->delayed_flights_count = 0;
+    stats->media = 0;
     
     g_hash_table_insert(manager->airline_lookup, stats->airline_id, stats);
     g_ptr_array_add(manager->airline_array, stats);
@@ -62,22 +64,22 @@ void destroy_airline(AirlineStats* a) {
     free(a);
 }
 
-int compare_airlines(gconstpointer a, gconstpointer b) {
-    const AirlineStats *as = a;
-    const AirlineStats *bs = b;
+int compare_airlines(const void* a, const void* b) {
+    AirlineStats *as = *(AirlineStats**)a;
+    AirlineStats *bs = *(AirlineStats**)b;
 
-    double mediaA = (double)as->total_delay / as->delayed_flights_count;
-    double mediaB = (double)bs->total_delay / bs->delayed_flights_count;
+    // calculo das médias (atraso total / número de voos)
+    double mediaA = get_airline_stats_media(as);
+    double mediaB = get_airline_stats_media(bs);
 
-    // fabs garante que a diferença é sempre positiva
-    if (fabs(mediaA - mediaB) < 0.0005) {
-        // empate nas 3 casas decimais
-        return strcmp(as->airline_id, bs->airline_id);
-    }
-
-    // se não é empate, ordem decrescente
+    // primeiro critério
     if (mediaA > mediaB) return -1;
-    return 1;
+    if (mediaA < mediaB) return 1;
+
+    // segundo critério
+
+    int result = strcmp(as->airline_id, bs->airline_id);
+    return result;
 }
 
 void airline_stats_sort_array(FlightCatalog* manager) {
@@ -99,14 +101,10 @@ void airline_stats_increment(FlightCatalog* manager, char* airline_id, int delay
     }
 }
 
-void sort_airline_stats_array(FlightCatalog* manager, char* airline_id, int delay) {
-    if (!manager) return;
+void set_airline_stats_media(AirlineStats* s, double media) {
+    if (s == NULL) return;
 
-    AirlineStats* stats = get_airline_stats_by_identifier(manager, airline_id);
-    if (stats != NULL) {
-        stats->total_delay += delay;
-        stats->delayed_flights_count++;
-    }
+    s->media = media;
 }
 
 // getters
@@ -183,4 +181,9 @@ int get_airline_stats_flights_count(AirlineStats* a) {
 long get_airline_stats_total_delay(AirlineStats* a) {
     if (a == NULL) return 0;
     else return a->total_delay;
+}
+
+double get_airline_stats_media(AirlineStats* a) {
+    if (a == NULL) return 0;
+    else return a->media;
 }
