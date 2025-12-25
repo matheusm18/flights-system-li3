@@ -5,9 +5,9 @@
 #include "catalog/flight_catalog.h"
 #include "catalog/aircraft_catalog.h"
 #include "entities/aircraft.h"
+#include "utils/min_heap.h"
 #include <stdio.h>
 
-typedef struct aircraft_count AircraftCount;
 
 /**
  * @brief Executa a Query 2: Top N aeronaves com mais voos
