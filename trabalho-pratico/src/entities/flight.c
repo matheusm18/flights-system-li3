@@ -50,6 +50,7 @@ Flight* create_flight(char* flight_id, long departure, long actual_departure, lo
 void destroy_flight(Flight* f) {
     if (!f) return;
 
+    free(f->flight_id);
     //free(f->gate);
     free(f->status);
     free(f->origin);
