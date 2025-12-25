@@ -1,11 +1,12 @@
 # Diretórios
-SRC_DIR     = src
+SRC_DIR = src
 CATALOG_DIR = $(SRC_DIR)/catalog
-ENTITIES_DIR= $(SRC_DIR)/entities
-IO_DIR      = $(SRC_DIR)/io
+ENTITIES_DIR = $(SRC_DIR)/entities
+IO_DIR = $(SRC_DIR)/io
 QUERIES_DIR = $(SRC_DIR)/queries
-TESTS_DIR   = tests
-UTILS_DIR   = $(SRC_DIR)/utils
+INTERACTIVE_DIR = $(SRC_DIR)/interactive
+TESTS_DIR = tests
+UTILS_DIR = $(SRC_DIR)/utils
 
 # Compilador
 CC     = gcc
@@ -14,19 +15,22 @@ LDFLAGS= `pkg-config --libs glib-2.0` -lm
 
 MAIN_PROGRAM = programa-principal
 TEST_PROGRAM = programa-testes
+INTERACTIVE_PROGRAM = programa-interativo
 
 # Fontes da aplicação
-SRCS_APP     := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c')
-SRCS_MAIN    := $(SRC_DIR)/main.c
-SRCS_TEST    := $(wildcard $(TESTS_DIR)/*.c)
+SRCS_APP := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c' ! -name 'main_interactive.c')
+SRCS_MAIN := $(SRC_DIR)/main.c
+SRCS_INTERACTIVE_MAIN := $(SRC_DIR)/interactive/main_interactive.c
+SRCS_TEST := $(wildcard $(TESTS_DIR)/*.c)
 
 # Objetos
-OBJS_APP     := $(SRCS_APP:.c=.o)
-OBJS_MAIN    := $(SRCS_MAIN:.c=.o)
-OBJS_TEST    := $(SRCS_TEST:.c=.o)
+OBJS_APP := $(SRCS_APP:.c=.o)
+OBJS_MAIN := $(SRCS_MAIN:.c=.o)
+OBJS_INTERACTIVE_MAIN := $(SRCS_INTERACTIVE_MAIN:.c=.o)
+OBJS_TEST := $(SRCS_TEST:.c=.o)
 
 # Alvo padrão
-all: $(MAIN_PROGRAM) $(TEST_PROGRAM)
+all: $(MAIN_PROGRAM) $(TEST_PROGRAM) $(INTERACTIVE_PROGRAM)
 
 # Programa principal
 $(MAIN_PROGRAM): $(OBJS_MAIN) $(OBJS_APP)
@@ -34,6 +38,9 @@ $(MAIN_PROGRAM): $(OBJS_MAIN) $(OBJS_APP)
 
 # Programa de testes
 $(TEST_PROGRAM): $(OBJS_TEST) $(OBJS_APP)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+$(INTERACTIVE_PROGRAM): $(OBJS_INTERACTIVE_MAIN) $(OBJS_APP)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 # Compilar .c -> .o (src)
@@ -50,6 +57,6 @@ $(TESTS_DIR)/%.o: $(TESTS_DIR)/%.c
 
 # Limpeza
 clean:
-	rm -f $(MAIN_PROGRAM) $(TEST_PROGRAM) $(OBJS_APP) $(OBJS_MAIN) $(OBJS_TEST)
+	rm -f $(MAIN_PROGRAM) $(TEST_PROGRAM) $(INTERACTIVE_PROGRAM) $(OBJS_APP) $(OBJS_MAIN) $(OBJS_INTERACTIVE_MAIN) $(OBJS_TEST)
 
 .PHONY: all clean

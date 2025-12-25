@@ -14,51 +14,32 @@
 #include <stdlib.h>
 #include <time.h>
 
-void process_commands(const char* commands_file, CatalogManager* catalog_manager, int* command_counter) {
-    
-    FILE* file = fopen(commands_file, "r");
-    if (!file) {
-        perror("Erro ao abrir ficheiro de comandos");
-        return;
-    }
-    
-    char line[256];
-    
-    // fgets vai ler até encontrar o \n e vai incluir no buffer de line
-    // fgets retornar null quando chega no EOF (end of file)
-    while (fgets(line, sizeof(line), file) != NULL) {
-        
-        int query_id;
-        char query_type_str[16];
-        char delimiter = ';';
+void execute_single_line(char* line, CatalogManager* catalog_manager, int command_counter, int is_interactive) {
 
-        // variaveis auxiliares para argumentos
-        char arg_str1[100], arg_str2[100]; 
-        int arg_int1;
+    int query_id;
+    char query_type_str[16];
+    char delimiter = ';';
 
-        QueryResult* result = NULL;
+    // variaveis auxiliares para argumentos
+    char arg_str1[100], arg_str2[100]; 
+    int arg_int1;
 
-        // remover o '\n' no final da string
-        line[strcspn(line, "\r\n")] = '\0';
+    QueryResult* result = NULL;
 
-        // criar caminho do output file
-        char output_path[100];
-        snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", *command_counter);
+    // remover o '\n' no final da string
+    line[strcspn(line, "\r\n")] = '\0';
 
-        // primeiro extraimos o n da query
-        if (sscanf(line, "%s", query_type_str) != 1) {
-            (*command_counter)++;
-            continue; // pular para a próxima iteração do while (ler proxima linha do input)
-        }
+    if (sscanf(line, "%s", query_type_str) != 1) return;
 
-        // verificar se tem o 'S' após o nº da querie para mudar o delimitador para '='
-        if (strchr(query_type_str, 'S') != NULL) delimiter = '='; // se encontrar o char 'S' retorna o ponteiro para ele, se não retorna NULL
+    // verificar se tem o 'S' após o nº da querie para mudar o delimitador para '='
+    if (strchr(query_type_str, 'S') != NULL) delimiter = '='; // se encontrar o char 'S' retorna o ponteiro para ele, se não retorna NULL
 
-        query_id = atoi(query_type_str); // converte "1S" ou "1" para o int 1
+    query_id = atoi(query_type_str);
 
-        switch(query_id) {
+    // 2. O teu Switch Case (exatamente como já tens)
+    switch(query_id) {
 
-            case 1: // Aeroporto (arg: code)
+        case 1: // Aeroporto (arg: code)
 
                 if (sscanf(line, "%*s %s", arg_str1) == 1) { // %*s diz para deitar o valor fora (não guardar) visto que guardamos em cima
                     result = execute_query1(get_airports_from_catalog_manager(catalog_manager), arg_str1);
@@ -114,15 +95,31 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
             default:
                 printf("Query ID %d desconhecido ou input inválido na linha: %s\n", query_id, line);
                 break;
-        }
-        
+    }
+
+    if (is_interactive) {
+        write_result(result, NULL, delimiter);
+    } else {
+        char output_path[100];
+        snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
         write_result(result, output_path, delimiter);
-        if (result != NULL) {
-            destroy_query_result(result); // libertar a memória da struct de resultados
-        } 
-        
-        (*command_counter)++;
+    }
+
+    if (result != NULL) destroy_query_result(result);
+}
+void process_commands(const char* commands_file, CatalogManager* catalog_manager, int* command_counter) {
+    FILE* file = fopen(commands_file, "r");
+    if (!file) { 
+        perror("Erro ao abrir ficheiro de comandos"); 
+        return; 
     }
     
+    char line[256];
+     // fgets vai ler até encontrar o \n e vai incluir no buffer de line
+    // fgets retornar null quando chega no EOF (end of file) 
+    while (fgets(line, sizeof(line), file) != NULL) {
+        execute_single_line(line, catalog_manager, *command_counter, 0); // 0 = modo normal
+        (*command_counter)++;
+    }
     fclose(file);
 }
