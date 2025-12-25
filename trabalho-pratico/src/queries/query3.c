@@ -17,8 +17,6 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
 
     if (!airport_manager || !start_date_str || !end_date_str) return NULL;
 
-    QueryResult* res = create_query_result();
-
     // converter strings de data para int (YYYYMMDD)
     int start_date = string_to_date(start_date_str);
     int end_date   = string_to_date(end_date_str);
@@ -29,30 +27,20 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
     AirportIter* air_it = airport_catalog_iter_create(airport_manager);
 
     const AirportData* data;
+
     while ((data = airport_catalog_iter_next(air_it)) != NULL) {
         const Airport* airport = get_airport_from_data(data);
         char* current_code = get_airport_code(airport);
-        int count = 0;
 
-        AirportFlightIter* f_it = airport_flight_iter_create(data);
 
-        const Flight* flight;
-        while ((flight = airport_flight_iter_next(f_it)) != NULL) {
-            long adt = get_flight_actual_departure(flight);
-            
-            if (adt <= 0) break; // voo cancelado (N/A)
-
-            int flight_date = get_date_part(adt);
-            if (flight_date > end_date) break;
-            if (flight_date >= start_date) count++;
-        }
-
-        airport_flight_iter_free(f_it); // libertar o iterador de voos antes de passar ao próximo aeroporto
+        int count = airport_catalog_count_flights_in_range(data, start_date, end_date);
 
         // atualiza melhor aeroporto
-        if (best_code == NULL || count > best_count || (count == best_count && strcmp(current_code, best_code) < 0)) {
+        if (count > best_count || 
+            (count == best_count && best_code && strcmp(current_code, best_code) < 0) ||
+            (count > 0 && best_code == NULL)) {
             
-            if (best_code != NULL) free(best_code);
+            free(best_code);
 
             best_code = current_code;
             best_count = count;
@@ -61,6 +49,8 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
     }
 
     airport_catalog_iter_free(air_it); // libertar o iterador de aeroportos
+
+    QueryResult* res = create_query_result();
 
     if (best_code != NULL && best_count > 0) {
         const Airport* best_airport = get_airport_by_code(airport_manager, best_code);

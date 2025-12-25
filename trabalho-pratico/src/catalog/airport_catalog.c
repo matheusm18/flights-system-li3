@@ -163,6 +163,72 @@ void airport_flight_iter_free(AirportFlightIter* it) {
 }
 
 
+// binary search para encontrar primeiro voo >= start_date
+static int find_first_flight_in_range(GPtrArray* flights, int start_date) {
+    if (!flights || flights->len == 0) return -1;
+    
+    int i = 0;
+    int j = flights->len - 1;
+    int first_idx = -1;
+    
+    while (i <= j) {
+        int mid = i + (j - i) / 2;
+        Flight* flight = g_ptr_array_index(flights, mid);
+        int flight_date = get_date_part(get_flight_actual_departure(flight));
+        
+        if (flight_date >= start_date) {
+            first_idx = mid;
+            j = mid - 1;  // procura mais à esquerda
+        } else {
+            i = mid + 1;
+        }
+    }
+    
+    return first_idx;
+}
+
+// binary search para encontrar último voo <= end_date
+static int find_last_flight_in_range(GPtrArray* flights, int end_date, int start_idx) {
+    if (!flights || flights->len == 0 || start_idx == -1) return -1;
+    
+    int i = start_idx;
+    int j = flights->len - 1;
+    int last_idx = -1;
+    
+    while (i <= j) {
+        int mid = i + (j - i) / 2;
+        Flight* flight = g_ptr_array_index(flights, mid);
+        int flight_date = get_date_part(get_flight_actual_departure(flight));
+        
+        if (flight_date <= end_date) {
+            last_idx = mid;
+            i = mid + 1;  // procura mais à direita
+        } else {
+            j = mid - 1;
+        }
+    }
+    
+    return last_idx;
+}
+
+
+int airport_catalog_count_flights_in_range(const AirportData* data, int start_date, int end_date) {
+    if (!data || !data->departing_flights) return 0;
+    
+    GPtrArray* flights = data->departing_flights;
+    
+    int first_idx = find_first_flight_in_range(flights, start_date); // binary search para encontrar limites
+    
+    if (first_idx == -1) return 0;  // nenhum voo >= start_date
+    
+    int last_idx = find_last_flight_in_range(flights, end_date, first_idx);
+    
+    if (last_idx == -1 || last_idx < first_idx) return 0;
+    
+    return last_idx - first_idx + 1;
+}
+
+
 // getters
 
 

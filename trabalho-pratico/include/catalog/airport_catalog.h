@@ -112,6 +112,8 @@ const Flight* airport_flight_iter_next(AirportFlightIter* it);
 void airport_flight_iter_free(AirportFlightIter* it);
 
 
+int airport_catalog_count_flights_in_range(const AirportData* data, int start_date, int end_date);
+
 /**
  * @brief Obtém um aeroporto do catálogo pelo seu código.
  * 
