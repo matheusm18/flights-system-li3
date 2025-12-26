@@ -13,20 +13,22 @@ CC     = gcc
 CFLAGS = -fno-omit-frame-pointer -Wall -Wextra -O3 -g -Iinclude `pkg-config --cflags glib-2.0`
 LDFLAGS= `pkg-config --libs glib-2.0` -lm
 
+NCURSES = -lncurses
+
 MAIN_PROGRAM = programa-principal
 TEST_PROGRAM = programa-testes
 INTERACTIVE_PROGRAM = programa-interativo
 
 # Fontes da aplicação
-SRCS_APP := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c' ! -name 'main_interactive.c')
+SRCS_APP := $(shell find $(SRC_DIR) -type f -name '*.c' ! -path '$(INTERACTIVE_DIR)/*' ! -name 'main.c')
 SRCS_MAIN := $(SRC_DIR)/main.c
-SRCS_INTERACTIVE_MAIN := $(SRC_DIR)/interactive/main_interactive.c
+SRCS_INTERACTIVE := $(shell find $(INTERACTIVE_DIR) -type f -name '*.c')
 SRCS_TEST := $(wildcard $(TESTS_DIR)/*.c)
 
 # Objetos
 OBJS_APP := $(SRCS_APP:.c=.o)
 OBJS_MAIN := $(SRCS_MAIN:.c=.o)
-OBJS_INTERACTIVE_MAIN := $(SRCS_INTERACTIVE_MAIN:.c=.o)
+OBJS_INTERACTIVE := $(SRCS_INTERACTIVE:.c=.o)
 OBJS_TEST := $(SRCS_TEST:.c=.o)
 
 # Alvo padrão
@@ -40,8 +42,8 @@ $(MAIN_PROGRAM): $(OBJS_MAIN) $(OBJS_APP)
 $(TEST_PROGRAM): $(OBJS_TEST) $(OBJS_APP)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
-$(INTERACTIVE_PROGRAM): $(OBJS_INTERACTIVE_MAIN) $(OBJS_APP)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+$(INTERACTIVE_PROGRAM): $(OBJS_INTERACTIVE) $(OBJS_APP)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(NCURSES) -o $@
 
 # Compilar .c -> .o (src)
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
