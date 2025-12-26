@@ -53,12 +53,27 @@ para isso calculamos em que dia da semana foi 1 de janeiro.
     // calcular semana
     int days_since_first_sunday = day_of_year - days_to_first_sunday; // quantos dias é que já se passaram desde o primeiro domingo
     
-    if (days_since_first_sunday < 0) { // data antes do primeiro domingo
-        wn->year = year - 1; // essa data pertence à ultima semana do ano anterior
-        wn->week = 52;  // simplificado
-    } else {
+    if (days_since_first_sunday >= 0) {
         wn->year = year;
         wn->week = (days_since_first_sunday / 7) + 1;
+    } else { // data antes do primeiro domingo, pertence à ultima semana do ano anterior
+        int previous_year = year - 1;
+
+        // descobrir o 31 de dezembro do ano anterior
+        struct tm dec31_prev = {0};
+        dec31_prev.tm_year = previous_year - 1900;
+        dec31_prev.tm_mon = 11;  // Dezembro
+        dec31_prev.tm_mday = 31;
+        dec31_prev.tm_isdst = -1;
+        mktime(&dec31_prev);
+
+        // calcular quantos dias desde o último domingo do ano anterior
+        int jan1_day_prev = (dec31_prev.tm_wday + 1) % 7; // domingo = 0
+        int days_since_last_sunday = dec31_prev.tm_yday - jan1_day_prev;
+        int last_week_number = (days_since_last_sunday / 7) + 1;
+
+        wn->year = previous_year;
+        wn->week = last_week_number;
     }
     
     return wn;
@@ -71,9 +86,6 @@ char* create_week_key(int year, int week) {
     return key;
 }
 
-void free_week_number(WeekNumber *wn) {
-    if (wn) free(wn);
-}
 
 
 
