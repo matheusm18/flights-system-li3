@@ -156,8 +156,13 @@ int menu_formato_resultado(int query_id) {
     while (1) {
         for (int i = 0; i < 2; i++) {
             if (i == highlight) wattron(win, A_REVERSE);
-            mvwprintw(win, i + 4, 4, "%s", options[i]);
-            wattroff(win, A_REVERSE);
+
+            if (i == 0)
+                mvwprintw(win, i + 4, 4, "%d  - resultados separados por ';'", query_id);
+            else
+                mvwprintw(win, i + 4, 4, "%dS - resultados separados por '='", query_id);
+
+            if (i == highlight) wattroff(win, A_REVERSE);
         }
         wrefresh(win);
         ch = wgetch(win);
@@ -257,15 +262,30 @@ void run_menu_loop(CatalogManager* manager) {
         for (int i = 0; i < q.num_args; i++)
             if (q.args[i].obrigatorio) obrigatorios++;
         if (tokens < obrigatorios) {
-            clear();
-            mvprintw(2, 2, "[!] Faltam argumentos obrigatórios.");
-            mvprintw(3, 2, "[!] Esperado pelo menos %d argumento(s).", obrigatorios);
-            mvprintw(4, 2, "[!] Recebido: %d.", tokens);
-            mvprintw(8, 2, "Prima qualquer tecla para voltar ao menu...");
-            refresh();
+            int height = 9; 
+            int width = (strlen("Prima qualquer tecla para voltar ao menu...") + 4);
+            int starty = (LINES - height) / 2;
+            int startx = (COLS - width) / 2;
+
+            WINDOW* win = newwin(height, width, starty, startx);
+            box(win, 0, 0);
+
+            // Título centralizado
+            char titulo[] = "== [!] AVISO [!] ==";
+            mvwprintw(win, 0, (width - strlen(titulo)) / 2, "%s", titulo);
+
+            mvwprintw(win, 2, 2, "Faltam argumentos obrigatórios.");
+            mvwprintw(win, 3, 2, "Esperado pelo menos %d argumento(s).", obrigatorios);
+            mvwprintw(win, 4, 2, "Recebido: %d.", tokens);
+            mvwprintw(win, 6, 2, "Prima qualquer tecla para voltar ao menu...");
+
+            wrefresh(win);
             getch();
+
+            delwin(win);  // apaga a janela antes de voltar ao menu
             continue;
         }
+
 
         char linha[512];
         snprintf(linha, sizeof(linha), "%d%s %s", q.id, com_S ? "S" : "",args);
