@@ -17,6 +17,10 @@
  *            airport_id (char*) -> int*
  */
 
+struct reservation_stats_iterator {
+    GHashTableIter iter;
+};
+
 struct reservation_catalog {
     GHashTable* reservations_by_id;
     GHashTable* nationality_stats;
@@ -53,29 +57,22 @@ void reservation_catalog_add(ReservationCatalog* manager, Reservation* reservati
     free(identifier);
 }
 
-Reservation* get_reservation_by_id (ReservationCatalog* manager, char* reservation_id) {
-    if (!manager || !reservation_id) return NULL;
-
-    return g_hash_table_lookup(manager->reservations_by_id, reservation_id);
-}
-
-
 void reservation_catalog_add_nationality_increment (ReservationCatalog* manager, const char* nationality, const char* airport_id) {
     if (!manager || !nationality || !airport_id) return;
 
-    /*obter mapa de aeroportos de uma nacionalidade*/
+    // obter mapa de aeroportos de uma nacionalidade
     GHashTable* airport_map = g_hash_table_lookup(manager->nationality_stats, nationality);
 
-    /*se não existir, crio*/
+    // se não existir, crio
     if (!airport_map) {
         airport_map = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
         g_hash_table_insert(manager->nationality_stats, g_strdup(nationality), airport_map);
     }
 
-    /*obter contador do aeroporto*/
+    // obter contador do aeroporto*
     int* count = g_hash_table_lookup(airport_map, airport_id);
 
-    /*se não existir, crio contador*/
+    // se não existir, crio contador
     if (!count) {
         count = malloc(sizeof(int));
         if (!count) return;
@@ -87,8 +84,42 @@ void reservation_catalog_add_nationality_increment (ReservationCatalog* manager,
     (*count)++;
 }
 
-GHashTable* reservation_catalog_get_nationality_map (ReservationCatalog* manager, const char* nationality) {
+// cria um iterador para percorrer os aeroportos de uma dada nacionalidade (query 6)
+ReservationStatsIter* reservation_catalog_create_stats_iter(ReservationCatalog* manager, const char* nationality) {
     if (!manager || !nationality) return NULL;
 
-    return g_hash_table_lookup(manager->nationality_stats, nationality);
+    GHashTable* airport_map = g_hash_table_lookup(manager->nationality_stats, nationality);
+
+    if (!airport_map) return NULL; // nacionalidade não tem dados
+
+    ReservationStatsIter* it = malloc(sizeof(ReservationStatsIter));
+    if (!it) return NULL;
+
+    g_hash_table_iter_init(&(it->iter), airport_map);
+    return it;
+}
+
+// avança para o próximo par (airport_id, count). retorna 1 se for para continuar o loop, 0 se for para terminar.
+// os valores são retornados por referência nos argumentos 'airport_id' e 'count'.
+int reservation_catalog_stats_iter_next(ReservationStatsIter* it, const char** airport_id, int* count) {
+    if (!it) return 0;
+
+    gpointer key, value;
+    if (g_hash_table_iter_next(&(it->iter), &key, &value)) {
+        if (airport_id) *airport_id = (const char*)key; // para garantir que a query não altera o valor
+        if (count) *count = *(int*)value;
+        return 1; // tem mais elementos
+    }
+    
+    return 0; // chegou ao fim
+}
+
+void reservation_catalog_stats_iter_destroy(ReservationStatsIter* it) {
+    if (it) free(it);
+}
+
+Reservation* get_reservation_by_id (ReservationCatalog* manager, char* reservation_id) {
+    if (!manager || !reservation_id) return NULL;
+
+    return g_hash_table_lookup(manager->reservations_by_id, reservation_id);
 }

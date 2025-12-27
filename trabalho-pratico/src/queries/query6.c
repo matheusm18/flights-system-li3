@@ -19,33 +19,33 @@ QueryResult* execute_query6(ReservationCatalog* manager, char* nationality) {
     QueryResult* res = create_query_result();
     if (!manager || !nationality) return res;
 
-    GHashTable* airport_map = reservation_catalog_get_nationality_map(manager, nationality);
+    ReservationStatsIter* it = reservation_catalog_create_stats_iter(manager, nationality);
+    if (!it) return res;
 
-    if (!airport_map) return res;
-
-    GHashTableIter iter;
-    gpointer key, value;
-
-    char* best_airport = NULL;
+    const char* best_airport = NULL; 
     int best_count = -1;
 
-    g_hash_table_iter_init(&iter, airport_map);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        char* airport_id = key;
-        int count = *(int*) value;
-
-        if (count > best_count ||
-           (count == best_count &&
-            strcmp(airport_id, best_airport) < 0)) {
-
-            best_airport = airport_id;
-            best_count = count;
+    const char* current_airport;
+    int current_count;
+    while (reservation_catalog_stats_iter_next(it, &current_airport, &current_count)) {
+        
+        if (current_count > best_count) {
+            best_count = current_count;
+            best_airport = current_airport;
+        } 
+        else if (current_count == best_count) {
+            if (strcmp(current_airport, best_airport) < 0) {
+                best_airport = current_airport;
+            }
         }
     }
 
+    reservation_catalog_stats_iter_destroy(it);
+
     if (best_airport) {
         char** tokens = malloc(2 * sizeof(char*));
-        tokens[0] = strdup(best_airport);
+        
+        tokens[0] = strdup(best_airport); 
         tokens[1] = int_to_string(best_count);
 
         add_line_to_result(res, tokens, 2);
@@ -53,5 +53,3 @@ QueryResult* execute_query6(ReservationCatalog* manager, char* nationality) {
 
     return res;
 }
-
-
