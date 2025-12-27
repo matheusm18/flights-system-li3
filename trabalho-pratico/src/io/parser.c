@@ -130,6 +130,7 @@ void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
     //printf("\nA carregar as reservas de: %s", reservations_file);
     read_csv(8, reservations_file, process_valid_line_reservations, catalog_manager, reservations_errors);
     fclose(reservations_errors);
+    reservation_catalog_prepare_metrics(get_reservations_from_catalog_manager(catalog_manager));
     //printf("\nTodos as reservas válidas foram carregadas!\n");
 
 }

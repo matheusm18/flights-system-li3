@@ -4,8 +4,9 @@
 #include <stdbool.h>
 
 char* int_to_string(int value);
-
 char* double_to_string(double valor);
+char* date_to_string(int date);
+
 bool validate_date(const char* date);
 bool validate_time(const char* time);
 bool validate_datetime(const char* datetime);

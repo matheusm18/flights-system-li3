@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <stdbool.h>
+#include <glib.h>
 
 char* int_to_string(int value) {
 
@@ -27,6 +28,24 @@ char* double_to_string(double valor) {
     }
     
     return str;
+}
+
+char* date_to_string(int date) {
+    if (date == -1) {
+        return strdup("N/A");
+    }
+
+    int year = date / 10000;
+    
+    int month = (date % 10000) / 100;
+    
+    int day = date % 100;
+
+    char buffer[32];
+
+    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d", year, month, day);
+
+    return strdup(buffer);
 }
 
 bool validate_date(const char* date) {

@@ -12,6 +12,7 @@ void destroy_flight(Flight* f);
 
 // getters
 long get_flight_actual_departure(const Flight* f);
+long get_flight_departure(const Flight* f);
 char* get_flight_id(const Flight* flight);
 char* get_flight_origin(const Flight* f);
 char* get_flight_destination(const Flight* f);

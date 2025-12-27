@@ -5,7 +5,7 @@
 
 struct flight {
     char *flight_id;
-    //long departure;
+    long departure;
     long actual_departure;
     //long arrival;
     //long actual_arrival;
@@ -32,7 +32,7 @@ Flight* create_flight(char* flight_id, long departure, long actual_departure, lo
     
     flight->flight_id = strdup(flight_id);
 
-    //flight->departure = departure;
+    flight->departure = departure;
     flight->actual_departure = actual_departure;
     //flight->arrival = arrival;
     //flight->actual_arrival = actual_arrival;
@@ -63,6 +63,10 @@ void destroy_flight(Flight* f) {
 
 long get_flight_actual_departure(const Flight* f) {
     return f->actual_departure;
+}
+
+long get_flight_departure(const Flight* f) {
+    return f->departure;
 }
 
 char* get_flight_origin(const Flight* f) {

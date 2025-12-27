@@ -70,11 +70,10 @@ void execute_single_line(char* line, CatalogManager* catalog_manager, int comman
 
                 // com intervalo de datas
                 if (sscanf(line, "%*s %s %s", arg_str1, arg_str2) == 2) {
-                    //
+                    result = execute_query4(get_reservations_from_catalog_manager(catalog_manager),get_passengers_from_catalog_manager(catalog_manager),arg_str1,arg_str2);
                 }
-                // sem argumentos (Top Global)
                 else {
-                    //
+                    result = execute_query4(get_reservations_from_catalog_manager(catalog_manager),get_passengers_from_catalog_manager(catalog_manager),NULL,NULL);
                 }
                 break;
             

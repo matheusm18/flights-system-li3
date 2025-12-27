@@ -10,6 +10,7 @@
 #include "validation/passenger_validation.h"
 #include "validation/reservation_validation.h"
 #include "utils/utils_validation.h"
+#include "utils/query4_utils.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -334,8 +335,11 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     int flight_count = 0;
     char *token = strtok(clean_ids, delims);
 
+    char* q4_week_id = NULL;
+    double total_price = atof(price);
+
     while (token && flight_count < 2) {
-        flight_ids_array[flight_count++] = strdup(token);
+        flight_ids_array[flight_count] = strdup(token);
 
         Flight* flight =
             get_flight_by_flight_id_from_catalog(flight_catalog, token);
@@ -360,19 +364,33 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
                     if (nationality) {
                         reservation_catalog_add_nationality_increment(reservation_catalog, nationality, destination);
                     }
+
+                    free(nationality);
                 }
 
                 if (origin) free(origin);
                 if (destination) free(destination);
-            }
 
+                if (flight_count == 0) {
+                    long departure_date = get_date_part(get_flight_departure(flight));
+                    if (departure_date) {
+                        q4_week_id = date_to_week_key(departure_date);
+                    }
+                }
+            }
             if (status) free(status);
         }
-
+        
+        flight_count++;
         token = strtok(NULL, delims);
     }
 
     free(clean_ids);
+
+    if (q4_week_id != NULL) {
+        reservation_catalog_add_price_increment(reservation_catalog, q4_week_id, document_number, total_price);
+        free(q4_week_id);
+    }
 
     bool extra_luggage_bool = string_to_bool(extra_luggage);
     bool priority_boarding_bool =

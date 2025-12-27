@@ -46,8 +46,26 @@ int get_passenger_dnumber(const Passenger* passenger) {
     return passenger->document_number;
 }
 
+char* get_passenger_first_name(const Passenger* passenger) {
+    if (passenger == NULL) return NULL;
+    
+    return strdup(passenger->first_name);
+}
+
+char* get_passenger_last_name(const Passenger* passenger) {
+    if (passenger == NULL) return NULL;
+    
+    return strdup(passenger->last_name);
+}
+
+int get_passenger_dob(const Passenger* passenger) {
+    if (passenger == NULL) return -1;
+    
+    return passenger->dob;
+}
+
 char* get_passenger_nationality(const Passenger* passenger) {
     if (passenger == NULL) return NULL;
     
-    return passenger->nationality;
+    return strdup(passenger->nationality);
 }
