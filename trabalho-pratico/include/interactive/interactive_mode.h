@@ -9,7 +9,9 @@ typedef struct  query_arg QueryArg;
 int largura_menu_queries(Query* queries, int n) ;
 int menu_queries(Query* queries, int n) ;
 int menu_formato_resultado(int query_id);
-void pedir_argumentos(Query q, int com_S, char* buffer, int size) ;
+void pedir_argumentos(Query q, int com_S, char* buffer, int size);
+void menu_inicial();
+int menu_aviso_argumentos(int obrigatorios, int recebidos);
 void start_interactive_ui(CatalogManager* manager);
 void run_menu_loop(CatalogManager* manager);
 

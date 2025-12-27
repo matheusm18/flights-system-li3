@@ -75,6 +75,7 @@ int largura_menu_queries(Query* queries, int n) {
 }
 
 int menu_queries(Query* queries, int n) {
+    curs_set(0);
     int highlight = 0;
     int ch;
 
@@ -115,13 +116,15 @@ int menu_queries(Query* queries, int n) {
             case 10:  // ENTER
                 delwin(menuwin); // apaga a janela
                 clear();   
-                refresh(); 
+                refresh();
+                curs_set(1); 
                 return highlight; // retorna o índice da opção selecionada
         }
     }
 }
 
 int menu_formato_resultado(int query_id) {
+    curs_set(0);
     const char* options[] = {
         "x  - resultados separados por ';'",
         "xS - resultados separados por '='"
@@ -151,25 +154,32 @@ int menu_formato_resultado(int query_id) {
     snprintf(buf, sizeof(buf), "QUERY %d", query_id);
 
     mvwprintw(win, 1, (width- strlen(buf)) / 2, "QUERY %d", query_id);
-    mvwprintw(win, 2, (width - strlen ("Escolha o formato dos seus resultados")) / 2, "Escolha o formato dos seus resultados");
 
     while (1) {
         for (int i = 0; i < 2; i++) {
             if (i == highlight) wattron(win, A_REVERSE);
 
             if (i == 0)
-                mvwprintw(win, i + 4, 4, "%d  - resultados separados por ';'", query_id);
+                mvwprintw(win, i + 3, 4, "%d  - resultados separados por ';'", query_id);
             else
-                mvwprintw(win, i + 4, 4, "%dS - resultados separados por '='", query_id);
+                mvwprintw(win, i + 3, 4, "%dS - resultados separados por '='", query_id);
 
             if (i == highlight) wattroff(win, A_REVERSE);
         }
+
+        mvwprintw(win, 6, 4, " ");
+
         wrefresh(win);
         ch = wgetch(win);
-        switch (ch) {
-            case KEY_UP: case KEY_DOWN: highlight = 1 - highlight; break;
-            case 10: delwin(win); return highlight; // 0 = normal, 1 = com S
+        if (ch == 10) {
+            delwin(win);
+            clear();        
+            refresh();  
+            curs_set(1);    
+            return highlight;
         }
+        if (ch == KEY_UP || ch == KEY_DOWN)
+            highlight = 1 - highlight;
     }
 }
 
@@ -177,26 +187,16 @@ int menu_formato_resultado(int query_id) {
 void pedir_argumentos(Query q, int com_S, char* buffer, int size) {
     clear();
     refresh();
-    // calcular largura máxima 
+
+    // calcular largura máxima da caixa principal
     int max_len = strlen("== EXECUTE QUERY xx == ");
-    
     for (int i = 0; i < q.num_args; i++) {
-        int len = strlen(q.args[i].nome) + 3; // <> ou [] + espaço
+        int len = strlen(q.args[i].nome) + 3; // <> ou []
         if (len > max_len) max_len = len;
     }
-    
-    int total_args_len = 0;
-    for (int i = 0; i < q.num_args; i++) {
-        total_args_len += strlen(q.args[i].nome) + 3; 
-    }
-    if (total_args_len > max_len) max_len = total_args_len;
-    
-    int prompt_len = strlen("> ");
-    if (prompt_len > max_len) max_len = prompt_len;
+    int width = max_len + 17;
+    int height = 12;
 
-    int width = max_len + 17; 
-    int height = 12; 
-    
     int starty = (LINES - height) / 2;
     int startx = (COLS - width) / 2;
 
@@ -207,31 +207,38 @@ void pedir_argumentos(Query q, int com_S, char* buffer, int size) {
     snprintf(titulo_caixa, sizeof(titulo_caixa), "== EXECUTE QUERY %d%s ==", q.id, com_S ? "S" : "");
     mvwprintw(win, 1, (width - strlen(titulo_caixa)) / 2, "%s", titulo_caixa);
 
-    int y = 3; 
-    y++;    
+    int y = 3;
 
-    // linha dos argumentos
     wmove(win, y++, 3);
     for (int i = 0; i < q.num_args; i++) {
         if (q.args[i].obrigatorio)
             wprintw(win, "<%s>", q.args[i].nome);
         else
             wprintw(win, "[%s]", q.args[i].nome);
-        
         if (i < q.num_args - 1)
             wprintw(win, " ");
     }
 
     y++;
 
-    mvwprintw(win, y++, 3, "* <arg> obrigatório");
-    mvwprintw(win, y++, 3, "* [arg] opcional");
+    // criar subjanela para legenda 
+    int box_height = 4;
+    int box_width = width - 6; 
+    int box_starty = y;
+    int box_startx = 3;
 
-    y++; 
+    WINDOW* legend_win = derwin(win, box_height, box_width, box_starty, box_startx);
+    box(legend_win, 0, 0);
+
+    mvwprintw(legend_win, 1, 2, "* <arg> obrigatório");
+    mvwprintw(legend_win, 2, 2, "* [arg] opcional");
+    wrefresh(legend_win);
+
+    y += box_height + 1;
 
     // Prompt
     mvwprintw(win, y++, 2, "> ");
-    wmove(win, y-1, 4); // mover cursor para após o >
+    wmove(win, y-1, 4); // cursor após >
 
     wrefresh(win);
 
@@ -239,22 +246,112 @@ void pedir_argumentos(Query q, int com_S, char* buffer, int size) {
     wgetnstr(win, buffer, size - 1);
     noecho();
 
+    delwin(legend_win);
     delwin(win);
 }
+
+
+void menu_inicial() {
+    curs_set(0);
+    int width = 75;   
+    int height = 20;  
+
+    int starty = (LINES - height) / 2;
+    int startx = (COLS - width) / 2;
+
+    WINDOW* win = newwin(height, width, starty, startx);
+    box(win, 0, 0);
+
+
+    mvwprintw(win, 1, 17, "_");
+    mvwprintw(win, 2, 15, "-=\\`\\");
+    mvwprintw(win, 3, 11, "|\\ ____\\_\\__");
+    mvwprintw(win, 4, 9, "-=\\c`\"\"\"\"\"\"\" \"`)");
+    mvwprintw(win, 5, 13, "~~~~~/ /~~`");
+    mvwprintw(win, 6, 14, "-==/ / ");
+    mvwprintw(win, 7, 16 , "'-'");
+    mvwprintw(win, 8, 31, "\\       /            _\\/_");
+    mvwprintw(win, 9, 33, ".-'-.              //o\\  _\\/_");
+    mvwprintw(win, 10, 14, "_  ___  __  _ --_ /     \\ _--_ __  __ _ | __/o\\\\ _");
+    mvwprintw(win, 11, 13, "=-=_=-=-_=-=_=-_= -=======- = =-=_=-=_,-'|\"'\"\"-|-,_ ");
+    mvwprintw(win, 12, 13, "=- _=-=-_=- _=-= _--=====- _=-=_-_,-\"          |");
+    mvwprintw(win, 13, 15, "=- =- =-= =- = -  -===- -= - .");
+
+
+    int y = 16;
+    int x = (width - strlen("[pressione ENTER para continuar]")) / 2;
+
+    mvwprintw(win, y, x, "[pressione ");
+    wattron(win, COLOR_PAIR(1) | A_BOLD);  
+    wprintw(win, "ENTER");
+    wattroff(win, COLOR_PAIR(1) | A_BOLD); 
+    wprintw(win, " para continuar]");
+
+    wrefresh(win);
+
+    while (wgetch(win) != 10) {}
+
+    delwin(win);
+    wattrset(stdscr, A_NORMAL); 
+    attrset(COLOR_PAIR(0));    
+    clear();
+    refresh();
+    curs_set(1);
+}
+
+int menu_aviso_argumentos(int obrigatorios, int recebidos) {
+    clear();
+    refresh();
+    curs_set(0);
+    const char* options[] = {
+        "voltar",
+        "sair"
+    };
+    int n_options = 2;
+    int highlight = 0;
+    int ch;
+
+    int width = 50;
+    int height = n_options + 7;
+    int starty = (LINES - height) / 2;
+    int startx = (COLS - width) / 2;
+
+    WINDOW* win = newwin(height, width, starty, startx);
+    box(win, 0, 0);
+    keypad(win, TRUE);
+
+    char titulo[] = "== [!] AVISO [!] ==";
+    mvwprintw(win, 0, (width - strlen(titulo)) / 2, "%s", titulo);
+    mvwprintw(win, 2, 2, "Faltam argumentos obrigatórios.");
+    mvwprintw(win, 3, 2, "Esperado pelo menos %d argumento(s).", obrigatorios);
+    mvwprintw(win, 4, 2, "Recebido: %d.", recebidos);
+
+    while (1) {
+        for (int i = 0; i < n_options; i++) {
+            if (i == highlight) wattron(win, A_REVERSE);
+            mvwprintw(win, i + 6, 4, "%s", options[i]);
+            if (i == highlight) wattroff(win, A_REVERSE);
+        }
+        wrefresh(win);
+
+        ch = wgetch(win);
+        switch (ch) {
+            case KEY_UP: highlight = (highlight - 1 + n_options) % n_options; break;
+            case KEY_DOWN: highlight = (highlight + 1) % n_options; break;
+            case 10: 
+                delwin(win);
+                curs_set(1);
+                return highlight; // 0 = voltar, 1 = sair
+        }
+    }
+}
+
 
 
 void start_interactive_ui(CatalogManager* manager) {
     char dataset_path[512];
 
-    initscr();
-    noecho();
-    cbreak();
-    keypad(stdscr, TRUE);
-
-    start_color();
-    use_default_colors();
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
-    attron(COLOR_PAIR(1));
+    menu_inicial();
 
     clear();
     mvprintw(2, 2, "Introduza o caminho dos ficheiros de dados: ");
@@ -279,8 +376,6 @@ void start_interactive_ui(CatalogManager* manager) {
     getch();
 
     run_menu_loop(manager);
-
-    endwin();
 }
 
 
@@ -302,42 +397,32 @@ void run_menu_loop(CatalogManager* manager) {
             com_S = menu_formato_resultado(q.id);
         }
 
-        pedir_argumentos(q, com_S, args, sizeof(args));
+        int argumentos_validos = 0;
 
-        // validação de argumentos obrigatórios
-        int tokens = contar_tokens(args);
-        int obrigatorios = 0;
-        for (int i = 0; i < q.num_args; i++)
-            if (q.args[i].obrigatorio) obrigatorios++;
-        if (tokens < obrigatorios) {
-            int height = 9; 
-            int width = (strlen("Prima qualquer tecla para voltar ao menu...") + 4);
-            int starty = (LINES - height) / 2;
-            int startx = (COLS - width) / 2;
+        int escolha;
+        while (!argumentos_validos) {  
+            pedir_argumentos(q, com_S, args, sizeof(args));
 
-            WINDOW* win = newwin(height, width, starty, startx);
-            box(win, 0, 0);
+            int tokens = contar_tokens(args);
+            int obrigatorios = 0;
+            for (int i = 0; i < q.num_args; i++)
+                if (q.args[i].obrigatorio) obrigatorios++;
 
-            // Título centralizado
-            char titulo[] = "== [!] AVISO [!] ==";
-            mvwprintw(win, 0, (width - strlen(titulo)) / 2, "%s", titulo);
-
-            mvwprintw(win, 2, 2, "Faltam argumentos obrigatórios.");
-            mvwprintw(win, 3, 2, "Esperado pelo menos %d argumento(s).", obrigatorios);
-            mvwprintw(win, 4, 2, "Recebido: %d.", tokens);
-            mvwprintw(win, 6, 2, "Prima qualquer tecla para voltar ao menu...");
-
-            wrefresh(win);
-            getch();
-
-            delwin(win);  // apaga a janela antes de voltar ao menu
-            continue;
+            if (tokens < obrigatorios) {
+                escolha = menu_aviso_argumentos(obrigatorios, tokens);
+                if (escolha == 0) {
+                    continue;
+                } else {
+                    endwin();
+                    exit(0);
+                }
+            } else {
+                argumentos_validos = 1;
+            }
         }
 
-
         char linha[512];
-        snprintf(linha, sizeof(linha), "%d%s %s", q.id, com_S ? "S" : "",args);
-
+        snprintf(linha, sizeof(linha), "%d%s %s", q.id, com_S ? "S" : "", args);
 
         clear();
         refresh();
@@ -349,5 +434,3 @@ void run_menu_loop(CatalogManager* manager) {
         getch();
     }
 }
-
-
