@@ -17,7 +17,6 @@ static int contar_tokens(const char* str) {
     strcpy(tmp, str);
 
     char* tok = strtok(tmp, " ");
-
     while (tok) {
         count++;
         tok = strtok(NULL, " ");
@@ -36,12 +35,9 @@ void run_menu_loop(CatalogManager* manager) {
         int q_index = ui_menu_queries(7); // 6 queries + opção sair
         
         const Query* q = get_query_at_index(q_index);
-        if (!q) break; 
-
-        if (get_query_id(q) == 0) break;
+        if (!q || get_query_id(q) == 0) break; 
 
         int com_S = 0;
-        
         if (get_query_permite_s(q)) {
             int escolha = ui_menu_formato_resultado(get_query_id(q));
             if (escolha == 2) continue; // voltar ao menu principal
@@ -50,22 +46,24 @@ void run_menu_loop(CatalogManager* manager) {
 
         int argumentos_validos = 0;
         int cancelar_query = 0;
+        
+        char args_copy[256]; 
 
         while (!argumentos_validos) {  
             ui_pedir_argumentos(q, com_S, args, sizeof(args));
+
+            strcpy(args_copy, args); // usar args_copy para validações (strtok) e args original para executar
 
             int tokens = contar_tokens(args);
             int obrigatorios = 0;
             
             int num_args = get_query_num_args(q);
-            
             for (int i = 0; i < num_args; i++) {
                 const QueryArg* arg = get_query_arg_at(q, i);
                 if (get_arg_obrigatorio(arg)) obrigatorios++;
             }
 
             if (tokens < obrigatorios) {
-                // se faltam argumentos, mostrar erro
                 int escolha = ui_menu_aviso_argumentos(obrigatorios, tokens);
                 if (escolha == 0) {
                     continue; // tentar novamente
@@ -76,7 +74,8 @@ void run_menu_loop(CatalogManager* manager) {
             } else {
                 char *arg_tokens[10];
                 int n_args = 0;
-                char *token = strtok(args, " ");
+                char *token = strtok(args_copy, " "); 
+                
                 while (token && n_args < 10) {
                     arg_tokens[n_args++] = token;
                     token = strtok(NULL, " ");
@@ -87,11 +86,17 @@ void run_menu_loop(CatalogManager* manager) {
                 if (!validation_result_get_ok(res)) {
                     int escolha;
                     ui_mostrar_erro_arg(res, &escolha);
-                    if (escolha == 0) continue; // tentar novamente
+                    if (escolha == 0) {
+                        } 
                     else {
                         cancelar_query = 1;
+                        free(res);
                         break;
                     }
+                } 
+                else {
+                    // Se passou na validação, marcamos como válido para sair do loop
+                    argumentos_validos = 1;
                 }
                 free(res);     
             }
@@ -100,7 +105,6 @@ void run_menu_loop(CatalogManager* manager) {
         if (cancelar_query) continue;
 
         char linha[512];
-        
         snprintf(linha, sizeof(linha), "%d%s %s", get_query_id(q), com_S ? "S" : "", args);
 
         def_prog_mode(); 
@@ -123,6 +127,8 @@ void run_menu_loop(CatalogManager* manager) {
         refresh();
     }
 }
+
+// ... start_interactive_ui mantém-se igual ...
 
 void start_interactive_ui(CatalogManager* manager) {
     wbkgd(stdscr, COLOR_PAIR(1));
