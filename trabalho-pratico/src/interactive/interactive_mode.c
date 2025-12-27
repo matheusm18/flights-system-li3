@@ -2,6 +2,7 @@
 #include "interactive/query_defs.h"
 #include "interactive/ui_components.h"
 #include "io/command_processor.h"
+#include "validation/validate_arg.h"
 #include "io/parser.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,7 +74,26 @@ void run_menu_loop(CatalogManager* manager) {
                     break;
                 }
             } else {
-                argumentos_validos = 1;
+                char *arg_tokens[10];
+                int n_args = 0;
+                char *token = strtok(args, " ");
+                while (token && n_args < 10) {
+                    arg_tokens[n_args++] = token;
+                    token = strtok(NULL, " ");
+                }
+
+                // validar semanticamente os argumentos
+                ValidationResult* res = validar_query(get_query_id(q), arg_tokens);
+                if (!validation_result_get_ok(res)) {
+                    int escolha;
+                    ui_mostrar_erro_arg(res, &escolha);
+                    if (escolha == 0) continue; // tentar novamente
+                    else {
+                        cancelar_query = 1;
+                        break;
+                    }
+                }
+                free(res);     
             }
         }
 

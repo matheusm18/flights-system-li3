@@ -155,3 +155,20 @@ bool string_to_bool(const char *str) {
     }
     return false;
 }
+
+
+bool validate_int_pos(const char *str) {
+    if (!str || str[0] == '\0') 
+        return false;  
+
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isdigit((unsigned char)str[i]))
+            return false;
+    }
+
+    int val = atoi(str);
+    if (val <= 0)
+        return false;
+
+    return true;
+}

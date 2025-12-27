@@ -1,3 +1,4 @@
+#include "validation/validate_arg.h"
 #include "interactive/ui_components.h"
 #include <string.h>
 #include <stdlib.h>
@@ -488,4 +489,64 @@ void ui_mostrar_carregamento_fim(WINDOW* load_win) {
     while ((ch = wgetch(load_win)) != 10 && ch != KEY_ENTER);
 
     delwin(load_win);
+}
+
+
+
+void ui_mostrar_erro_arg(ValidationResult *res, int *escolha) {
+    curs_set(0);
+    clear();
+    refresh();
+    const char* msg = validation_result_get_erro(res);
+    const char* options[] = {"[Tentar novamente]", "[Voltar ao menu]"};
+    int n_options = 2;
+    int highlight = 0;
+    int ch;
+
+    int width = strlen(msg) + 14;
+    int height = 8;
+    int starty = (LINES - height) / 2;
+    int startx = (COLS - width) / 2;
+
+    WINDOW* win = newwin(height, width, starty, startx);
+    box(win, 0, 0);
+    keypad(win, TRUE);
+
+    wattron(win, COLOR_PAIR(5) | A_BOLD);
+    mvwprintw(win, 0, (width - 12)/2, "[! ERRO !]");
+    wattroff(win, COLOR_PAIR(5) | A_BOLD);
+
+    print_center(win, 2, msg);
+
+    int button_y = 5;
+    int spacing = 4;
+    int total_width = strlen(options[0]) + strlen(options[1]) + spacing;
+    int start_button_x = (width - total_width) / 2;
+
+    while (1) {
+        int x = start_button_x;
+        for (int i = 0; i < n_options; i++) {
+            if (i == highlight) wattron(win, A_REVERSE);
+            mvwprintw(win, button_y, x, "%s", options[i]);
+            if (i == highlight) wattroff(win, A_REVERSE);
+            x += strlen(options[i]) + spacing;
+        }
+
+        wrefresh(win);
+        ch = wgetch(win);
+
+        switch (ch) {
+            case KEY_LEFT:
+                highlight = (highlight - 1 + n_options) % n_options;
+                break;
+            case KEY_RIGHT:
+                highlight = (highlight + 1) % n_options;
+                break;
+            case 10: // ENTER
+                *escolha = highlight;
+                delwin(win);
+                curs_set(1);
+                return;
+        }
+    }
 }
