@@ -21,6 +21,11 @@ int largura_menu_queries(int n) {
     return max + 6; // margem
 }
 
+void print_center(WINDOW *w, int y, const char *text) {
+      int x = (getmaxx(w) - strlen(text)) / 2;
+      mvwprintw(w, y, x, "%s", text);
+}
+
 void ui_menu_inicial() {
     curs_set(0);
     noecho();
@@ -77,7 +82,7 @@ char* ui_pedir_caminho_dataset() {
     int pos = 0;
     int ch;
 
-    int width = 70, height = 10;
+    int width = 70, height = 9;
     int starty = (LINES - height) / 2;
     int startx = (COLS - width) / 2;
 
@@ -93,16 +98,15 @@ char* ui_pedir_caminho_dataset() {
     mvwprintw(win, 1, (width - 18)/2, "== LOAD DATASET ==");
     wattroff(win, COLOR_PAIR(2) | A_BOLD);
     
-    mvwprintw(win, 4, 4, "Insira o caminho do dataset:");
-    mvwprintw(win, 5, 4, "(vazio para o caminho padrao)");
-    mvwhline(win, 7, 1, ACS_HLINE, width - 2);
-    mvwprintw(win, 8, 4, "> ");
+    mvwprintw(win, 4, 4, "Insira o caminho do dataset [vazio para o caminho padrão]");
+    mvwhline(win, 6, 1, ACS_HLINE, width - 2);
+    mvwprintw(win, 7, 4, "> ");
     
     curs_set(1);
     noecho();
 
     while (1) {
-        wmove(win, 8, 6 + pos);
+        wmove(win, 7, 6 + pos);
         wrefresh(win);
         ch = wgetch(win);
 
@@ -112,13 +116,13 @@ char* ui_pedir_caminho_dataset() {
             if (pos > 0) {
                 pos--;
                 path[pos] = '\0';
-                mvwaddch(win, 8, 6 + pos, ' ');
+                mvwaddch(win, 7, 6 + pos, ' ');
             }
         }
         // filtro: só aceita se for caractere imprimível (letras, numeros, etc)
         else if (pos < 45 && isprint(ch)) {
             path[pos] = ch;
-            mvwaddch(win, 8, 6 + pos, ch);
+            mvwaddch(win, 7, 6 + pos, ch);
             pos++;
         }
     }
@@ -358,22 +362,43 @@ int ui_menu_aviso_argumentos(int obrigatorios, int recebidos) {
     wattron(win, COLOR_PAIR(5) | A_BOLD);
     mvwprintw(win, 0, (width - strlen(titulo)) / 2, "%s", titulo);
     wattroff(win, COLOR_PAIR(5) | A_BOLD);
-    mvwprintw(win, 2, 2, "Faltam argumentos obrigatórios.");
-    mvwprintw(win, 3, 2, "Esperado pelo menos %d argumento(s).", obrigatorios);
-    mvwprintw(win, 4, 2, "Recebido: %d.", recebidos);
+
+    print_center(win, 2, "Faltam argumentos obrigatórios.");
+    char buffer[100];
+
+    snprintf(buffer, sizeof(buffer), "Esperado pelo menos %d argumento(s).", obrigatorios);
+    print_center(win, 3, buffer);
+
+    snprintf(buffer, sizeof(buffer),"Recebido: %d.", recebidos);
+    print_center(win, 4, buffer);
+
+    int button_y = 6;
+    int spacing = 4;
+
+    int total_width = strlen(options[0]) + strlen(options[1]) + spacing;
+    int start_button_x = (width - total_width) / 2;
 
     while (1) {
+        int x = start_button_x;
+
         for (int i = 0; i < n_options; i++) {
             if (i == highlight) wattron(win, A_REVERSE);
-            mvwprintw(win, i + 6, 4, "%s", options[i]);
+            mvwprintw(win, button_y, x, "%s", options[i]);
             if (i == highlight) wattroff(win, A_REVERSE);
+
+            x += strlen(options[i]) + spacing;
         }
         wrefresh(win);
 
         ch = wgetch(win);
         switch (ch) {
-            case KEY_UP: highlight = (highlight - 1 + n_options) % n_options; break;
-            case KEY_DOWN: highlight = (highlight + 1) % n_options; break;
+            case KEY_LEFT:
+                highlight = (highlight - 1 + n_options) % n_options;
+                break;
+
+            case KEY_RIGHT:
+                highlight = (highlight + 1) % n_options;
+               break;
             case 10: 
                 delwin(win);
                 curs_set(1);
