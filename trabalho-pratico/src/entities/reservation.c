@@ -63,3 +63,4 @@ char* get_reservation_identifier(const Reservation* r) {
     if (r == NULL) return NULL;
     return strdup(r->reservation_id); 
 }
+

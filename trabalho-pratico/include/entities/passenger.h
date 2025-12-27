@@ -12,5 +12,6 @@ void destroy_passenger(Passenger* p);
 // getters
 
 int get_passenger_dnumber(const Passenger* passenger);
+char* get_passenger_nationality(const Passenger* passenger);
 
 #endif

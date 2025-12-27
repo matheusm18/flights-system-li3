@@ -284,26 +284,29 @@ void init_reservations_errors_file() {
 
 void process_valid_line_reservations(char **fields, int num_fields, void* user_data, FILE *errors_file) {
     (void) num_fields;
+
     CatalogManager* manager = (CatalogManager*) user_data;
     AirportCatalog* airport_catalog = get_airports_from_catalog_manager(manager);
     FlightCatalog* flight_catalog = get_flights_from_catalog_manager(manager);
     PassengerCatalog* passenger_catalog = get_passengers_from_catalog_manager(manager);
     ReservationCatalog* reservation_catalog = get_reservations_from_catalog_manager(manager);
-    
-    char *reservation_id = fields[0];
-    char *flight_ids = fields[1];
-    char *document_number = fields[2];
-    char *seat = fields[3];
-    char *price = fields[4];
-    char *extra_luggage = fields[5];
-    char *priority_boarding = fields[6];
-    char *qr_code = fields[7];
 
-    if (get_reservation_by_id(reservation_catalog, reservation_id) != NULL || 
+    char *reservation_id    = fields[0];
+    char *flight_ids        = fields[1];
+    char *document_number   = fields[2];
+    char *seat              = fields[3];
+    char *price             = fields[4];
+    char *extra_luggage     = fields[5];
+    char *priority_boarding = fields[6];
+    char *qr_code           = fields[7];
+
+    (void) qr_code;
+
+    if (get_reservation_by_id(reservation_catalog, reservation_id) != NULL ||
         !validate_reservation_id(reservation_id) ||
         !validate_flight_ids_reservation(flight_ids, flight_catalog) ||
-        !validate_passenger_document_number(document_number) || 
-        !validate_document_number_reservation(document_number, passenger_catalog)) { 
+        !validate_passenger_document_number(document_number) ||
+        !validate_document_number_reservation(document_number, passenger_catalog)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -319,43 +322,75 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     }
 
     char *clean_ids = strdup(flight_ids);
-    char *delims = "[]' ,\""; // ignorar estes caracteres e parar quando encontrar o flight_id
+    if (!clean_ids) return;
+
+    char *delims = "[]' ,\"";
     char **flight_ids_array = calloc(2, sizeof(char*));
+    if (!flight_ids_array) {
+        free(clean_ids);
+        return;
+    }
+
     int flight_count = 0;
+    char *token = strtok(clean_ids, delims);
 
-    char *token = strtok(clean_ids, delims); // extrair cada flight_id individualmente
+    while (token && flight_count < 2) {
+        flight_ids_array[flight_count++] = strdup(token);
 
-    while (token != NULL && flight_count < 2) {
-        flight_ids_array[flight_count] = strdup(token);
+        Flight* flight =
+            get_flight_by_flight_id_from_catalog(flight_catalog, token);
 
-        Flight* flight = get_flight_by_flight_id_from_catalog(flight_catalog, token);
-
-        if (flight != NULL) {
+        if (flight) {
             char* status = get_flight_status(flight);
 
-            if (status != NULL && !is_canceled(status)) {
+            if (status && !is_canceled(status)) {
                 char* origin = get_flight_origin(flight);
                 char* destination = get_flight_destination(flight);
 
-                airport_passenger_increment(airport_catalog, origin, 'd');
-                airport_passenger_increment(airport_catalog, destination, 'a');
+                if (origin)
+                    airport_passenger_increment(airport_catalog, origin, 'd');
+                if (destination)
+                    airport_passenger_increment(airport_catalog, destination, 'a');
 
-                free(origin);
-                free(destination);
+                Passenger* p = get_passenger_by_dnumber(passenger_catalog, atoi(document_number));
+
+                if (p && destination) {
+                    char* nationality = get_passenger_nationality(p);
+
+                    if (nationality) {
+                        reservation_catalog_add_nationality_increment(reservation_catalog, nationality, destination);
+                    }
+                }
+
+                if (origin) free(origin);
+                if (destination) free(destination);
             }
+
             if (status) free(status);
         }
-        flight_count++;
-        token = strtok(NULL,delims);
+
+        token = strtok(NULL, delims);
     }
-    
-    bool extra_luggage_bool = string_to_bool(extra_luggage);
-    bool priority_boarding_bool = string_to_bool(priority_boarding);
 
-    Reservation* res = create_reservation(reservation_id, flight_ids_array, document_number, seat, atof(price), extra_luggage_bool, priority_boarding_bool);
-    if (res != NULL) reservation_catalog_add(reservation_catalog, res);
-
-    for (int i = 0; i < flight_count; i++) free(flight_ids_array[i]);
-    free(flight_ids_array);
     free(clean_ids);
+
+    bool extra_luggage_bool = string_to_bool(extra_luggage);
+    bool priority_boarding_bool =
+        string_to_bool(priority_boarding);
+
+    Reservation* res =
+        create_reservation(reservation_id,
+                           flight_ids_array,
+                           document_number,
+                           seat,
+                           atof(price),
+                           extra_luggage_bool,
+                           priority_boarding_bool);
+
+    if (res)
+        reservation_catalog_add(reservation_catalog, res);
+
+    for (int i = 0; i < flight_count; i++)
+        free(flight_ids_array[i]);
+    free(flight_ids_array);
 }

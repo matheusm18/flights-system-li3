@@ -40,3 +40,4 @@ Passenger* get_passenger_by_dnumber(PassengerCatalog* manager, int document_numb
 
     return g_hash_table_lookup(manager->passengers_by_document_number, GINT_TO_POINTER(document_number));
 }
+

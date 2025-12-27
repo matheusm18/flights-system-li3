@@ -85,16 +85,16 @@ void execute_single_line(char* line, CatalogManager* catalog_manager, int comman
                 }
                 break;
             
-            case 6: // Aeroporto Destino por Nacionalidade (arg: nacionalidade)
-
-                if (sscanf(line, "%*s %s", arg_str1) == 1) {
-                    //
+            case 6: // Aeroporto Destino por Nacionalidade
+                
+                char* nationality_str = line + strlen(query_type_str) + 1;
+                
+                if (*nationality_str != '\0') {
+                    result = execute_query6(get_reservations_from_catalog_manager(catalog_manager), nationality_str);
                 }
+                
                 break;
-
-            default:
-                printf("Query ID %d desconhecido ou input inválido na linha: %s\n", query_id, line);
-                break;
+                
     }
 
     if (is_interactive) {

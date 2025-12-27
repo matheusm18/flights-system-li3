@@ -45,3 +45,9 @@ int get_passenger_dnumber(const Passenger* passenger) {
     
     return passenger->document_number;
 }
+
+char* get_passenger_nationality(const Passenger* passenger) {
+    if (passenger == NULL) return NULL;
+    
+    return passenger->nationality;
+}
