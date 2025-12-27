@@ -123,8 +123,8 @@ int menu_queries(Query* queries, int n) {
 
 int menu_formato_resultado(int query_id) {
     const char* options[] = {
-        "Normal   (x)  - resultados separados por ';'",
-        "Especial (xS) - resultados separados por '='"
+        "x  - resultados separados por ';'",
+        "xS - resultados separados por '='"
     };
 
     int highlight = 0;
@@ -176,22 +176,70 @@ int menu_formato_resultado(int query_id) {
 
 void pedir_argumentos(Query q, int com_S, char* buffer, int size) {
     clear();
-    mvprintw(2, 2, "Query selecionada: %d%s", q.id, com_S ? "S" : "");
-    mvprintw(4, 2, "%s", q.descricao);
-
-    mvprintw(6, 2, "Os argumentos indicados com [!] são obrigatórios:");
-    int y = 7;
+    refresh();
+    // calcular largura máxima 
+    int max_len = strlen("== EXECUTE QUERY xx == ");
+    
     for (int i = 0; i < q.num_args; i++) {
-        mvprintw(y++, 4, "- %s %s", q.args[i].nome, q.args[i].obrigatorio ? "[!]" : "");
+        int len = strlen(q.args[i].nome) + 3; // <> ou [] + espaço
+        if (len > max_len) max_len = len;
+    }
+    
+    int total_args_len = 0;
+    for (int i = 0; i < q.num_args; i++) {
+        total_args_len += strlen(q.args[i].nome) + 3; 
+    }
+    if (total_args_len > max_len) max_len = total_args_len;
+    
+    int prompt_len = strlen("> ");
+    if (prompt_len > max_len) max_len = prompt_len;
+
+    int width = max_len + 17; 
+    int height = 12; 
+    
+    int starty = (LINES - height) / 2;
+    int startx = (COLS - width) / 2;
+
+    WINDOW* win = newwin(height, width, starty, startx);
+    box(win, 0, 0);
+
+    char titulo_caixa[256];
+    snprintf(titulo_caixa, sizeof(titulo_caixa), "== EXECUTE QUERY %d%s ==", q.id, com_S ? "S" : "");
+    mvwprintw(win, 1, (width - strlen(titulo_caixa)) / 2, "%s", titulo_caixa);
+
+    int y = 3; 
+    y++;    
+
+    // linha dos argumentos
+    wmove(win, y++, 3);
+    for (int i = 0; i < q.num_args; i++) {
+        if (q.args[i].obrigatorio)
+            wprintw(win, "<%s>", q.args[i].nome);
+        else
+            wprintw(win, "[%s]", q.args[i].nome);
+        
+        if (i < q.num_args - 1)
+            wprintw(win, " ");
     }
 
-    mvprintw(y + 1, 2, "[!] Introduza os argumentos numa linha e seperados por espaço [!]");
-    mvprintw(y + 3, 2, "> ");
-    refresh();
+    y++;
+
+    mvwprintw(win, y++, 3, "* <arg> obrigatório");
+    mvwprintw(win, y++, 3, "* [arg] opcional");
+
+    y++; 
+
+    // Prompt
+    mvwprintw(win, y++, 2, "> ");
+    wmove(win, y-1, 4); // mover cursor para após o >
+
+    wrefresh(win);
 
     echo();
-    getnstr(buffer, size - 1);
+    wgetnstr(win, buffer, size - 1);
     noecho();
+
+    delwin(win);
 }
 
 
