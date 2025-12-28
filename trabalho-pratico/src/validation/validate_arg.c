@@ -108,7 +108,7 @@ ValidationResult validate_query6(char **args) { // argumento tem de ser inserido
 }
 
 
-ValidationResult* validar_query(int query, char **args) {
+ValidationResult* validate_query(int query, char **args) {
     ValidationResult* res = malloc(sizeof(ValidationResult));
     switch (query) {
         case 1: *res = validate_query1(args); break;

@@ -12,7 +12,7 @@ ValidationResult validate_query3(char **args);
 ValidationResult validate_query4(char **args);
 ValidationResult validate_query5(char **args);
 ValidationResult validate_query6(char **args);
-ValidationResult* validar_query(int query, char **args);
+ValidationResult* validate_query(int query, char **args);
 
 
 const char* validation_result_get_erro(ValidationResult* res);

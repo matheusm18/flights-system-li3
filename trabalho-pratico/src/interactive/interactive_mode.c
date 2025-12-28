@@ -84,7 +84,7 @@ void run_menu_loop(CatalogManager* manager) {
                 }
 
                 // validar semanticamente os argumentos
-                ValidationResult* res = validar_query(get_query_id(q), arg_tokens);
+                ValidationResult* res = validate_query(get_query_id(q), arg_tokens);
                 if (!validation_result_get_ok(res)) {
                     int escolha;
                     ui_mostrar_erro_arg(res, &escolha);
@@ -269,11 +269,11 @@ void start_interactive_ui(CatalogManager* manager) {
         }
     }
 
-    WINDOW* load_win = ui_mostrar_carregamento_inicio();
+    ui_mostrar_carregamento_inicio();
 
     load_datasets(dataset_path, manager);
 
-    ui_mostrar_carregamento_fim(load_win);
+    ui_mostrar_carregamento_fim();
     
     run_menu_loop(manager);
 }

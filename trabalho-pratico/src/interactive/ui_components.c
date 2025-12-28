@@ -473,36 +473,54 @@ WINDOW* ui_mostrar_carregamento_inicio() {
     
     return load_win;
 }
+void ui_mostrar_carregamento_fim(void) {
+    curs_set(0);
+    noecho();
 
-void ui_mostrar_carregamento_fim(WINDOW* load_win) {
-    int width = 50; 
-    
-    wclear(load_win);
-    wbkgd(load_win, ' ' | A_NORMAL);
-    box(load_win, 0, 0);
+    int width  = 60;
+    int height = 14;
 
-    wattron(load_win, COLOR_PAIR(2) | A_BOLD);
-    mvwprintw(load_win, 1, (width - 22)/2, "=== PROCESSAMENTO ===");
-    wattroff(load_win, COLOR_PAIR(2) | A_BOLD);
+    int starty = (LINES - height) / 2;
+    int startx = (COLS  - width)  / 2;
 
-    wattron(load_win, COLOR_PAIR(4) | A_BOLD);
-    mvwprintw(load_win, 4, (width - 23)/2, "Carregamento concluido!");
-    wattroff(load_win, COLOR_PAIR(4) | A_BOLD);
+    WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
+    keypad(win, TRUE);
+    box(win, 0, 0);
 
-    mvwprintw(load_win, 5, (width - 32)/2, "[pressione ");
-    wattron(load_win, COLOR_PAIR(3) | A_BOLD);  
-    wprintw(load_win, "ENTER");
-    wattroff(load_win, COLOR_PAIR(3) | A_BOLD); 
-    wprintw(load_win, " para continuar]");
 
-    wrefresh(load_win);
+
+    mvwprintw(win, 4, 4,  "   .---.   ");
+    mvwprintw(win, 5, 4,  "  /     \\  ");
+    mvwprintw(win, 6, 4,  "  \\.@-@./  ");
+    mvwprintw(win, 7, 4,  "  /`\\_/`\\  ");
+    mvwprintw(win, 8, 4,  " //  _  \\\\ ");
+    mvwprintw(win, 9, 4,  "| \\     )|_");
+    mvwprintw(win,10, 3,  "/`\\_`>  <_/ \\");
+    mvwprintw(win,11, 3,  "\\__/'---'\\__/");
+
+    wattron(win, COLOR_PAIR(4) | A_BOLD);
+    mvwprintw(win, 7, 22, "Carregamento concluido!");
+    wattroff(win, COLOR_PAIR(4) | A_BOLD);
+
+    mvwprintw(win, 9, 22, "Pressione ");
+    wattron(win, COLOR_PAIR(2) | A_BOLD);
+    wprintw(win, "ENTER");
+    wattroff(win, COLOR_PAIR(2) | A_BOLD);
+    wprintw(win, " para continuar");
+
+    wrefresh(win);
 
     int ch;
-    flushinp(); 
-    while ((ch = wgetch(load_win)) != 10 && ch != KEY_ENTER);
+    flushinp();
+    while ((ch = wgetch(win)) != '\n' && ch != KEY_ENTER);
 
-    delwin(load_win);
+    delwin(win);
+    clear();
+    refresh();
+    curs_set(1);
 }
+
 
 void ui_mostrar_erro_arg(ValidationResult *res, int *escolha) {
     curs_set(0);
