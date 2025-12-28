@@ -80,19 +80,18 @@ void ui_menu_inicial() {
 
 
 char* ui_pedir_caminho_dataset() {
-    static char path[46];
+   static char path[200];
     memset(path, 0, sizeof(path));
 
     int pos = 0;
     int ch;
+    int input_y = 5;
+    int input_x = 2 + 24;   // após "C:\> "
+    int max_width  = 30;    
+    int max_height = 7;     // número de linhas da "caixa do computador"
+    int line = 0;
 
-    int width  = 90;
-    int height = 28;
-
-    int starty = (LINES - height) / 2;
-    int startx = (COLS  - width)  / 2;
-
-    WINDOW* win = newwin(height, width, starty, startx);
+    WINDOW* win = newwin(28, 90, (LINES-28)/2, (COLS-90)/2);
     wbkgd(win, ' ' | A_NORMAL);
     keypad(win, TRUE);
 
@@ -121,37 +120,47 @@ char* ui_pedir_caminho_dataset() {
     mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
     mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
 
-
-
-    int input_y = 5;
-    int input_x = 2 + 24;   // após "C:\> "
-
     curs_set(1);
-    noecho();
+        noecho();
 
-    while (1) {
-        wmove(win, input_y, input_x + pos);
-        wrefresh(win);
+        while (1) {
+            wmove(win, input_y + line, input_x + pos);
+            wrefresh(win);
 
-        ch = wgetch(win);
+            ch = wgetch(win);
 
-        if (ch == '\n' || ch == KEY_ENTER)
-            break;
+            if (ch == '\n' || ch == KEY_ENTER)
+                break;
 
-        else if ((ch == KEY_BACKSPACE || ch == 127 || ch == 8) && pos > 0) {
-            pos--;
-            path[pos] = '\0';
-            mvwaddch(win, input_y, input_x + pos, ' ');
+            else if ((ch == KEY_BACKSPACE || ch == 127 || ch == 8)) {
+                if (pos > 0) {
+                    pos--;
+                    path[pos + line * max_width] = '\0';
+                    mvwaddch(win, input_y + line, input_x + pos, ' ');
+                } else if (line > 0) {
+                    line--;
+                    pos = max_width;
+                }
+            }
+            else if (isprint(ch) && pos + line*max_width < 200) { // limite do buffer
+                path[pos + line * max_width] = ch;
+                mvwaddch(win, input_y + line, input_x + pos, ch);
+                pos++;
+
+                if (pos >= max_width) { // ir para linha seguinte
+                    if (line + 1 < max_height) {
+                        line++;
+                        pos = 0;
+                    } else {
+                        pos = max_width - 1; // não deixa ultrapassar a caixa
+                    }
+                }
+            }
         }
-        else if (pos < 45 && isprint(ch)) {
-            path[pos++] = ch;
-            mvwaddch(win, input_y, input_x + pos - 1, ch);
-        }
-    }
 
-    curs_set(0);
-    delwin(win);
-    return path;
+        curs_set(0);
+        delwin(win);
+        return path;
 }
 
 
