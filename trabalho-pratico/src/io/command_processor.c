@@ -13,8 +13,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ncurses.h>
 
-void execute_single_line(char* line, CatalogManager* catalog_manager, int command_counter, int is_interactive) {
+QueryResult* execute_single_line(char* line, CatalogManager* catalog_manager, int command_counter, bool in_ncurses, WINDOW* win) {
 
     int query_id;
     char query_type_str[16];
@@ -29,7 +30,7 @@ void execute_single_line(char* line, CatalogManager* catalog_manager, int comman
     // remover o '\n' no final da string
     line[strcspn(line, "\r\n")] = '\0';
 
-    if (sscanf(line, "%s", query_type_str) != 1) return;
+    if (sscanf(line, "%s", query_type_str) != 1) return NULL;
 
     // verificar se tem o 'S' após o nº da querie para mudar o delimitador para '='
     if (strchr(query_type_str, 'S') != NULL) delimiter = '='; // se encontrar o char 'S' retorna o ponteiro para ele, se não retorna NULL
@@ -96,16 +97,16 @@ void execute_single_line(char* line, CatalogManager* catalog_manager, int comman
                 
     }
 
-    if (is_interactive) {
-        write_result(result, NULL, delimiter);
-    } else {
+    if (!in_ncurses && result != NULL) {
         char output_path[100];
         snprintf(output_path, sizeof(output_path), "resultados/command%d_output.txt", command_counter);
-        write_result(result, output_path, delimiter);
+        write_result(result, output_path, delimiter, in_ncurses, win); 
     }
 
-    if (result != NULL) destroy_query_result(result);
+    return result;
 }
+
+
 void process_commands(const char* commands_file, CatalogManager* catalog_manager, int* command_counter) {
     FILE* file = fopen(commands_file, "r");
     if (!file) { 
@@ -117,7 +118,7 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
      // fgets vai ler até encontrar o \n e vai incluir no buffer de line
     // fgets retornar null quando chega no EOF (end of file) 
     while (fgets(line, sizeof(line), file) != NULL) {
-        execute_single_line(line, catalog_manager, *command_counter, 0); // 0 = modo normal
+        execute_single_line(line, catalog_manager, *command_counter,0, NULL); // 0 = modo normal
         (*command_counter)++;
     }
     fclose(file);

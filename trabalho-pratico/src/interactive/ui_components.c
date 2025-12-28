@@ -37,6 +37,7 @@ void ui_menu_inicial() {
     int startx = (COLS - width) / 2;
 
     WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
     keypad(win, TRUE);
     box(win, 0, 0);
 
@@ -83,7 +84,7 @@ char* ui_pedir_caminho_dataset() {
     int pos = 0;
     int ch;
 
-    int width = 70, height = 9;
+    int width = 76, height = 9;
     int starty = (LINES - height) / 2;
     int startx = (COLS - width) / 2;
 
@@ -91,7 +92,8 @@ char* ui_pedir_caminho_dataset() {
     refresh();
 
     WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, COLOR_PAIR(1));
+    wbkgd(win, ' ' | A_NORMAL);
+
     keypad(win, TRUE);
     box(win, 0, 0);
 
@@ -99,7 +101,7 @@ char* ui_pedir_caminho_dataset() {
     mvwprintw(win, 1, (width - 18)/2, "== LOAD DATASET ==");
     wattroff(win, COLOR_PAIR(2) | A_BOLD);
     
-    mvwprintw(win, 4, 4, "Insira o caminho do dataset [vazio para o caminho padrão]");
+    mvwprintw(win, 4, 3, "Insira o caminho do dataset [vazio para o caminho padrão]");
     mvwhline(win, 6, 1, ACS_HLINE, width - 2);
     mvwprintw(win, 7, 4, "> ");
     
@@ -148,6 +150,8 @@ int ui_menu_queries(int n) {
     int startx = (COLS - width) / 2;
 
     WINDOW* menuwin = newwin(height, width, starty, startx);
+    wbkgd(menuwin, ' ' | A_NORMAL);
+
     box(menuwin, 0, 0);
     keypad(menuwin, TRUE);
 
@@ -218,6 +222,7 @@ int ui_menu_formato_resultado(int query_id) {
     int startx = (COLS - width) / 2;
 
     WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
     box(win, 0, 0);
     keypad(win, TRUE);
 
@@ -283,6 +288,7 @@ void ui_pedir_argumentos(const Query* q, int com_S, char* buffer, int size) {
     int startx = (COLS - width) / 2;
 
     WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
     box(win, 0, 0);
 
     char titulo_caixa[256];
@@ -316,6 +322,7 @@ void ui_pedir_argumentos(const Query* q, int com_S, char* buffer, int size) {
     int box_startx = 3;
 
     WINDOW* legend_win = derwin(win, box_height, box_width, box_starty, box_startx);
+    wbkgd(legend_win, ' ' | A_NORMAL);
     box(legend_win, 0, 0);
 
     mvwprintw(legend_win, 1, 2, "* <arg> obrigatório");
@@ -356,6 +363,7 @@ int ui_menu_aviso_argumentos(int obrigatorios, int recebidos) {
     int startx = (COLS - width) / 2;
 
     WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
     box(win, 0, 0);
     keypad(win, TRUE);
 
@@ -417,7 +425,7 @@ void ui_mostrar_erro_dataset() {
     int startx = (COLS - width) / 2;
 
     WINDOW* err_win = newwin(height, width, starty, startx);
-    wbkgd(err_win, COLOR_PAIR(1)); 
+    wbkgd(err_win, ' ' | A_NORMAL);
     box(err_win, 0, 0);
 
     char* msg1 = "Caminho de dataset invalido!";
@@ -451,7 +459,7 @@ WINDOW* ui_mostrar_carregamento_inicio() {
     int startx = (COLS - width) / 2;
     
     WINDOW* load_win = newwin(height, width, starty, startx);
-    wbkgd(load_win, COLOR_PAIR(1));
+    wbkgd(load_win, ' ' | A_NORMAL);
     box(load_win, 0, 0);
     keypad(load_win, TRUE);
     
@@ -469,6 +477,7 @@ void ui_mostrar_carregamento_fim(WINDOW* load_win) {
     int width = 50; 
     
     wclear(load_win);
+    wbkgd(load_win, ' ' | A_NORMAL);
     box(load_win, 0, 0);
 
     wattron(load_win, COLOR_PAIR(2) | A_BOLD);
@@ -476,12 +485,10 @@ void ui_mostrar_carregamento_fim(WINDOW* load_win) {
     wattroff(load_win, COLOR_PAIR(2) | A_BOLD);
 
     wattron(load_win, COLOR_PAIR(3) | A_BOLD);
-    mvwprintw(load_win, 3, (width - 23)/2, "Carregamento concluido!");
+    mvwprintw(load_win, 4, (width - 23)/2, "Carregamento concluido!");
     wattroff(load_win, COLOR_PAIR(3) | A_BOLD);
 
-    wattron(load_win, COLOR_PAIR(4) | A_BOLD | A_REVERSE);
     mvwprintw(load_win, 5, (width - 16)/2, "[Menu Queries]");
-    wattroff(load_win, COLOR_PAIR(4) | A_BOLD | A_REVERSE);
     wrefresh(load_win);
 
     int ch;
@@ -509,6 +516,7 @@ void ui_mostrar_erro_arg(ValidationResult *res, int *escolha) {
     int startx = (COLS - width) / 2;
 
     WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
     box(win, 0, 0);
     keypad(win, TRUE);
 

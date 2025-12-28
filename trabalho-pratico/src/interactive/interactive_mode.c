@@ -4,10 +4,12 @@
 #include "io/command_processor.h"
 #include "validation/validate_arg.h"
 #include "io/parser.h"
+#include "queries/query_result.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
+#include "io/output_writer.h"
 
 static int contar_tokens(const char* str) {
     int count = 0;
@@ -95,7 +97,7 @@ void run_menu_loop(CatalogManager* manager) {
                     }
                 } 
                 else {
-                    // Se passou na validação, marcamos como válido para sair do loop
+                    // se passou na validação, marcamos como válido para sair do loop
                     argumentos_validos = 1;
                 }
                 free(res);     
@@ -107,28 +109,129 @@ void run_menu_loop(CatalogManager* manager) {
         char linha[512];
         snprintf(linha, sizeof(linha), "%d%s %s", get_query_id(q), com_S ? "S" : "", args);
 
-        def_prog_mode(); 
-        endwin();
-        
-        if (system("clear") == -1) {} 
-        
-        printf("=== RESULTADOS DA QUERY %d ===\n\n", get_query_id(q));
+        QueryResult* result = execute_single_line(linha, manager, 0, 0, NULL); 
 
-        execute_single_line(linha, manager, 0, 1);
+        if (result == NULL) {
+            mvprintw(LINES - 1, 0, "Erro ao executar query. Prima ENTER...");
+            refresh();
+            flushinp();
+            int c;
+            while ((c = getch()) != '\n' && c != '\r' && c != KEY_ENTER);
+            continue;
+        }
 
-        printf("\n\nPrima ENTER para voltar ao menu...");
-        
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF); 
+        int total_lines = get_result_num_lines(result);
 
-        if (system("clear") == -1) {}
-        
-        reset_prog_mode();
+        bkgd(COLOR_PAIR(1));
+        erase();
         refresh();
+
+        int frame_height = LINES - 2;
+        if (frame_height < 10) frame_height = 10;
+
+        WINDOW* frame = newwin(frame_height, COLS, 0, 0);
+        if (frame == NULL) {
+            destroy_query_result(result);
+            mvprintw(LINES - 1, 0, "Erro ao criar janela. Prima ENTER...");
+            refresh();
+            flushinp();
+            int c;
+            while ((c = getch()) != '\n' && c != '\r' && c != KEY_ENTER);
+            continue;
+        }
+
+        wbkgd(frame, COLOR_PAIR(1));
+        box(frame, 0, 0);
+
+        wattron(frame, A_BOLD | COLOR_PAIR(2));
+        mvwprintw(frame, 0, (COLS - 24) / 2, " RESULTADOS DA QUERY ");
+        wattroff(frame, A_BOLD | COLOR_PAIR(2));
+        wrefresh(frame);
+
+        // criar PAD para o conteúdo (área scrollável)
+        int pad_height = total_lines + 10;
+        int pad_width = COLS - 4;
+
+        WINDOW* content_pad = newpad(pad_height, pad_width);
+        if (content_pad == NULL) {
+            delwin(frame);
+            destroy_query_result(result);
+            mvprintw(LINES - 1, 0, "Erro ao criar pad. Prima ENTER...");
+            refresh();
+            flushinp();
+            int c;
+            while ((c = getch()) != '\n' && c != '\r' && c != KEY_ENTER);
+            continue;
+        }
+
+        wbkgd(content_pad, COLOR_PAIR(1));
+        keypad(content_pad, TRUE); // ativa o suporte a teclas especiais
+
+        // escrever conteúdo no pad
+        write_result(result, NULL, com_S ? '=' : ';', 1, content_pad);
+
+        // calcular área visível e limites de scroll
+        int visible_height = frame_height - 3;
+        int max_scroll = total_lines - visible_height + 2;
+        if (max_scroll < 0) max_scroll = 0;
+
+        int scroll_pos = 0;
+
+        // mostrar conteúdo inicial
+        prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3);  // visible_height limita até onde desenha no ecra
+
+        mvprintw(LINES - 2, 2, "Faça scroll para navegar pelos resultados | ENTER para voltar");
+        refresh();
+
+        // loop de eventos
+        int ch;
+        MEVENT event;
+
+        while (1) {
+            ch = wgetch(content_pad);
+            
+            if (ch == '\n' || ch == '\r' || ch == KEY_ENTER || ch == 'q' || ch == 'Q') {
+                break;
+            }
+            else if (ch == KEY_MOUSE) {
+                if (getmouse(&event) == OK) {
+                    if (event.bstate & BUTTON4_PRESSED && scroll_pos > 0) {
+                        scroll_pos--;
+                        prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3); // scroll_pos é a linha de onde começa a visualização
+                    }
+                    else if (event.bstate & BUTTON5_PRESSED && scroll_pos < max_scroll) {
+                        scroll_pos++;
+                        prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3);
+                    }
+                }
+            }
+            else if (ch == KEY_UP && scroll_pos > 0) {
+                scroll_pos--;
+                prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3);
+            }
+            else if (ch == KEY_DOWN && scroll_pos < max_scroll) {
+                scroll_pos++;
+                prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3);
+            }
+            else if (ch == KEY_PPAGE && scroll_pos > 0) {
+                scroll_pos -= (visible_height - 2);
+                if (scroll_pos < 0) scroll_pos = 0;
+                prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3);
+            }
+            else if (ch == KEY_NPAGE && scroll_pos < max_scroll) {
+                scroll_pos += (visible_height - 2);
+                if (scroll_pos > max_scroll) scroll_pos = max_scroll;
+                prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3);
+            }
+        }
+
+        delwin(content_pad);
+        delwin(frame);
+        destroy_query_result(result);
+
     }
 }
 
-// ... start_interactive_ui mantém-se igual ...
 
 void start_interactive_ui(CatalogManager* manager) {
     wbkgd(stdscr, COLOR_PAIR(1));

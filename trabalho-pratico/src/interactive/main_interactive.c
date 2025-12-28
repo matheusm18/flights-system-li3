@@ -22,22 +22,23 @@ int main(int argc, char **argv) {
 
     if (has_colors()) {
         start_color();
+
+        use_default_colors(); 
         
         // branco no preto (geral)
-        init_pair(1, COLOR_WHITE, COLOR_BLACK);
+        init_pair(1, COLOR_WHITE, -1);
         // ciano no preto (titulos)
-        init_pair(2, COLOR_CYAN, COLOR_BLACK);
+        init_pair(2, COLOR_CYAN, -1);
         // amarelo no preto (titulos)
-        init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+        init_pair(3, COLOR_YELLOW, -1);
         // verde no preto (sucesso)
-        init_pair(4, COLOR_GREEN, COLOR_BLACK);
+        init_pair(4, COLOR_GREEN, -1);
         // vermelho no preto (avisos/erro)
-        init_pair(5, COLOR_RED, COLOR_BLACK);
+        init_pair(5, COLOR_RED, -1);
         // preto no ciano (selecao)
-        init_pair(6, COLOR_BLACK, COLOR_CYAN);
+        init_pair(6, COLOR_BLACK, -1);
     }
 
-    bkgd(COLOR_PAIR(1));
     erase();
     refresh();
 

@@ -36,11 +36,11 @@ all: $(MAIN_PROGRAM) $(TEST_PROGRAM) $(INTERACTIVE_PROGRAM)
 
 # Programa principal
 $(MAIN_PROGRAM): $(OBJS_MAIN) $(OBJS_APP)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(NCURSES) -o $@
 
 # Programa de testes
 $(TEST_PROGRAM): $(OBJS_TEST) $(OBJS_APP)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(NCURSES) -o $@
 
 $(INTERACTIVE_PROGRAM): $(OBJS_INTERACTIVE) $(OBJS_APP)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(NCURSES) -o $@
