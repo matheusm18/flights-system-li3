@@ -288,6 +288,7 @@ void ui_pedir_argumentos(const Query* q, int com_S, char* buffer, int size) {
     int startx = (COLS - width) / 2;
 
     WINDOW* win = newwin(height, width, starty, startx);
+    keypad(win, TRUE);
     wbkgd(win, ' ' | A_NORMAL);
     box(win, 0, 0);
 
@@ -372,7 +373,7 @@ int ui_menu_aviso_argumentos(int obrigatorios, int recebidos) {
     mvwprintw(win, 0, (width - strlen(titulo)) / 2, "%s", titulo);
     wattroff(win, COLOR_PAIR(5) | A_BOLD);
 
-    print_center(win, 2, "Faltam argumentos obrigatórios.");
+    print_center(win, 2, "Faltam argumentos obrigatorios.");
     char buffer[100];
 
     snprintf(buffer, sizeof(buffer), "Esperado pelo menos %d argumento(s).", obrigatorios);
@@ -484,11 +485,16 @@ void ui_mostrar_carregamento_fim(WINDOW* load_win) {
     mvwprintw(load_win, 1, (width - 22)/2, "=== PROCESSAMENTO ===");
     wattroff(load_win, COLOR_PAIR(2) | A_BOLD);
 
-    wattron(load_win, COLOR_PAIR(3) | A_BOLD);
+    wattron(load_win, COLOR_PAIR(4) | A_BOLD);
     mvwprintw(load_win, 4, (width - 23)/2, "Carregamento concluido!");
-    wattroff(load_win, COLOR_PAIR(3) | A_BOLD);
+    wattroff(load_win, COLOR_PAIR(4) | A_BOLD);
 
-    mvwprintw(load_win, 5, (width - 16)/2, "[Menu Queries]");
+    mvwprintw(load_win, 5, (width - 32)/2, "[pressione ");
+    wattron(load_win, COLOR_PAIR(3) | A_BOLD);  
+    wprintw(load_win, "ENTER");
+    wattroff(load_win, COLOR_PAIR(3) | A_BOLD); 
+    wprintw(load_win, " para continuar]");
+
     wrefresh(load_win);
 
     int ch;
@@ -498,14 +504,12 @@ void ui_mostrar_carregamento_fim(WINDOW* load_win) {
     delwin(load_win);
 }
 
-
-
 void ui_mostrar_erro_arg(ValidationResult *res, int *escolha) {
     curs_set(0);
     clear();
     refresh();
     const char* msg = validation_result_get_erro(res);
-    const char* options[] = {"[Tentar novamente]", "[Voltar ao menu]"};
+    const char* options[] = {"[tentar novamente]", "[voltar ao menu]"};
     int n_options = 2;
     int highlight = 0;
     int ch;

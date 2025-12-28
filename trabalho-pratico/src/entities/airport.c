@@ -69,6 +69,8 @@ char* get_airport_type(const Airport* airport) {
     if (airport->type == 'S') return strdup("small_airport");
     else if (airport->type == 'M') return strdup("medium_airport");
     else if (airport->type == 'L') return strdup("large_airport");
+    else if (airport->type == 'H') return strdup("heliport");
+    else if (airport->type == 'P') return strdup("seaplane_base");
     else return strdup("unknown");
 }
 
@@ -76,5 +78,7 @@ char airport_type_to_char(const char* type_str) {
     if (strcmp(type_str, "small_airport") == 0) return 'S';
     else if (strcmp(type_str, "medium_airport") == 0) return 'M';
     else if (strcmp(type_str, "large_airport") == 0) return 'L';
+    else if (strcmp(type_str, "heliport") == 0) return 'H';
+    else if (strcmp(type_str, "seaplane_base") == 0) return 'P';
     else return 'U'; // unknown
 }

@@ -27,7 +27,7 @@ static int contar_tokens(const char* str) {
 }
 
 void run_menu_loop(CatalogManager* manager) {
-    char args[256];
+    char args[35];
 
     while (1) {
         bkgd(COLOR_PAIR(1));
@@ -49,7 +49,7 @@ void run_menu_loop(CatalogManager* manager) {
         int argumentos_validos = 0;
         int cancelar_query = 0;
         
-        char args_copy[256]; 
+        char args_copy[35]; 
 
         while (!argumentos_validos) {  
             ui_pedir_argumentos(q, com_S, args, sizeof(args));
@@ -74,7 +74,7 @@ void run_menu_loop(CatalogManager* manager) {
                     break;
                 }
             } else {
-                char *arg_tokens[10];
+                char *arg_tokens[10] = {NULL};
                 int n_args = 0;
                 char *token = strtok(args_copy, " "); 
                 
@@ -178,9 +178,12 @@ void run_menu_loop(CatalogManager* manager) {
         int scroll_pos = 0;
 
         // mostrar conteúdo inicial
+        curs_set(0);
         prefresh(content_pad, scroll_pos, 0, 2, 2, visible_height, COLS - 3);  // visible_height limita até onde desenha no ecra
 
+        attron(COLOR_PAIR(4) | A_BOLD);
         mvprintw(LINES - 2, 2, "Faça scroll para navegar pelos resultados | ENTER para voltar");
+        attroff(COLOR_PAIR(4) | A_BOLD);
         refresh();
 
         // loop de eventos

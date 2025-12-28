@@ -35,8 +35,6 @@ int main(int argc, char **argv) {
         init_pair(4, COLOR_GREEN, -1);
         // vermelho no preto (avisos/erro)
         init_pair(5, COLOR_RED, -1);
-        // preto no ciano (selecao)
-        init_pair(6, COLOR_BLACK, -1);
     }
 
     erase();
