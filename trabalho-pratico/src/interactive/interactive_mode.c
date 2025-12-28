@@ -11,6 +11,34 @@
 #include <ncurses.h>
 #include "io/output_writer.h"
 
+#define MIN_ROWS 30
+#define MIN_COLS 100
+
+void wait_for_bigger_terminal_size() {
+    int rows, cols;
+
+    while (1) {
+        getmaxyx(stdscr, rows, cols); // função do ncurses que obtêm as dimensões da janela do terminal
+
+        if (rows >= MIN_ROWS && cols >= MIN_COLS) break;
+
+        clear();
+        mvprintw(0, 0, "Terminal demasiado pequeno!");
+        mvprintw(1, 0, "Minimo: %dx%d", MIN_COLS, MIN_ROWS);
+        mvprintw(2, 0, "Atual:  %dx%d", cols, rows);
+        mvprintw(4, 0, "Redimensione o terminal até funcionar!");
+        refresh();
+
+        int ch = getch();
+        if (ch == KEY_RESIZE)
+            continue;
+    }
+
+    clear();
+    refresh();
+}
+
+
 static int contar_tokens(const char* str) {
     int count = 0;
     char tmp[512];
@@ -30,6 +58,7 @@ void run_menu_loop(CatalogManager* manager) {
     char args[35];
 
     while (1) {
+        wait_for_bigger_terminal_size();
         bkgd(COLOR_PAIR(1));
         erase();
         refresh();
@@ -243,6 +272,7 @@ void run_menu_loop(CatalogManager* manager) {
 
 
 void start_interactive_ui(CatalogManager* manager) {
+    wait_for_bigger_terminal_size();
     wbkgd(stdscr, COLOR_PAIR(1));
     
     ui_menu_inicial();
