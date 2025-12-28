@@ -269,9 +269,11 @@ void start_interactive_ui(CatalogManager* manager) {
         }
     }
 
-    ui_mostrar_carregamento_inicio();
+    WINDOW* load_win = ui_mostrar_carregamento_inicio();
 
     load_datasets(dataset_path, manager);
+
+    delwin(load_win); 
 
     ui_mostrar_carregamento_fim();
     

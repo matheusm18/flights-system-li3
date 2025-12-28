@@ -58,13 +58,13 @@ void ui_menu_inicial() {
     wattroff(win, COLOR_PAIR(2) | A_BOLD);
 
     int y = 16;
-    int x = (width - strlen("[pressione ENTER para continuar]")) / 2;
+    int x = (width - strlen("[pressione ENTER para indicar o caminho de dados]")) / 2;
 
-    mvwprintw(win, y, x, "[pressione ");
+    mvwprintw(win, y, x + 2, "[pressione ");
     wattron(win, COLOR_PAIR(3) | A_BOLD);  
     wprintw(win, "ENTER");
     wattroff(win, COLOR_PAIR(3) | A_BOLD); 
-    wprintw(win, " para continuar]");
+    wprintw(win, " indicar o caminho de dados]");
 
     wrefresh(win);
 
@@ -78,63 +78,84 @@ void ui_menu_inicial() {
     curs_set(1);
 }
 
+
 char* ui_pedir_caminho_dataset() {
-    static char path[46]; 
+    static char path[46];
     memset(path, 0, sizeof(path));
+
     int pos = 0;
     int ch;
 
-    int width = 76, height = 9;
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
+    int width  = 90;
+    int height = 28;
 
-    erase();
-    refresh();
+    int starty = (LINES - height) / 2;
+    int startx = (COLS  - width)  / 2;
 
     WINDOW* win = newwin(height, width, starty, startx);
     wbkgd(win, ' ' | A_NORMAL);
-
     keypad(win, TRUE);
-    box(win, 0, 0);
 
-    wattron(win, COLOR_PAIR(2) | A_BOLD);
-    mvwprintw(win, 1, (width - 18)/2, "== LOAD DATASET ==");
-    wattroff(win, COLOR_PAIR(2) | A_BOLD);
-    
-    mvwprintw(win, 4, 3, "Insira o caminho do dataset [vazio para o caminho padrão]");
-    mvwhline(win, 6, 1, ACS_HLINE, width - 2);
-    mvwprintw(win, 7, 4, "> ");
-    
+
+    mvwprintw(win, 1,  2, "              _____________________________________________");
+    mvwprintw(win, 2,  2, "             /                                             \\");
+    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(win, 4,  2, "            |   |                                       |   |");
+    mvwprintw(win, 5,  2, "            |   |  C:\\>                                 |   |");
+    mvwprintw(win, 6,  2, "            |   |                                       |   |");
+    mvwprintw(win, 7,  2, "            |   |                                       |   |");
+    mvwprintw(win, 8,  2, "            |   |                                       |   |");
+    mvwprintw(win, 9,  2, "            |   |                                       |   |");
+    mvwprintw(win, 10, 2, "            |   |                                       |   |");
+    mvwprintw(win, 11, 2, "            |   |                                       |   |");
+    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(win, 13, 2, "            |                                               |");
+    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(win, 15, 2, "                   \\___________________________________/");
+    mvwprintw(win, 16, 2, "                ___________________________________________");
+    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
+
+
+
+    int input_y = 5;
+    int input_x = 2 + 24;   // após "C:\> "
+
     curs_set(1);
     noecho();
 
     while (1) {
-        wmove(win, 7, 6 + pos);
+        wmove(win, input_y, input_x + pos);
         wrefresh(win);
+
         ch = wgetch(win);
 
-        if (ch == 10 || ch == KEY_ENTER) break;
+        if (ch == '\n' || ch == KEY_ENTER)
+            break;
 
-        else if (ch == KEY_BACKSPACE || ch == 127 || ch == 8) {
-            if (pos > 0) {
-                pos--;
-                path[pos] = '\0';
-                mvwaddch(win, 7, 6 + pos, ' ');
-            }
+        else if ((ch == KEY_BACKSPACE || ch == 127 || ch == 8) && pos > 0) {
+            pos--;
+            path[pos] = '\0';
+            mvwaddch(win, input_y, input_x + pos, ' ');
         }
-        // filtro: só aceita se for caractere imprimível (letras, numeros, etc)
         else if (pos < 45 && isprint(ch)) {
-            path[pos] = ch;
-            mvwaddch(win, 7, 6 + pos, ch);
-            pos++;
+            path[pos++] = ch;
+            mvwaddch(win, input_y, input_x + pos - 1, ch);
         }
     }
 
-    path[pos] = '\0';
     curs_set(0);
     delwin(win);
     return path;
 }
+
+
+
 
 int ui_menu_queries(int n) {
     
@@ -418,67 +439,8 @@ int ui_menu_aviso_argumentos(int obrigatorios, int recebidos) {
 }
 
 void ui_mostrar_erro_dataset() {
-    erase(); 
-    refresh(); 
-
-    int width = 50, height = 8;
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
-
-    WINDOW* err_win = newwin(height, width, starty, startx);
-    wbkgd(err_win, ' ' | A_NORMAL);
-    box(err_win, 0, 0);
-
-    char* msg1 = "Caminho de dataset invalido!";
-    char* msg3 = "[pressione ENTER para tentar novamente]";
-
-    wattron(err_win, COLOR_PAIR(5) | A_BOLD);
-    mvwprintw(err_win, 3, (width - strlen(msg1)) / 2, "%s", msg1);
-    wattroff(err_win, COLOR_PAIR(5) | A_BOLD);
-
-    mvwprintw(err_win, 5, (width - strlen(msg3)) / 2, "[pressione ");
-    wattron(err_win, COLOR_PAIR(3) | A_BOLD);  
-    wprintw(err_win, "ENTER");
-    wattroff(err_win, COLOR_PAIR(3) | A_BOLD); 
-    wprintw(err_win, " para tentar novamente]");
-
-    wrefresh(err_win);
-
-    int ch;
-    flushinp(); 
-    while ((ch = wgetch(err_win)) != 10 && ch != KEY_ENTER); 
-
-    delwin(err_win);
-}
-
-WINDOW* ui_mostrar_carregamento_inicio() {
-    clear(); 
-    refresh();
-    
-    int width = 50, height = 8;
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
-    
-    WINDOW* load_win = newwin(height, width, starty, startx);
-    wbkgd(load_win, ' ' | A_NORMAL);
-    box(load_win, 0, 0);
-    keypad(load_win, TRUE);
-    
-    wattron(load_win, COLOR_PAIR(2) | A_BOLD);
-    mvwprintw(load_win, 1, (width - 22)/2, "=== PROCESSAMENTO ===");
-    wattroff(load_win, COLOR_PAIR(2) | A_BOLD);
-
-    mvwprintw(load_win, 4, (width - 19)/2, "A carregar dados...");
-    wrefresh(load_win);
-    
-    return load_win;
-}
-void ui_mostrar_carregamento_fim(void) {
-    curs_set(0);
-    noecho();
-
-    int width  = 60;
-    int height = 14;
+    int width  = 90;
+    int height = 28;
 
     int starty = (LINES - height) / 2;
     int startx = (COLS  - width)  / 2;
@@ -486,30 +448,135 @@ void ui_mostrar_carregamento_fim(void) {
     WINDOW* win = newwin(height, width, starty, startx);
     wbkgd(win, ' ' | A_NORMAL);
     keypad(win, TRUE);
-    box(win, 0, 0);
 
 
+    mvwprintw(win, 1,  2, "              _____________________________________________");
+    mvwprintw(win, 2,  2, "             /                                             \\");
+    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(win, 4,  2, "            |   |                                       |   |");
+    mvwprintw(win, 5,  2, "            |   |                                       |   |");
+    mvwprintw(win, 6,  2, "            |   |                                       |   |");
+    mvwprintw(win, 7,  2, "            |   | [tentar novamente]                    |   |");
+    mvwprintw(win, 8,  2, "            |   |                                       |   |");
+    mvwprintw(win, 9,  2, "            |   |                                       |   |");
+    mvwprintw(win, 10, 2, "            |   |                                       |   |");
+    mvwprintw(win, 11, 2, "            |   |                                       |   |");
+    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(win, 13, 2, "            |                                               |");
+    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(win, 15, 2, "                   \\___________________________________/");
+    mvwprintw(win, 16, 2, "                ___________________________________________");
+    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
 
-    mvwprintw(win, 4, 4,  "   .---.   ");
-    mvwprintw(win, 5, 4,  "  /     \\  ");
-    mvwprintw(win, 6, 4,  "  \\.@-@./  ");
-    mvwprintw(win, 7, 4,  "  /`\\_/`\\  ");
-    mvwprintw(win, 8, 4,  " //  _  \\\\ ");
-    mvwprintw(win, 9, 4,  "| \\     )|_");
-    mvwprintw(win,10, 3,  "/`\\_`>  <_/ \\");
-    mvwprintw(win,11, 3,  "\\__/'---'\\__/");
-
-    wattron(win, COLOR_PAIR(4) | A_BOLD);
-    mvwprintw(win, 7, 22, "Carregamento concluido!");
-    wattroff(win, COLOR_PAIR(4) | A_BOLD);
-
-    mvwprintw(win, 9, 22, "Pressione ");
-    wattron(win, COLOR_PAIR(2) | A_BOLD);
-    wprintw(win, "ENTER");
-    wattroff(win, COLOR_PAIR(2) | A_BOLD);
-    wprintw(win, " para continuar");
+    wattron(win, COLOR_PAIR(5) | A_BOLD);
+    mvwprintw(win, 5, 20, "Caminho de dataset invalido!  ");
+    wattroff(win,COLOR_PAIR(5) | A_BOLD);
 
     wrefresh(win);
+
+    int ch;
+    flushinp(); 
+    while ((ch = wgetch(win)) != 10 && ch != KEY_ENTER); 
+
+    delwin(win);
+}
+
+WINDOW* ui_mostrar_carregamento_inicio() {
+    clear();
+    refresh();
+    int width  = 90;
+    int height = 28;
+
+    int starty = (LINES - height) / 2;
+    int startx = (COLS  - width)  / 2;
+
+    WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
+    keypad(win, TRUE);
+
+
+    mvwprintw(win, 1,  2, "              _____________________________________________");
+    mvwprintw(win, 2,  2, "             /                                             \\");
+    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(win, 4,  2, "            |   |                                       |   |");
+    mvwprintw(win, 5,  2, "            |   |                                       |   |");
+    mvwprintw(win, 6,  2, "            |   |                                       |   |");
+    mvwprintw(win, 7,  2, "            |   |                                       |   |");
+    mvwprintw(win, 8,  2, "            |   |                                       |   |");
+    mvwprintw(win, 9,  2, "            |   |                                       |   |");
+    mvwprintw(win, 10, 2, "            |   |                                       |   |");
+    mvwprintw(win, 11, 2, "            |   |                                       |   |");
+    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(win, 13, 2, "            |                                               |");
+    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(win, 15, 2, "                   \\___________________________________/");
+    mvwprintw(win, 16, 2, "                ___________________________________________");
+    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
+
+    wattron(win, A_BOLD);
+    mvwprintw(win, 5, 20, "> A carregar dados...");
+    wattroff(win, A_BOLD);
+
+    wrefresh(win);
+    
+    return win;
+}
+
+void ui_mostrar_carregamento_fim() {
+    curs_set(0);
+    noecho();
+
+    int width  = 90;
+    int height = 28;
+
+    int starty = (LINES - height) / 2;
+    int startx = (COLS  - width)  / 2;
+
+    WINDOW* win = newwin(height, width, starty, startx);
+    wbkgd(win, ' ' | A_NORMAL);
+    keypad(win, TRUE);
+
+
+    mvwprintw(win, 1,  2, "              _____________________________________________");
+    mvwprintw(win, 2,  2, "             /                                             \\");
+    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(win, 4,  2, "            |   |                                       |   |");
+    mvwprintw(win, 5,  2, "            |   |                                       |   |");
+    mvwprintw(win, 6,  2, "            |   |                                       |   |");
+    mvwprintw(win, 7,  2, "            |   | [pressione ENTER para continuar]      |   |");
+    mvwprintw(win, 8,  2, "            |   |                                       |   |");
+    mvwprintw(win, 9,  2, "            |   |                                       |   |");
+    mvwprintw(win, 10, 2, "            |   |                                       |   |");
+    mvwprintw(win, 11, 2, "            |   |                                       |   |");
+    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(win, 13, 2, "            |                                               |");
+    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(win, 15, 2, "                   \\___________________________________/");
+    mvwprintw(win, 16, 2, "                ___________________________________________");
+    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
+
+    wattron(win, A_BOLD);
+    mvwprintw(win, 5, 20, "Carregamento concluído! ");
+    wattroff(win, A_BOLD);
+
 
     int ch;
     flushinp();
