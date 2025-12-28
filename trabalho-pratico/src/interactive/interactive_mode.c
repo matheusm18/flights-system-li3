@@ -167,8 +167,14 @@ void run_menu_loop(CatalogManager* manager) {
         wbkgd(content_pad, COLOR_PAIR(1));
         keypad(content_pad, TRUE); // ativa o suporte a teclas especiais
 
-        // escrever conteúdo no pad
-        write_result(result, NULL, com_S ? '=' : ';', 1, content_pad);
+        if(total_lines == 0){
+            wattron(content_pad, A_BOLD | COLOR_PAIR(4));
+        mvwprintw(content_pad, 1, 2, "Sem resultados a apresentar.");
+        wattroff(content_pad, A_BOLD | COLOR_PAIR(4));
+        } else {
+            // escrever conteúdo no pad
+            write_result(result, NULL, com_S ? '=' : ';', 1, content_pad);
+        }
 
         // calcular área visível e limites de scroll
         int visible_height = frame_height - 3;

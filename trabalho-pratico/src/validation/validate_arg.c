@@ -47,6 +47,14 @@ ValidationResult validate_query3(char **args) {
     if (!validate_date(args[0]) || !validate_date(args[1]))
         return (ValidationResult){false, "Formato de data invalido! (YYYY-MM-DD)"};
 
+    if (!validate_date(args[0]) || !validate_date(args[1])) {
+        return (ValidationResult){false, "Formato de data invalido! (YYYY-MM-DD)"};
+    }
+    
+    if (strcmp(args[0], args[1]) > 0) {
+        return (ValidationResult){false, "Data de fim nao pode ser anterior a de inicio!"};
+    }
+
     return (ValidationResult){true, NULL};
 }
 
