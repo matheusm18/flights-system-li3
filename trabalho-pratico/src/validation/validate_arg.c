@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 struct validation_result {
     bool ok;
@@ -21,6 +22,23 @@ ValidationResult validate_query1(char **args) {
 ValidationResult validate_query2(char **args) {
     if (!validate_int_pos(args[0]))
         return (ValidationResult){false, "O primeiro argumento deve ser um inteiro positivo!"};
+
+    // se houver o segundo argumento valida-o
+    if (args[1] != NULL && args[1][0] != '\0') {
+        char *manufacturer = args[1];
+        
+        // verifica se a primeira letra é maiúscula
+        if (!isupper((unsigned char)manufacturer[0])) {
+            return (ValidationResult){false, "Manufacturer deve comecar com letra maiuscula!"};
+        }
+        
+        // verifica se contém apenas letras
+        for (int i = 0; manufacturer[i] != '\0'; i++) {
+            if (!isalpha((unsigned char)manufacturer[i])) {
+                return (ValidationResult){false, "Manufacturer deve conter apenas letras!"};
+            }
+        }
+    }
 
     return (ValidationResult){true, NULL};
 }
@@ -63,8 +81,29 @@ ValidationResult validate_query5(char **args) {
     return (ValidationResult){true, NULL};
 }
 
-ValidationResult validate_query6(char **args) {
-    (void) args;
+ValidationResult validate_query6(char **args) { // argumento tem de ser inserido entre " " !!!!!!!!!!
+    char *nationality = args[0];
+
+    if (!isupper((unsigned char)nationality[0])) {
+        return (ValidationResult){false, "Nacionalidade deve comecar com letra maiuscula"};
+    }
+
+    bool expect_upper = false; // Flag para indicar se esperamos maiúscula após espaço
+    
+    for (int i = 1; nationality[i] != '\0'; i++) {
+        if (nationality[i] == ' ') {
+            expect_upper = true; // Próximo caractere deve ser maiúscula
+        } else if (isalpha((unsigned char)nationality[i])) {
+            if (expect_upper && !isupper((unsigned char)nationality[i])) {
+                return (ValidationResult){false, "Cada palavra da nacionalidade deve comecar com maiuscula"};
+            }
+            expect_upper = false;
+        } else {
+            // nao é letra nem espaço
+            return (ValidationResult){false, "Nacionalidade deve conter apenas letras e espacos"};
+        }
+    }
+
     return (ValidationResult){true, NULL};
 }
 
