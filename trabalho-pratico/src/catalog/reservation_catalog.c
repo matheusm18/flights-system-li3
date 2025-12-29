@@ -271,9 +271,18 @@ char* reservation_catalog_get_top_passenger_in_period(ReservationCatalog* manage
     char* filter_start_week = NULL;
     char* filter_end_week = NULL;
 
-    if (begin_date) filter_start_week = date_to_week_key(string_to_date(begin_date));
+    char start_week_buf[20] = {0};
+    char end_week_buf[20]   = {0};
 
-    if (end_date) filter_end_week = date_to_week_key(string_to_date(end_date));
+    if (begin_date) {
+        date_to_week_key_buf(string_to_date(begin_date), start_week_buf);
+        filter_start_week = start_week_buf;
+    }
+
+    if (end_date) {
+        date_to_week_key_buf(string_to_date(end_date), end_week_buf);
+        filter_end_week = end_week_buf;
+    }
 
     GHashTable* passenger_frequency_map = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, free);
 
@@ -324,9 +333,6 @@ char* reservation_catalog_get_top_passenger_in_period(ReservationCatalog* manage
             }
         }
     }
-    
-    if (filter_start_week) free(filter_start_week);
-    if (filter_end_week) free(filter_end_week);
 
     if (out_count) *out_count = max_frequency;
 

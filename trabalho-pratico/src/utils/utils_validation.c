@@ -48,58 +48,64 @@ char* date_to_string(int date) {
     return strdup(buffer);
 }
 
-bool validate_date(const char* date) {
-    if (!date) return false;
-    
-    if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') return false;
 
-    for (int i = 0; i < 10; i++) {
-        if (i != 4 && i != 7) {
-            if(date[i] < '0' || date[i] > '9') return false;
-        }
+static inline int quick_atoi2(const char* s) {
+    return (s[0] - '0') * 10 + (s[1] - '0');
+}
+
+static inline int quick_atoi4(const char* s) {
+    return (s[0] - '0') * 1000 + (s[1] - '0') * 100 + (s[2] - '0') * 10 + (s[3] - '0');
+}
+
+bool validate_date(const char* date) {
+    if (!date) return false; 
+    if (date[4] != '-' || date[7] != '-') return false;
+
+
+    const int indices[] = {0, 1, 2, 3, 5, 6, 8, 9};
+    for (int k = 0; k < 8; k++) {
+        int i = indices[k];
+        if (date[i] < '0' || date[i] > '9') return false;
     }
 
-    int year, month, day;
-    if (sscanf(date, "%d-%d-%d", &year, &month, &day) != 3) return false;
+    int year  = quick_atoi4(date);
+    int month = quick_atoi2(&date[5]);
+    int day   = quick_atoi2(&date[8]);
 
     if (month < 1 || month > 12 || day < 1 || day > 31) return false;
 
     int input_date = year * 10000 + month * 100 + day;
-    int current_date = 2025 * 10000 + 9 * 100 + 30;
+    const int current_date = 20250930; 
     
     return input_date <= current_date;
 }
 
 bool validate_time(const char* time) {
-    if (!time) return false;
-    
-    if (strlen(time) != 5 || time[2] != ':') return false;
+    if (!time || time[2] != ':') return false;
 
-    
-    for (int i = 0; i < 5; i++) {
-        if (i != 2) { ///< // Verifica se todos os caracteres, exceto ':' são digitos
-            if (time[i] < '0' || time[i] > '9') return false;
-        }
-    }
+    if (time[0] < '0' || time[0] > '9' || time[1] < '0' || time[1] > '9' ||
+        time[3] < '0' || time[3] > '9' || time[4] < '0' || time[4] > '9') return false;
 
-    int hours, minutes;
-    if (sscanf(time, "%d:%d", &hours, &minutes) != 2) return false;
+    int hours   = quick_atoi2(time);
+    int minutes = quick_atoi2(&time[3]);
 
     return (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59);
 }
 
 
 bool validate_datetime(const char* datetime) {
-    if (!datetime) return false;
-
-    if (strcmp(datetime, "N/A") == 0) return true; ///< Aceitar 'N/A' como válido
+    if (!datetime || datetime[0] == '\0') return false;
     
-    if (strlen(datetime) < 16) return false;
+    if (datetime[0] == 'N' && datetime[1] == '/' && datetime[2] == 'A' && datetime[3] == '\0') {
+        return true;
+    }
 
-    char date_part[11], time_part[6];
-    if (sscanf(datetime, "%10s %5s", date_part, time_part) != 2) return false;
+    if (datetime[4] != '-' || datetime[7] != '-' || datetime[10] != ' ' || 
+        datetime[13] != ':' || datetime[16] != '\0') {
+        return false;
+    }
 
-    return validate_date(date_part) && validate_time(time_part);
+    return validate_date(datetime) && validate_time(&datetime[11]);
 }
 
 int string_to_date(const char* str) {

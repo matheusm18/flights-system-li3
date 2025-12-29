@@ -3,10 +3,7 @@
 
 #include <glib.h>
 
-typedef struct week_number WeekNumber;
-
-WeekNumber* get_week_number(int year, int month, int day);
-char* create_week_key(int year, int week);
-char* date_to_week_key(int date);
+int get_week_number_fast(int year, int month, int day);
+void date_to_week_key_buf(int date, char buf[20]) ;
 
 #endif

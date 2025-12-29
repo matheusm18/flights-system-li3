@@ -19,4 +19,5 @@ int get_flight_delay(long actual_departure, long expected_departure);
 bool string_to_bool(const char *str);
 bool validate_int_pos(const char *str);
 
+
 #endif

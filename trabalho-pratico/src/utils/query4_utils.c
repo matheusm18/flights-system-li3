@@ -1,74 +1,56 @@
 #include "utils/query4_utils.h"
 #include <glib.h>
-#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// estrutura auxiliar para representar uma semana
-struct week_number {
-    int year;
-    int week;
-};
+#include <stdio.h>
 
-WeekNumber* get_week_number(int year, int month, int day) {
-    WeekNumber *wn = malloc(sizeof(WeekNumber));
-    wn->year = year;
+static const int days_before_month[12] = {0,31,59,90,120,151,181,212,243,273,304,334};
 
-    struct tm time_struct = {0};
-    time_struct.tm_year = year - 1900;
-    time_struct.tm_mon = month - 1;
-    time_struct.tm_mday = day;
-    time_struct.tm_hour = 12; // IMPORTANTE: Meio-dia para evitar erros de fuso horário/DST
-    time_struct.tm_isdst = -1;
-    
-    // O mktime preenche os campos tm_wday e tm_yday
-    if (mktime(&time_struct) == -1) {
-        // Tratamento de erro básico
-        wn->week = 0;
-        return wn;
+static int is_leap(int y) {
+    return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
+}
+
+// 1..365/366
+static int day_of_year(int y, int m, int d) {
+    int doy = days_before_month[m-1] + d;
+    if (m > 2 && is_leap(y)) doy++;
+    return doy;
+}
+
+// Zeller's congruence para calcular dia da semana (0=Dom,1=Seg,..6=Sáb)
+static int weekday(int y, int m, int d) {
+    if (m < 3) {
+        m += 12;
+        y--;
     }
-    
-    // Descobrir em que dia da semana caiu 1 de Janeiro deste ano
-    struct tm jan1 = {0};
-    jan1.tm_year = year - 1900;
-    jan1.tm_mon = 0;
-    jan1.tm_mday = 1;
-    jan1.tm_hour = 12;
-    jan1.tm_isdst = -1;
-    mktime(&jan1);
-    
-    // Algoritmo para Semana (Domingo a Sábado):
-    // tm_yday: dia do ano (0 a 365)
-    // jan1.tm_wday: dia da semana de 1 Jan (0=Dom, 1=Seg...)
-    // A fórmula ajusta o dia do ano como se o ano começasse no Domingo anterior
-    int week = (time_struct.tm_yday + jan1.tm_wday) / 7;
-    
-    // Somamos 1 porque a contagem começa em 0, e queremos Semana 1, Semana 2...
-    wn->week = week + 1;
-    
-    return wn;
+    int K = y % 100;
+    int J = y / 100;
+    int w = (d + 13*(m+1)/5 + K + K/4 + J/4 + 5*J) % 7;
+    return ((w + 6) % 7); // converte para 0=Dom
 }
 
-// criar uma chave única para cada semana exemplo: 2024-W01
-char* create_week_key(int year, int week) {
-    char *key = malloc(20);
-    snprintf(key, 20, "%d-W%02d", year, week);
-    return key;
+// versão rápida do cálculo da semana (domingo-sábado)
+int get_week_number_fast(int year, int month, int day) {
+    int doy = day_of_year(year, month, day);
+    int wday_jan1 = weekday(year, 1, 1); // 1º de Janeiro
+
+    int week = (doy + wday_jan1 - 1) / 7 + 1;
+    return week;
 }
 
-char* date_to_week_key(int date) {
-    if (date <= 0) return NULL;
+// escreve diretamente no buffer fornecido
+void date_to_week_key_buf(int date, char buf[20]) {
+    int year  = date / 10000;
+    int month = (date / 100) % 100;
+    int day   = date % 100;
 
-    int year = date / 10000;           // 20250110 / 10000 = 2025
-    int month = (date / 100) % 100;    // 20250110 / 100 = 202501 -> 202501 % 100 = 1
-    int day = date % 100;              // 20250110 % 100 = 10
-
-    WeekNumber* wn = get_week_number(year, month, day);
-    char* key = create_week_key(wn->year, wn->week);
-    
-    free(wn);
-    return key;
+    int week = get_week_number_fast(year, month, day);
+    snprintf(buf, 20, "%d-W%02d", year, week);
 }
+
+
+
 
 

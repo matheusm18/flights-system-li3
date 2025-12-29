@@ -335,8 +335,10 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     int flight_count = 0;
     char *token = strtok(clean_ids, delims);
 
-    char* q4_week_id = NULL;
     double total_price = atof(price);
+
+    char week_buf[20] = {0}; // buffer de stack válido durante toda a função
+    char* q4_week_id = NULL;
 
     while (token && flight_count < 2) {
         flight_ids_array[flight_count] = strdup(token);
@@ -371,10 +373,13 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
                 if (origin) free(origin);
                 if (destination) free(destination);
 
+
                 if (flight_count == 0) {
                     long departure_date = get_date_part(get_flight_departure(flight));
                     if (departure_date) {
-                        q4_week_id = date_to_week_key(departure_date);
+                        date_to_week_key_buf(departure_date, week_buf);
+                        q4_week_id = week_buf;
+
                     }
                 }
             }
@@ -387,9 +392,8 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
 
     free(clean_ids);
 
-    if (q4_week_id != NULL) {
+    if (q4_week_id != NULL && q4_week_id[0] != '\0') {
         reservation_catalog_add_price_increment(reservation_catalog, q4_week_id, document_number, total_price);
-        free(q4_week_id);
     }
 
     bool extra_luggage_bool = string_to_bool(extra_luggage);

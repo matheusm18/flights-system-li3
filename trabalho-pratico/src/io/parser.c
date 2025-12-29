@@ -69,6 +69,20 @@ void read_csv(int fields_length, const char *filename, void (*callback)(char **f
     fclose(fp);
 }
 
+void load_csv_file(const char* path, int num_fields,
+                   void (*process_line)(char **fields, int num_fields, void* user_data, FILE* errors_file),
+                   CatalogManager* catalog_manager,
+                   const char* errors_file_name,
+                   void (*init_errors_file)()) {
+
+    init_errors_file();
+    FILE *errors_file = fopen(errors_file_name, "a");
+    if (!errors_file) { perror("Erro ao abrir arquivo de erros"); return; }
+
+    read_csv(num_fields, path, process_line, catalog_manager, errors_file);
+    fclose(errors_file);
+}
+
 void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
 
     char airports_file[256];
@@ -86,51 +100,21 @@ void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
     char reservations_file[256];
     snprintf(reservations_file, sizeof(reservations_file), "%s/reservations.csv", dataset_path);
   
-    //printf("\nA inicializar ficheiro de erros de aeroportos...\n");
-    init_airports_errors_file();
-    FILE *airports_errors = fopen("resultados/airports_errors.csv", "a");
+    load_csv_file(airports_file, 8, process_valid_line_airports, catalog_manager,
+                  "resultados/airports_errors.csv", init_airports_errors_file);
 
-    //printf("\nA carregar os aeroportos de: %s", airports_file);
-    read_csv(8, airports_file, process_valid_line_airports, catalog_manager, airports_errors);
-    fclose(airports_errors);
-    //printf("\nTodos os aeroportos válidos foram carregados!\n");
+    load_csv_file(aircrafts_file, 6, process_valid_line_aircrafts, catalog_manager,
+                  "resultados/aircrafts_errors.csv", init_aircrafts_errors_file);
 
-    //printf("\nA inicializar ficheiro de erros de aeronaves...\n");
-    init_aircrafts_errors_file();
-    FILE *aircrafts_errors = fopen("resultados/aircrafts_errors.csv", "a");
+    load_csv_file(flights_file, 12, process_valid_line_flights, catalog_manager,
+                  "resultados/flights_errors.csv", init_flights_errors_file);
+    airport_catalog_sort_all_flights(get_airports_from_catalog_manager(catalog_manager));
 
-    //printf("\nA carregar as aeronaves de: %s", aircrafts_file);
-    read_csv(6, aircrafts_file, process_valid_line_aircrafts, catalog_manager, aircrafts_errors);
-    fclose(aircrafts_errors);
-    //printf("\nTodas as aeronaves válidas foram carregadas!\n");
+    load_csv_file(passengers_file, 10, process_valid_line_passengers, catalog_manager,
+                  "resultados/passengers_errors.csv", init_passengers_errors_file);
 
-    //printf("\nA inicializar ficheiro de erros de voos...\n");
-    init_flights_errors_file();
-    FILE *flights_errors = fopen("resultados/flights_errors.csv", "a");
-
-    //printf("\nA carregar os voos de: %s", flights_file);
-    read_csv(12, flights_file, process_valid_line_flights, catalog_manager, flights_errors);
-    fclose(flights_errors);
-    airport_catalog_sort_all_flights(get_airports_from_catalog_manager(catalog_manager)); // ordenar voos por actual_departure para query3
-    //printf("\nTodos os voos válidos foram carregados!\n");
-
-    //printf("\nA inicializar ficheiro de erros de passageiros...\n");
-    init_passengers_errors_file();
-    FILE *passengers_errors = fopen("resultados/passengers_errors.csv", "a");
-
-    //printf("\nA carregar os passageiros de: %s", passengers_file);
-    read_csv(10, passengers_file, process_valid_line_passengers, catalog_manager, passengers_errors);
-    fclose(passengers_errors);
-    //printf("\nTodos os passageiros válidos foram carregados!\n");
-
-    //printf("\nA inicializar ficheiro de erros de reservas...\n");
-    init_reservations_errors_file();
-    FILE *reservations_errors = fopen("resultados/reservations_errors.csv", "a");
-
-    //printf("\nA carregar as reservas de: %s", reservations_file);
-    read_csv(8, reservations_file, process_valid_line_reservations, catalog_manager, reservations_errors);
-    fclose(reservations_errors);
+    load_csv_file(reservations_file, 8, process_valid_line_reservations, catalog_manager,
+                  "resultados/reservations_errors.csv", init_reservations_errors_file);
     reservation_catalog_prepare_metrics(get_reservations_from_catalog_manager(catalog_manager));
-    //printf("\nTodos as reservas válidas foram carregadas!\n");
 
 }
