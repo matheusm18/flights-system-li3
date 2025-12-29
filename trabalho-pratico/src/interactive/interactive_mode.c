@@ -197,9 +197,23 @@ void run_menu_loop(CatalogManager* manager) {
         keypad(content_pad, TRUE); // ativa o suporte a teclas especiais
 
         if(total_lines == 0){
-            wattron(content_pad, A_BOLD | COLOR_PAIR(4));
-        mvwprintw(content_pad, 1, 2, "Sem resultados a apresentar.");
-        wattroff(content_pad, A_BOLD | COLOR_PAIR(4));
+            curs_set(0);
+            int msg_height = 3;
+            int msg_width  = 39;
+            int starty = (LINES - msg_height) / 2;
+            int startx = (COLS - msg_width) / 2;
+
+            WINDOW* msg_win = newwin(msg_height, msg_width, starty, startx);
+            wbkgd(msg_win, COLOR_PAIR(4) | A_BOLD);
+            box(msg_win, 0, 0);
+
+            mvwprintw(msg_win, 1, 2, "[!] Sem resultados a apresentar [!]");
+            wrefresh(msg_win);
+
+            wgetch(msg_win);
+            curs_set(1);
+
+            delwin(msg_win);
         } else {
             // escrever conteúdo no pad
             write_result(result, NULL, com_S ? '=' : ';', 1, content_pad);
