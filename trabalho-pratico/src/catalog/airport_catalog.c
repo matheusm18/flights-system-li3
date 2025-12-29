@@ -164,6 +164,7 @@ void airport_flight_iter_free(AirportFlightIter* it) {
 }
 
 
+// acho que nao faz sentido remover o static aqui
 // binary search para encontrar primeiro voo >= start_date
 static int find_first_flight_in_range(GPtrArray* flights, int start_date) {
     if (!flights || flights->len == 0) return -1;

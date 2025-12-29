@@ -5,7 +5,7 @@
 #include "catalog/flight_catalog.h"
 #include "catalog/aircraft_catalog.h"
 #include "entities/aircraft.h"
-#include "utils/min_heap.h"
+#include "utils/query2_utils.h"
 #include <stdio.h>
 
 

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "utils/min_heap.h"
+#include "utils/query2_utils.h"
 
 
 
@@ -37,7 +37,7 @@ void destroy_min_heap(MinHeap* h) {
     free(h);
 }
 
-
+// NOTA: como são funções dependentes das estruturas internas da min heap colocamos static
 static void swap_aircraft(AircraftCount* a, AircraftCount* b) {
     AircraftCount tmp = *a;
     *a = *b;

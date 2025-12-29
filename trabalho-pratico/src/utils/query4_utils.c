@@ -6,18 +6,19 @@
 
 #include <stdio.h>
 
-static const int days_in_month[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-static int is_leap(int y) {
+int is_leap(int y) {
     return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
 }
 
-static int get_days_in_month_adj(int m, int y) {
+int get_days_in_month_adj(int m, int y) {
+    static const int days_in_month[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    
     if (m == 2 && is_leap(y)) return 29;
     return days_in_month[m];
 }
 
-static int weekday(int y, int m, int d) {
+int weekday(int y, int m, int d) {
     if (m < 3) { m += 12; y--; }
     int K = y % 100;
     int J = y / 100;

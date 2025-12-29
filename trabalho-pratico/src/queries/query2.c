@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "utils/min_heap.h"
+#include "utils/query2_utils.h"
 
 
 

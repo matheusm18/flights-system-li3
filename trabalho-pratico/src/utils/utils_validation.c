@@ -144,33 +144,29 @@ int compare_datetimes(long dt1, long dt2) {
     return 0;
 }
 
+long datetime_to_minutes(long date) {
+    static const int days_before_month[] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+
+    int min  = date % 100;
+    int hour = (date / 100) % 100;
+    int day  = (date / 10000) % 100;
+    int month  = (date / 1000000) % 100;
+    int year  = (date / 100000000L);
+
+    long total_days = year * 365 + (year / 4) + days_before_month[month - 1] + day;
+    
+    // ajuste para bissexto se estivermos em Janeiro/Fevereiro do próprio ano
+    if (month <= 2 && (year % 4 == 0)) total_days--;
+
+    return (total_days * 1440) + (hour * 60) + min;
+}
 
 int get_flight_delay(long actual_departure, long expected_departure) {
     if (actual_departure <= 0 || expected_departure <= 0) return 0;
 
-    struct tm t_actual_departure = {0}, t_expected_departure = {0};
-
-    t_actual_departure.tm_min  = actual_departure % 100;
-    t_actual_departure.tm_hour = (actual_departure / 100) % 100;
-    t_actual_departure.tm_mday = (actual_departure / 10000) % 100;
-    t_actual_departure.tm_mon  = ((actual_departure / 1000000) % 100) - 1;
-    t_actual_departure.tm_year = (actual_departure / 100000000L) - 1900;
-    t_actual_departure.tm_isdst = -1;
-
-    t_expected_departure.tm_min  = expected_departure % 100;
-    t_expected_departure.tm_hour = (expected_departure / 100) % 100;
-    t_expected_departure.tm_mday = (expected_departure / 10000) % 100;
-    t_expected_departure.tm_mon  = ((expected_departure / 1000000) % 100) - 1;
-    t_expected_departure.tm_year = (expected_departure / 100000000L) - 1900;
-    t_expected_departure.tm_isdst = -1;
-
-    // converter ambos para time_t (segundos)
-    time_t s_actual_departure = mktime(&t_actual_departure);
-    time_t s_expected_departure = mktime(&t_expected_departure);
-
-    // diferença em segundos dividida por 60 (para dar em minutos)
-    return (int)(difftime(s_actual_departure, s_expected_departure) / 60);
+    return (int)(datetime_to_minutes(actual_departure) - datetime_to_minutes(expected_departure));
 }
+
 
 bool string_to_bool(const char *str) {
     if (!str) return false;
