@@ -5,6 +5,7 @@
 
 #include <glib.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 /*
@@ -39,8 +40,8 @@ struct reservation_catalog {
     GHashTable* nationality_stats;
     GHashTable* weekly_stats;
 
-    WeeklyTop** timeline; // array ordenado
-    int timeline_size; // tamanho do array
+    WeeklyTop** timeline;
+    int timeline_size;
 };
 
 ReservationCatalog* reservation_catalog_create() {
@@ -51,9 +52,6 @@ ReservationCatalog* reservation_catalog_create() {
 
     manager->nationality_stats = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_hash_table_destroy);
     manager->weekly_stats = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_hash_table_destroy);
-
-    manager->timeline = NULL;
-    manager->timeline_size = 0;
 
     return manager;
 }
@@ -68,16 +66,13 @@ void reservation_catalog_destroy(ReservationCatalog* manager) {
 
     if (manager->timeline) {
         for (int i = 0; i < manager->timeline_size; i++) {
-            // liberta a string da chave
-            free(manager->timeline[i]->week_key);
-            // liberta as strings dos ids dos passageiros
-            for (int j = 0; j < manager->timeline[i]->count; j++) {
-                free(manager->timeline[i]->top_ids[j]);
+            WeeklyTop *wt = manager->timeline[i];
+            free(wt->week_key);
+            for (int j = 0; j < wt->count; j++) {
+                free(wt->top_ids[j]);
             }
-            // liberta a struct da semana
-            free(manager->timeline[i]);
+            free(wt);
         }
-        // liberta o array principal
         free(manager->timeline);
     }
 
@@ -199,148 +194,144 @@ int compare_passengers(const void* a, const void* b) {
 }
 
 int compare_weeks(const void* a, const void* b) {
-    WeeklyTop* w1 = *(WeeklyTop**)a;
-    WeeklyTop* w2 = *(WeeklyTop**)b;
+    const WeeklyTop *w1 = *(const WeeklyTop **)a;
+    const WeeklyTop *w2 = *(const WeeklyTop **)b;
     return strcmp(w1->week_key, w2->week_key);
 }
 
-void reservation_catalog_prepare_metrics(ReservationCatalog* manager) {
+int compare_strings(const void *a, const void *b) {
+    return strcmp(*(const char **)a, *(const char **)b);
+}
+
+void reservation_catalog_prepare_query4 (ReservationCatalog* manager) {
     if (!manager || !manager->weekly_stats) return;
 
-    // alocar o array da timeline
     guint num_weeks = g_hash_table_size(manager->weekly_stats);
-    manager->timeline = malloc(sizeof(WeeklyTop*) * num_weeks);
+    if (num_weeks == 0) return;
+
+    manager->timeline = malloc(sizeof(struct weekly_top*) * num_weeks);
     manager->timeline_size = 0;
 
     GHashTableIter iter;
     gpointer key, value;
     g_hash_table_iter_init(&iter, manager->weekly_stats);
 
-    // iterar sobre cada semana da hash table
     while (g_hash_table_iter_next(&iter, &key, &value)) {
         char* week_str = (char*)key;
         GHashTable* week_data = (GHashTable*)value;
 
-        // criar struct de resumo da semana
-        WeeklyTop* week_stats = malloc(sizeof(WeeklyTop));
+        struct weekly_top* week_stats = malloc(sizeof(struct weekly_top));
         week_stats->week_key = strdup(week_str);
         week_stats->count = 0;
 
-        // passar dados da hash para array temporário para ordenar
         guint num_p = g_hash_table_size(week_data);
-        PassengerSpend* temp_list = malloc(sizeof(PassengerSpend) * num_p);
-        int idx = 0;
+        if (num_p > 0) {
+            struct passenger_spend* temp_list = malloc(sizeof(struct passenger_spend) * num_p);
+            int idx = 0;
 
-        GHashTableIter inner_iter;
-        gpointer inner_key, inner_val;
-        g_hash_table_iter_init(&inner_iter, week_data);
+            GHashTableIter inner_iter;
+            gpointer inner_key, inner_val;
+            g_hash_table_iter_init(&inner_iter, week_data);
 
-        while (g_hash_table_iter_next(&inner_iter, &inner_key, &inner_val)) {
-            temp_list[idx].id = (char*)inner_key;
-            temp_list[idx].value = *(double*)inner_val;
-            idx++;
+            while (g_hash_table_iter_next(&inner_iter, &inner_key, &inner_val)) {
+                temp_list[idx].id = (char*)inner_key;
+                temp_list[idx].value = *(double*)inner_val;
+                idx++;
+            }
+
+            qsort(temp_list, num_p, sizeof(struct passenger_spend), compare_passengers);
+
+            int limit = (num_p < 10) ? num_p : 10;
+            for (int i = 0; i < limit; i++) {
+                week_stats->top_ids[i] = strdup(temp_list[i].id);
+            }
+            week_stats->count = limit;
+            free(temp_list);
         }
-
-        // ordenar para encontrar os vencedores
-        qsort(temp_list, num_p, sizeof(PassengerSpend), compare_passengers);
-
-        // guardar apenas o TOP 10
-        int limit = (num_p < 10) ? num_p : 10;
-        for (int i = 0; i < limit; i++) {
-            week_stats->top_ids[i] = strdup(temp_list[i].id);
-        }
-        week_stats->count = limit;
 
         manager->timeline[manager->timeline_size++] = week_stats;
-        free(temp_list);
     }
 
-    // 3. ordenar a timeline por data (WeekKey)
-    qsort(manager->timeline, manager->timeline_size, sizeof(WeeklyTop*), compare_weeks);
+    qsort(manager->timeline, manager->timeline_size, sizeof(struct weekly_top*), compare_weeks);
 
-    // 4. libertar a Hash Table (já não precisamos dela)
     g_hash_table_destroy(manager->weekly_stats);
     manager->weekly_stats = NULL; 
 }
 
 char* reservation_catalog_get_top_passenger_in_period(ReservationCatalog* manager, char* begin_date, char* end_date, int* out_count) {
     if (out_count) *out_count = 0;
+    if (!manager || !manager->timeline) return NULL;
+
+    char start_key[40] = "";
+    char end_key[40] = "9999-99-99"; // para o caso do null
     
-    if (!manager) return NULL;
-
-    char* filter_start_week = NULL;
-    char* filter_end_week = NULL;
-
-    char start_week_buf[20] = {0};
-    char end_week_buf[20]   = {0};
-
     if (begin_date) {
-        date_to_week_key_buf(string_to_date(begin_date), start_week_buf);
-        filter_start_week = start_week_buf;
+        int d = string_to_date(begin_date);
+        if (d > 0) date_to_week_key_buf(d, start_key);
     }
-
     if (end_date) {
-        date_to_week_key_buf(string_to_date(end_date), end_week_buf);
-        filter_end_week = end_week_buf;
+        int d = string_to_date(end_date);
+        if (d > 0) date_to_week_key_buf(d, end_key);
     }
 
-    GHashTable* passenger_frequency_map = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, free);
+    GPtrArray *candidates = g_ptr_array_new();
 
-    char* best_passenger = NULL;
-    int max_frequency = 0;
-
-    // iterar pela timeline (que já está ordenada alfabeticamente/cronologicamente)
     for (int i = 0; i < manager->timeline_size; i++) {
-        WeeklyTop* week_stats = manager->timeline[i];
+        struct weekly_top* wt = manager->timeline[i];
 
-        // se temos filter_start_week e a semana atual é "menor", avançamos
-        if (filter_start_week && strcmp(week_stats->week_key, filter_start_week) < 0) {
-            continue;
-        }
+        if (strcmp(wt->week_key, start_key) < 0) continue;
+        if (strcmp(wt->week_key, end_key) > 0) break;
 
-        // se temos filter_end_week e a semana atual é "maior", paramos (break)
-        if (filter_end_week && strcmp(week_stats->week_key, filter_end_week) > 0) {
-            break;
-        }
-
-        // contar os passageiros desta semana válida
-        for (int j = 0; j < week_stats->count; j++) {
-            char* p_id = week_stats->top_ids[j]; // passenger_id
-            
-            int* frequency_ptr = g_hash_table_lookup(passenger_frequency_map, p_id); // aponta para a frequencia atual do passageiro
-            
-            if (!frequency_ptr) {
-                frequency_ptr = malloc(sizeof(int));
-                *frequency_ptr = 1;
-                // usamos o passenger_id que já está na memória do timeline como chave
-                g_hash_table_insert(passenger_frequency_map, p_id, frequency_ptr); 
-            } else {
-                (*frequency_ptr)++;
-            }
-
-            int current_val = *frequency_ptr;
-
-            // verificar se é o novo líder
-            if (current_val > max_frequency) {
-                max_frequency = current_val;
-                best_passenger = p_id;
-            } 
-            else if (current_val == max_frequency) {
-                // desempate: identificador mais baixo
-                if (best_passenger == NULL || strcmp(p_id, best_passenger) < 0) {
-                    best_passenger = p_id;
-                }
-            }
+        for (int j = 0; j < wt->count; j++) {
+            g_ptr_array_add(candidates, wt->top_ids[j]);
         }
     }
 
-    if (out_count) *out_count = max_frequency;
-
-    char* result = NULL;
-    if (best_passenger) {
-        result = strdup(best_passenger);
+    if (candidates->len == 0) {
+        g_ptr_array_free(candidates, TRUE);
+        return NULL;
     }
 
-    g_hash_table_destroy(passenger_frequency_map);
-    return result;
+    // ordena strings alfabeticamente
+    qsort(candidates->pdata, candidates->len, sizeof(char*), compare_strings);
+
+    char *winner = NULL;
+    int max_streak = 0;
+    
+    char *current_id = g_ptr_array_index(candidates, 0);
+    int current_streak = 1;
+
+    winner = current_id;
+    max_streak = 1;
+
+    for (guint i = 1; i < candidates->len; i++) {
+        char *next = g_ptr_array_index(candidates, i);
+        
+        if (strcmp(current_id, next) == 0) {
+            current_streak++;
+        } else {
+            if (current_streak > max_streak) {
+                max_streak = current_streak;
+                winner = current_id;
+            } else if (current_streak == max_streak) {
+                // empate: id menor ganha
+                if (strcmp(current_id, winner) < 0) winner = current_id;
+            }
+            current_id = next;
+            current_streak = 1;
+        }
+    }
+
+    if (current_streak > max_streak) {
+        max_streak = current_streak;
+        winner = current_id;
+    } else if (current_streak == max_streak) {
+        if (strcmp(current_id, winner) < 0) winner = current_id;
+    }
+
+    if (out_count) *out_count = max_streak;
+    char *result_str = winner ? strdup(winner) : NULL;
+    
+    g_ptr_array_free(candidates, TRUE);
+    return result_str;
 }

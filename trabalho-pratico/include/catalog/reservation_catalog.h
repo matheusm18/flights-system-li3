@@ -23,7 +23,8 @@ Reservation* get_reservation_by_id(ReservationCatalog* manager, char* reservatio
 
 int compare_passengers(const void* a, const void* b);
 int compare_weeks(const void* a, const void* b);
-void reservation_catalog_prepare_metrics(ReservationCatalog* manager);
+int compare_strings(const void *a, const void *b);
+void reservation_catalog_prepare_query4 (ReservationCatalog* manager);
 char* reservation_catalog_get_top_passenger_in_period(ReservationCatalog* manager, char* begin_date, char* end_date, int* out_count);
 
 #endif

@@ -6,51 +6,46 @@
 
 #include <stdio.h>
 
-static const int days_before_month[12] = {0,31,59,90,120,151,181,212,243,273,304,334};
+static const int days_in_month[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 static int is_leap(int y) {
     return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
 }
 
-// 1..365/366
-static int day_of_year(int y, int m, int d) {
-    int doy = days_before_month[m-1] + d;
-    if (m > 2 && is_leap(y)) doy++;
-    return doy;
+static int get_days_in_month_adj(int m, int y) {
+    if (m == 2 && is_leap(y)) return 29;
+    return days_in_month[m];
 }
 
-// Zeller's congruence para calcular dia da semana (0=Dom,1=Seg,..6=Sáb)
 static int weekday(int y, int m, int d) {
-    if (m < 3) {
-        m += 12;
-        y--;
-    }
+    if (m < 3) { m += 12; y--; }
     int K = y % 100;
     int J = y / 100;
     int w = (d + 13*(m+1)/5 + K + K/4 + J/4 + 5*J) % 7;
-    return ((w + 6) % 7); // converte para 0=Dom
+    return ((w + 6) % 7); // 0 = dom, 1 = seg, ..., 6 = sab
 }
 
-// versão rápida do cálculo da semana (domingo-sábado)
-int get_week_number_fast(int year, int month, int day) {
-    int doy = day_of_year(year, month, day);
-    int wday_jan1 = weekday(year, 1, 1); // 1º de Janeiro
-
-    int week = (doy + wday_jan1 - 1) / 7 + 1;
-    return week;
-}
-
-// escreve diretamente no buffer fornecido
 void date_to_week_key_buf(int date, char buf[20]) {
     int year  = date / 10000;
     int month = (date / 100) % 100;
     int day   = date % 100;
 
-    int week = get_week_number_fast(year, month, day);
-    snprintf(buf, 20, "%d-W%02d", year, week);
+    // descobrir qual o dia da semana atual (0 = dom a 6 = sab)
+    int wday = weekday(year, month, day);
+
+    // recuar até Domingo
+    day = day - wday;
+
+    // c orrigir underflow de dia/mês/ano
+    while (day <= 0) {
+        month--;
+        if (month < 1) {
+            month = 12;
+            year--;
+        }
+        // soma os dias do mes anterior ao saldo negativo
+        day += get_days_in_month_adj(month, year);
+    }
+
+    snprintf(buf, 20, "%04d-%02d-%02d", year % 10000, month % 100, day % 100);
 }
-
-
-
-
-

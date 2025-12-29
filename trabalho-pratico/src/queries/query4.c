@@ -14,7 +14,6 @@ QueryResult* execute_query4(ReservationCatalog* reservation_catalog, PassengerCa
     
     if (!reservation_catalog || !passenger_catalog) return res;
 
-    // retorna o document_number do passageiro vencedor.
     int count = 0;
     char* winner_id = reservation_catalog_get_top_passenger_in_period(reservation_catalog, begin_date, end_date, &count);
 
@@ -34,7 +33,7 @@ QueryResult* execute_query4(ReservationCatalog* reservation_catalog, PassengerCa
             add_line_to_result(res, tokens, 6);
         }
         
-        free(winner_id); // Libertar a string retornada pelo catálogo
+        free(winner_id); // libertar a string retornada pelo catálogo
     }
 
     return res;
