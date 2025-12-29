@@ -118,7 +118,12 @@ void process_commands(const char* commands_file, CatalogManager* catalog_manager
      // fgets vai ler até encontrar o \n e vai incluir no buffer de line
     // fgets retornar null quando chega no EOF (end of file) 
     while (fgets(line, sizeof(line), file) != NULL) {
-        execute_single_line(line, catalog_manager, *command_counter,0, NULL); // 0 = modo normal
+        QueryResult* result = execute_single_line(line, catalog_manager, *command_counter, 0, NULL); // 0 = modo normal
+
+        if (result != NULL) {
+            destroy_query_result(result);
+        }
+
         (*command_counter)++;
     }
     fclose(file);

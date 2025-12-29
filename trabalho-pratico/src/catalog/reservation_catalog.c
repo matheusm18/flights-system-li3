@@ -53,6 +53,9 @@ ReservationCatalog* reservation_catalog_create() {
     manager->nationality_stats = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_hash_table_destroy);
     manager->weekly_stats = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_hash_table_destroy);
 
+    manager->timeline = NULL;
+    manager->timeline_size = 0;
+
     return manager;
 }
 
