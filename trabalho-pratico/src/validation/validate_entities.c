@@ -373,17 +373,18 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
                 if (origin) free(origin);
                 if (destination) free(destination);
 
+            }
 
-                if (flight_count == 0) {
+            if (status) free(status);
+
+            if (flight_count == 0) {
                     long departure_date = get_date_part(get_flight_departure(flight));
                     if (departure_date) {
                         date_to_week_key_buf(departure_date, week_buf);
                         q4_week_id = week_buf;
 
                     }
-                }
             }
-            if (status) free(status);
         }
         
         flight_count++;
