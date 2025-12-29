@@ -37,7 +37,7 @@ void date_to_week_key_buf(int date, char buf[20]) {
     // recuar até Domingo
     day = day - wday;
 
-    // c orrigir underflow de dia/mês/ano
+    // corrigir underflow de dia/mês/ano 
     while (day <= 0) {
         month--;
         if (month < 1) {
@@ -48,5 +48,15 @@ void date_to_week_key_buf(int date, char buf[20]) {
         day += get_days_in_month_adj(month, year);
     }
 
-    snprintf(buf, 20, "%04d-%02d-%02d", year % 10000, month % 100, day % 100);
+    buf[0] = (year / 1000) + '0';
+    buf[1] = (year / 100 % 10) + '0';
+    buf[2] = (year /10 % 10) + '0';
+    buf[3] = (year % 10) + '0';
+    buf[4] = '-';
+    buf[5] = (month / 10) + '0';
+    buf[6] = (month % 10) + '0';
+    buf[7] = '-';
+    buf[8] = (day / 10) + '0';
+    buf[9] = (day % 10) + '0';
+    buf[10] = '\0';
 }
