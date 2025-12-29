@@ -3,149 +3,270 @@
 
 #include <glib.h>
 #include "entities/airport.h"
+#include "entities/flight.h"
 
-typedef struct airport_iterator AirportIter;
-typedef struct airport_flight_iterator AirportFlightIter;
-typedef struct airport_data AirportData;
+/**
+ * @typedef AirportCatalog
+ * @brief Estrutura opaca que representa o catálogo de aeroportos.
+ *
+ * O catálogo de aeroportos gere toda a informação associada aos aeroportos,
+ * permitindo:
+ *  - Acesso rápido a aeroportos através do código
+ *  - Contabilização de chegadas e partidas
+ *  - Associação de voos de partida a cada aeroporto
+ *  - Iteração sobre aeroportos e respetivos voos
+ *
+ * A implementação concreta encontra-se no ficheiro .c, garantindo encapsulamento.
+ */
 typedef struct airport_catalog AirportCatalog;
 
 /**
+ * @typedef AirportData
+ * @brief Estrutura que agrega um aeroporto e estatísticas associadas.
+ *
+ * Contém:
+ *  - Ponteiro para Airport
+ *  - Contadores de chegadas e partidas
+ *  - Lista de voos que partiram do aeroporto
+ */
+typedef struct airport_data AirportData;
+
+/**
+ * @typedef AirportIter
+ * @brief Iterador para percorrer todos os aeroportos do catálogo.
+ *
+ * Permite iterar sobre todas as entradas do catálogo de aeroportos,
+ * devolvendo estruturas AirportData.
+ */
+typedef struct airport_iterator AirportIter;
+
+/**
+ * @typedef AirportFlightIter
+ * @brief Iterador para percorrer os voos de partida de um aeroporto.
+ *
+ * Permite iterar sequencialmente sobre os voos associados a um aeroporto
+ * específico.
+ *
+ * Utilizado, por exemplo, na query 3.
+ */
+typedef struct airport_flight_iterator AirportFlightIter;
+
+/**
  * @brief Cria e inicializa um catálogo de aeroportos.
- * 
+ *
  * Esta função aloca memória para um novo catálogo de aeroportos e inicializa
- * uma tabela hash (GHashTable) para armazenar os aeroportos indexados pelo
- * seu código IATA. A tabela hash é configurada para liberar automaticamente
- * a memória das chaves (strings) e dos valores (objetos Airport) quando
- * os elementos são removidos ou a tabela é destruída.
- * 
+ * uma tabela hash que associa códigos de aeroporto a estruturas AirportData.
+ *
  * @return Ponteiro para o catálogo de aeroportos criado, ou NULL se a alocação
  *         de memória falhar.
- * 
- * @note A tabela hash utiliza g_str_hash para função de hash e g_str_equal
- *       para comparação de chaves. As chaves são libertadas com g_free e os
- *       valores com destroy_airport.
- * 
- * @see destroy_airport
  */
-AirportCatalog* airport_catalog_create(void);
+AirportCatalog* airport_catalog_create();
 
 /**
  * @brief Destrói um catálogo de aeroportos e liberta toda a memória associada.
- * 
- * Esta função liberta toda a memória alocada para o catálogo de aeroportos,
- * incluindo a tabela hash e todos os objetos Airport nela contidos. A função
- * g_hash_table_destroy invoca automaticamente as funções de destruição
- * configuradas (g_free para as chaves e destroy_airport para os valores).
- * 
- * @param manager Ponteiro para o catálogo de aeroportos a ser destruído.
- * 
+ *
+ * Liberta:
+ *  - Todos os aeroportos armazenados
+ *  - As estruturas AirportData
+ *  - As listas de voos de partida
+ *  - A tabela hash interna
+ *  - A própria estrutura do catálogo
+ *
+ * @param manager Ponteiro para o catálogo de aeroportos a destruir.
+ *
  * @return void
- * 
+ *
  * @note Se manager for NULL, a função não realiza nenhuma operação.
- *       Todos os objetos Airport no catálogo são automaticamente destruídos
- *       devido à configuração da tabela hash com destroy_airport.
- * 
  */
 void airport_catalog_destroy(AirportCatalog* manager);
 
 /**
  * @brief Adiciona um aeroporto ao catálogo.
- * 
- * Esta função adiciona um objeto Airport ao catálogo, indexando-o pelo seu
- * código. O código é duplicado (g_strdup) para servir como chave na
- * tabela hash. Se já existir um aeroporto com o mesmo código, ele será
- * substituído e o anterior será automaticamente destruído.
- * 
+ *
+ * Insere um aeroporto no catálogo, inicializando os contadores de chegadas
+ * e partidas a zero e criando a estrutura para armazenar os voos de partida.
+ *
  * @param manager Ponteiro para o catálogo de aeroportos.
- * @param airport Ponteiro para o objeto Airport a ser adicionado.
- * 
+ * @param airport Ponteiro para o aeroporto a adicionar.
+ *
  * @return void
- * 
- * @note Se manager, airport ou o código do aeroporto forem NULL, a função
- *       não realiza nenhuma operação. O código é duplicado para garantir
- *       que a tabela hash tenha sua própria cópia da chave.
- * 
- * @see get_airport_code
- * @see airport_catalog_create
  */
 void airport_catalog_add(AirportCatalog* manager, Airport* airport);
 
-void airport_catalog_add_flight(AirportCatalog* manager, const char* code, Flight* flight);
-
-int compare_flight_actual_departure(const void* a, const void* b);
+/**
+ * @brief Adiciona um voo à lista de partidas de um aeroporto.
+ *
+ * Associa um voo a um aeroporto específico, registando-o como voo
+ * de partida desse aeroporto.
+ *
+ * @param manager Ponteiro para o catálogo de aeroportos.
+ * @param code Código do aeroporto.
+ * @param flight Ponteiro para o voo a adicionar.
+ *
+ * @return void
+ */
+void airport_catalog_add_flight(
+    AirportCatalog* manager,
+    const char* code,
+    Flight* flight
+);
 
 /**
- * @brief Ordena as listas de voos de partida de todos os aeroportos no catálogo.
- * 
- * Esta função percorre todos os aeroportos no catálogo e ordena as suas
- * listas de voos de partida. É chamada após o carregamento
- * de todos os dados para preparar os aeroportos para consultas.
- * 
+ * @brief Ordena os voos de partida de todos os aeroportos.
+ *
+ * Ordena os voos de partida de cada aeroporto por data real de partida,
+ * em ordem crescente.
+ *
  * @param catalog Ponteiro para o catálogo de aeroportos.
- * 
+ *
  * @return void
- * 
- * @note Se catalog for NULL, a função não realiza nenhuma operação.
- * 
- * @see airport_sort_departing_flights
  */
 void airport_catalog_sort_all_flights(AirportCatalog* catalog);
 
-
-void airport_passenger_increment(AirportCatalog* manager, char* airport_code, char type);
-
-// iterar aeroportos
-
-AirportIter* airport_catalog_iter_create(const AirportCatalog* catalog);
-
-const AirportData* airport_catalog_iter_next(AirportIter* it);
-
-void airport_catalog_iter_free(AirportIter* it);
-
-
-// iterar voos de um aeroporto
-
-AirportFlightIter* airport_flight_iter_create(const AirportData* data);
-
-const Flight* airport_flight_iter_next(AirportFlightIter* it);
-
-void airport_flight_iter_free(AirportFlightIter* it);
-
-
-int airport_catalog_count_flights_in_range(const AirportData* data, int start_date, int end_date);
+/**
+ * @brief Incrementa o contador de passageiros de um aeroporto.
+ *
+ * Atualiza o número de chegadas ou partidas de um aeroporto, consoante
+ * o tipo especificado.
+ *
+ * @param manager Ponteiro para o catálogo de aeroportos.
+ * @param airport_code Código do aeroporto.
+ * @param type Tipo de incremento: 'a' para chegada, 'd' para partida.
+ *
+ * @return void
+ */
+void airport_passenger_increment(
+    AirportCatalog* manager,
+    char* airport_code,
+    char type
+);
 
 /**
- * @brief Obtém um aeroporto do catálogo pelo seu código.
- * 
- * Esta função procura e retorna um aeroporto no catálogo usando o seu
- * código como chave de pesquisa. A pesquisa é realizada na tabela
- * hash do catálogo, garantindo acesso eficiente em tempo O(1) médio.
- * 
- * @param manager Ponteiro para o catálogo de aeroportos.
- * @param code String que contêm o código IATA do aeroporto a procurar.
- * 
- * @return Ponteiro constante para o objeto Airport se encontrado, ou NULL
- *         se o aeroporto não existir no catálogo, ou se manager ou code forem NULL.
- * 
+ * @brief Cria um iterador para percorrer todos os aeroportos.
+ *
+ * @param catalog Ponteiro constante para o catálogo de aeroportos.
+ *
+ * @return Ponteiro para o iterador criado, ou NULL em caso de erro.
  */
-const Airport* get_airport_by_code(AirportCatalog* manager, char* code);
+AirportIter* airport_catalog_iter_create(const AirportCatalog* catalog);
+
+/**
+ * @brief Obtém o próximo aeroporto do iterador.
+ *
+ * Avança o iterador e devolve a estrutura AirportData associada.
+ *
+ * @param it Ponteiro para o iterador.
+ *
+ * @return Ponteiro constante para AirportData se existir próximo elemento,
+ *         ou NULL se o iterador tiver terminado.
+ */
+const AirportData* airport_catalog_iter_next(AirportIter* it);
+
+/**
+ * @brief Liberta um iterador de aeroportos.
+ *
+ * @param it Ponteiro para o iterador a libertar.
+ *
+ * @return void
+ */
+void airport_catalog_iter_free(AirportIter* it);
+
+/**
+ * @brief Cria um iterador para percorrer os voos de partida de um aeroporto.
+ *
+ * @param data Ponteiro constante para a estrutura AirportData.
+ *
+ * @return Ponteiro para o iterador criado, ou NULL se data for NULL.
+ */
+AirportFlightIter* airport_flight_iter_create(const AirportData* data);
+
+/**
+ * @brief Obtém o próximo voo de partida do iterador.
+ *
+ * @param it Ponteiro para o iterador de voos.
+ *
+ * @return Ponteiro constante para Flight se existir próximo voo,
+ *         ou NULL se o iterador tiver terminado.
+ */
+const Flight* airport_flight_iter_next(AirportFlightIter* it);
+
+/**
+ * @brief Liberta um iterador de voos.
+ *
+ * @param it Ponteiro para o iterador a libertar.
+ *
+ * @return void
+ */
+void airport_flight_iter_free(AirportFlightIter* it);
+
+/**
+ * @brief Conta o número de voos de partida num intervalo de datas.
+ *
+ * Conta quantos voos de um aeroporto têm data real de partida
+ * compreendida entre start_date e end_date (inclusive).
+ *
+ * @param data Ponteiro constante para AirportData.
+ * @param start_date Data inicial (YYYYMMDD).
+ * @param end_date Data final (YYYYMMDD).
+ *
+ * @return Número de voos no intervalo especificado.
+ */
+int airport_catalog_count_flights_in_range(
+    const AirportData* data,
+    int start_date,
+    int end_date
+);
+
+/**
+ * @brief Obtém um aeroporto através do seu código.
+ *
+ * @param manager Ponteiro para o catálogo de aeroportos.
+ * @param code Código do aeroporto.
+ *
+ * @return Ponteiro constante para Airport se existir,
+ *         ou NULL caso contrário.
+ */
+const Airport* get_airport_by_code(
+    AirportCatalog* manager,
+    char* code
+);
 
 /**
  * @brief Obtém o número total de aeroportos no catálogo.
- * 
- * Esta função retorna a quantidade total de aeroportos armazenados no catálogo,
- * consultando o tamanho da tabela hash que os contém.
- * 
+ *
  * @param manager Ponteiro para o catálogo de aeroportos.
- * 
- * @return Número total de aeroportos no catálogo, ou 0 se manager for NULL.
- * 
+ *
+ * @return Número total de aeroportos registados.
  */
 int airport_catalog_get_count(AirportCatalog* manager);
 
+/**
+ * @brief Obtém o aeroporto associado a uma estrutura AirportData.
+ *
+ * @param data Ponteiro constante para AirportData.
+ *
+ * @return Ponteiro constante para Airport, ou NULL se data for NULL.
+ */
 const Airport* get_airport_from_data(const AirportData* data);
 
+/**
+ * @brief Obtém o número de chegadas registadas num aeroporto.
+ *
+ * @param manager Ponteiro para o catálogo de aeroportos.
+ * @param code Código do aeroporto.
+ *
+ * @return Número de chegadas registadas, ou 0 se não existir.
+ */
 int airport_get_arrival_count(AirportCatalog* manager, char* code);
+
+/**
+ * @brief Obtém o número de partidas registadas num aeroporto.
+ *
+ * @param manager Ponteiro para o catálogo de aeroportos.
+ * @param code Código do aeroporto.
+ *
+ * @return Número de partidas registadas, ou 0 se não existir.
+ */
 int airport_get_departure_count(AirportCatalog* manager, char* code);
 
 #endif

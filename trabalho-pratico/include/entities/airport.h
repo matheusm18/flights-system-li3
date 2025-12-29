@@ -87,7 +87,7 @@ char* get_airport_country(const Airport* airport);
  * * Esta função acede ao campo de tipo da estrutura Airport ('S', 'M', 'L')
  * e retorna a string descritiva correspondente.
  * * @note A string retornada é alocada dinamicamente (strdup). 
- * O chamador é responsável por fazer free() da memória.
+ * O caller é responsável por fazer free() da memória.
  * * @param airport Ponteiro para a entidade Airport (não deve ser NULL).
  * * @return String contendo o tipo ("small_airport", "medium_airport", "large_airport") ou "unknown".
  */

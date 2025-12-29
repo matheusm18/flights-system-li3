@@ -10,141 +10,203 @@ typedef struct flight_catalog FlightCatalog;
 /**
  * @brief Cria e inicializa um catálogo de voos.
  * 
- * Esta função aloca memória para um novo catálogo de voos e inicializa
- * uma tabela hash (GHashTable) para armazenar os voos indexados pelo
- * seu identificador (flight ID). A tabela hash é configurada para liberar
- * automaticamente a memória das chaves (strings) e dos valores (objetos Flight)
- * quando os elementos são removidos ou a tabela é destruída.
+ * Aloca memória para um novo catálogo de voos e inicializa as estruturas
+ * internas necessárias:
+ *  - Uma tabela hash para armazenar voos indexados pelo flight ID.
+ *  - Uma tabela hash auxiliar para estatísticas por companhia aérea.
+ *  - Um array dinâmico para armazenar estatísticas das companhias aéreas.
  * 
- * @return Ponteiro para o catálogo de voos criado, ou NULL se a alocação
- *         de memória falhar.
- * 
- * @note A tabela hash utiliza g_str_hash para função de hash e g_str_equal
- *       para comparação de chaves. As chaves são libertadas com g_free e os
- *       valores com destroy_flight.
- * 
- * @see destroy_flight
+ * @return Ponteiro para o catálogo criado ou NULL em caso de falha.
  */
 FlightCatalog* flight_catalog_create(void);
 
 /**
- * @brief Destrói um catálogo de voos e liberta toda a memória associada.
+ * @brief Destrói um catálogo de voos.
  * 
- * Esta função liberta toda a memória alocada para o catálogo de voos,
- * incluindo a tabela hash e todos os objetos Flight nela contidos. A função
- * g_hash_table_destroy invoca automaticamente as funções de destruição
- * configuradas (g_free para as chaves e destroy_flight para os valores).
+ * Liberta toda a memória associada ao catálogo, incluindo:
+ *  - Todos os voos armazenados.
+ *  - Estatísticas das companhias aéreas.
+ *  - Estruturas auxiliares internas.
  * 
- * @param manager Ponteiro para o catálogo de voos a ser destruído.
- * 
- * @return void
- * 
- * @note Se manager for NULL, a função não realiza nenhuma operação.
- *       Todos os objetos Flight no catálogo são automaticamente destruídos
- *       devido à configuração da tabela hash com destroy_flight.
- * 
+ * @param manager Ponteiro para o catálogo a destruir.
  */
 void flight_catalog_destroy(FlightCatalog* manager);
 
 /**
  * @brief Adiciona um voo ao catálogo.
  * 
- * Esta função adiciona um objeto Flight ao catálogo, indexando-o pelo seu
- * identificador (flight ID). O identificador é duplicado (g_strdup) para
- * servir como chave na tabela hash. Se já existir um voo com o mesmo
- * identificador, ele será substituído e o anterior será automaticamente destruído.
+ * Insere um objeto Flight na tabela hash do catálogo, indexado
+ * pelo seu identificador único (flight ID).
  * 
  * @param manager Ponteiro para o catálogo de voos.
- * @param flight Ponteiro para o objeto Flight a ser adicionado.
- * 
- * @return void
- * 
- * @note Se manager, flight ou o identificador do voo forem NULL, a função
- *       não realiza nenhuma operação. O identificador é duplicado para garantir
- *       que a tabela hash tenha sua própria cópia da chave.
+ * @param flight Ponteiro para o voo a adicionar.
  */
 void flight_catalog_add(FlightCatalog* manager, Flight* flight);
 
+/**
+ * @brief Inicializa estatísticas para uma companhia aérea.
+ * 
+ * Cria uma estrutura AirlineStats associada a uma companhia aérea
+ * identificada pelo seu código e adiciona-a às estruturas internas
+ * do catálogo.
+ * 
+ * @param manager Ponteiro para o catálogo de voos.
+ * @param airline_id Identificador da companhia aérea.
+ */
 void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id);
 
+/**
+ * @brief Liberta a memória associada a uma estrutura AirlineStats.
+ * 
+ * @param a Ponteiro para a estrutura AirlineStats a destruir.
+ */
 void destroy_airline(AirlineStats* a);
 
+/**
+ * @brief Função de comparação entre duas companhias aéreas.
+ * 
+ * Critérios de ordenação:
+ *  1. Média de atraso (ordem decrescente).
+ *  2. Identificador da companhia aérea (ordem lexicográfica crescente).
+ * 
+ * @param a Ponteiro para o primeiro elemento.
+ * @param b Ponteiro para o segundo elemento.
+ * 
+ * @return Valor negativo, zero ou positivo conforme a ordenação.
+ */
 int compare_airlines(const void* a, const void* b);
+
+/**
+ * @brief Ordena o array de estatísticas das companhias aéreas.
+ * 
+ * A ordenação é feita com base na função compare_airlines.
+ * 
+ * @param manager Ponteiro para o catálogo de voos.
+ */
 void airline_stats_sort_array(FlightCatalog* manager);
 
+/**
+ * @brief Atualiza estatísticas de atraso de uma companhia aérea.
+ * 
+ * Incrementa o atraso total e o número de voos atrasados
+ * associados à companhia aérea indicada.
+ * 
+ * @param manager Ponteiro para o catálogo de voos.
+ * @param airline_id Identificador da companhia aérea.
+ * @param delay Valor do atraso a adicionar.
+ */
 void airline_stats_increment(FlightCatalog* manager, char* airline_id, int delay);
 
+/**
+ * @brief Define a média de atraso de uma companhia aérea.
+ * 
+ * @param s Ponteiro para AirlineStats.
+ * @param media Valor da média de atraso.
+ */
 void set_airline_stats_media(AirlineStats* s, double media);
 
 /**
- * @brief Obtém um voo do catálogo pelo seu identificador.
- * 
- * Esta função procura e retorna um voo no catálogo usando o seu
- * identificador como chave de pesquisa. A pesquisa é realizada na tabela
- * hash do catálogo, garantindo acesso eficiente em tempo O(1) médio.
+ * @brief Obtém um voo pelo seu identificador.
  * 
  * @param manager Ponteiro para o catálogo de voos.
- * @param flight_id String contendo o identificador do voo a procurar.
+ * @param flight_id Identificador do voo.
  * 
- * @return Ponteiro para o objeto Flight se encontrado, ou NULL se o voo
- *         não existir no catálogo, ou se manager ou flight_id forem NULL.
- * 
+ * @return Ponteiro para o voo ou NULL se não existir.
  */
 Flight* get_flight_by_flight_id_from_catalog(FlightCatalog* manager, const char* flight_id);
 
 /**
- * @brief Obtém a origem de um voo através do seu identificador.
- * 
- * Esta função procura um voo no catálogo pelo seu identificador e retorna
- * o código do aeroporto de origem desse voo.
+ * @brief Obtém o aeroporto de origem de um voo.
  * 
  * @param manager Ponteiro para o catálogo de voos.
- * @param flight_id String contendo o identificador do voo.
+ * @param flight_id Identificador do voo.
  * 
- * @return String contendo o código do aeroporto de origem, ou NULL se o voo
- *         não for encontrado, ou se manager ou flight_id forem NULL.
- * 
- * @see get_flight_origin
+ * @return Código do aeroporto de origem ou NULL.
  */
 char* flight_catalog_get_origin(const FlightCatalog* manager, const char* flight_id);
 
 /**
- * @brief Obtém o destino de um voo através do seu identificador.
- * 
- * Esta função procura um voo no catálogo pelo seu identificador e retorna
- * o código do aeroporto de destino desse voo.
+ * @brief Obtém o aeroporto de destino de um voo.
  * 
  * @param manager Ponteiro para o catálogo de voos.
- * @param flight_id String contendo o identificador do voo.
+ * @param flight_id Identificador do voo.
  * 
- * @return String contendo o código do aeroporto de destino, ou NULL se o voo
- *         não for encontrado, ou se manager ou flight_id forem NULL.
- * 
- * @see get_flight_destination
+ * @return Código do aeroporto de destino ou NULL.
  */
 char* flight_catalog_get_destination(const FlightCatalog* manager, const char* flight_id);
 
 /**
  * @brief Obtém o número total de voos no catálogo.
  * 
- * Esta função retorna a quantidade total de voos armazenados no catálogo,
- * consultando o tamanho da tabela hash que os contém.
- * 
  * @param manager Ponteiro para o catálogo de voos.
  * 
- * @return Número total de voos no catálogo, ou 0 se manager for NULL.
- * 
+ * @return Número total de voos.
  */
 int flight_catalog_get_count(FlightCatalog* manager);
 
+/**
+ * @brief Obtém estatísticas de uma companhia aérea pelo identificador.
+ * 
+ * @param manager Ponteiro para o catálogo de voos.
+ * @param airline_id Identificador da companhia aérea.
+ * 
+ * @return Ponteiro para AirlineStats ou NULL.
+ */
 AirlineStats* get_airline_stats_by_identifier(FlightCatalog* manager, char* airline_id);
 
+/**
+ * @brief Obtém estatísticas de uma companhia aérea por índice.
+ * 
+ * @param manager Ponteiro para o catálogo de voos.
+ * @param index Índice no array de estatísticas.
+ * 
+ * @return Ponteiro para AirlineStats ou NULL.
+ */
 AirlineStats* get_airline_stats_from_array(FlightCatalog* manager, int index);
 
+/**
+ * @brief Obtém o número de companhias aéreas com estatísticas registadas.
+ * 
+ * @param manager Ponteiro para o catálogo de voos.
+ * 
+ * @return Tamanho do array de estatísticas.
+ */
 int get_airline_stats_array_length(FlightCatalog* manager);
+
+/**
+ * @brief Obtém o identificador da companhia aérea.
+ * 
+ * @param a Ponteiro para AirlineStats.
+ * 
+ * @return String duplicada com o identificador da companhia aérea.
+ */
 char* get_airline_stats_airline(AirlineStats* a);
+
+/**
+ * @brief Obtém o número de voos atrasados de uma companhia aérea.
+ * 
+ * @param a Ponteiro para AirlineStats.
+ * 
+ * @return Número de voos atrasados.
+ */
 int get_airline_stats_flights_count(AirlineStats* a);
+
+/**
+ * @brief Obtém o atraso total acumulado de uma companhia aérea.
+ * 
+ * @param a Ponteiro para AirlineStats.
+ * 
+ * @return Atraso total.
+ */
 long get_airline_stats_total_delay(AirlineStats* a);
+
+/**
+ * @brief Obtém a média de atraso de uma companhia aérea.
+ * 
+ * @param a Ponteiro para AirlineStats.
+ * 
+ * @return Média de atraso.
+ */
 double get_airline_stats_media(AirlineStats* a);
 
 #endif

@@ -8,16 +8,53 @@
 #include "utils/query2_utils.h"
 #include <stdio.h>
 
-
 /**
- * @brief Executa a Query 2: Top N aeronaves com mais voos
- * @return QueryResult* contendo os tokens para escrita posterior
+ * @brief Executa a Query 2: Top N aeronaves com mais voos.
+ *
+ * Esta query devolve um ranking das N aeronaves com maior número de voos.
+ * Opcionalmente, pode filtrar apenas por um fabricante específico.
+ *
+ * Cada linha do resultado contém os seguintes campos:
+ *  - Identificador da aeronave
+ *  - Fabricante
+ *  - Modelo
+ *  - Número de voos
+ *
+ * @param aircraft_manager Ponteiro para o catálogo de aeronaves.
+ * @param n Número máximo de aeronaves a incluir no resultado.
+ * @param manufacturer Se não for NULL, filtra apenas aeronaves deste fabricante.
+ * @return Ponteiro para QueryResult contendo até N linhas de resultado.
  */
 QueryResult* execute_query2(AircraftCatalog* aircraft_manager, int n, char* manufacturer);
 
-int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, char* manufacturer, AircraftCount** out_array);
-int compare_aircraft_counts(const void* a, const void* b);
-void free_aircraft_count_array(AircraftCount* array, int count);
 
+/**
+ * @brief Cria um array filtrado de contagem de voos por aeronave.
+ *
+ * Este array é usado internamente para gerar rankings ou processamentos adicionais.
+ *
+ * @param aircraft_catalog Ponteiro para o catálogo de aeronaves.
+ * @param manufacturer Se não for NULL, filtra apenas aeronaves deste fabricante.
+ * @param out_array Saída: ponteiro para o array alocado de AircraftCount.
+ * @return Número de elementos no array.
+ */
+int filter_build_aircraft_count_array(AircraftCatalog* aircraft_catalog, char* manufacturer, AircraftCount** out_array);
+
+/**
+ * @brief Função de comparação para qsort, compara contagens de aeronaves.
+ *
+ * @param a Ponteiro para um AircraftCount.
+ * @param b Ponteiro para outro AircraftCount.
+ * @return Valor <0, 0 ou >0 conforme a ordenação desejada (decrescente por count, depois por ID).
+ */
+int compare_aircraft_counts(const void* a, const void* b);
+
+/**
+ * @brief Liberta a memória de um array de AircraftCount.
+ *
+ * @param array Ponteiro para o array alocado.
+ * @param count Número de elementos do array.
+ */
+void free_aircraft_count_array(AircraftCount* array, int count);
 
 #endif

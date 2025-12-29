@@ -4,131 +4,176 @@
 #include <glib.h>
 #include "entities/aircraft.h"
 
-typedef struct aircraft_data AircraftData;
-typedef struct aircraft_iterator AircraftIter;
+/**
+ * @typedef AircraftCatalog
+ * @brief Estrutura opaca que representa o catálogo de aeronaves.
+ *
+ * O catálogo de aeronaves gere todas as aeronaves do sistema, permitindo:
+ *  - Acesso rápido a aeronaves através do seu identificador
+ *  - Contabilização do número de voos realizados por cada aeronave
+ *  - Iteração sobre todas as aeronaves registadas
+ *
+ * A implementação concreta da estrutura encontra-se no ficheiro .c,
+ * garantindo encapsulamento.
+ */
 typedef struct aircraft_catalog AircraftCatalog;
 
 /**
+ * @typedef AircraftData
+ * @brief Estrutura que agrega uma aeronave e estatísticas associadas.
+ *
+ * Esta estrutura associa uma instância de Aircraft ao respetivo número
+ * de voos realizados, sendo usada internamente pelo catálogo.
+ */
+typedef struct aircraft_data AircraftData;
+
+/**
+ * @typedef AircraftIter
+ * @brief Iterador para percorrer todas as aeronaves do catálogo.
+ *
+ * Permite iterar sobre todas as entradas do catálogo de aeronaves,
+ * devolvendo uma estrutura AircraftData por iteração.
+ */
+typedef struct aircraft_iterator AircraftIter;
+
+/**
  * @brief Cria e inicializa um catálogo de aeronaves.
- * 
+ *
  * Esta função aloca memória para um novo catálogo de aeronaves e inicializa
- * uma tabela hash (GHashTable) para armazenar as aeronaves indexadas pelo
- * seu identificador. A tabela hash é configurada para libertar automaticamente
- * a memória das chaves (strings) e dos valores (objetos Aircraft) quando
- * os elementos são removidos ou a tabela é destruída.
- * 
+ * uma tabela hash que associa identificadores de aeronaves a estruturas
+ * AircraftData.
+ *
  * @return Ponteiro para o catálogo de aeronaves criado, ou NULL se a alocação
  *         de memória falhar.
- * 
- * @note A tabela hash utiliza g_str_hash para função de hash e g_str_equal
- *       para comparação de chaves. As chaves são libertadas com g_free e os
- *       valores com destroy_aircraft.
- * 
- * @see destroy_aircraft
  */
 AircraftCatalog* aircraft_catalog_create();
 
 /**
  * @brief Destrói um catálogo de aeronaves e liberta toda a memória associada.
- * 
- * Esta função liberta toda a memória alocada para o catálogo de aeronaves,
- * incluindo a tabela hash e todos os objetos Aircraft nela contidos. A função
- * g_hash_table_destroy invoca automaticamente as funções de destruição
- * configuradas (g_free para as chaves e destroy_aircraft para os valores).
- * 
- * @param manager Ponteiro para o catálogo de aeronaves a ser destruído.
- * 
+ *
+ * Esta função liberta:
+ *  - Todas as aeronaves armazenadas
+ *  - As estruturas AircraftData
+ *  - A tabela hash interna
+ *  - A própria estrutura do catálogo
+ *
+ * @param manager Ponteiro para o catálogo de aeronaves a destruir.
+ *
  * @return void
- * 
+ *
  * @note Se manager for NULL, a função não realiza nenhuma operação.
- *       Todos os objetos Aircraft no catálogo são automaticamente destruídos
- *       devido à configuração da tabela hash com destroy_aircraft.
- * 
  */
 void aircraft_catalog_destroy(AircraftCatalog* manager);
 
 /**
  * @brief Adiciona uma aeronave ao catálogo.
- * 
- * Esta função adiciona um objeto Aircraft ao catálogo, indexando-o pelo seu
- * identificador. O identificador é duplicado (g_strdup) para servir como chave
- * na tabela hash. Se já existir uma aeronave com o mesmo identificador, ela
- * será substituída e a anterior será automaticamente destruída.
- * 
+ *
+ * Insere uma aeronave no catálogo, associando o seu identificador único
+ * a uma estrutura AircraftData inicializada com contador de voos a zero.
+ *
  * @param manager Ponteiro para o catálogo de aeronaves.
- * @param aircraft Ponteiro para o objeto Aircraft a ser adicionado.
- * 
+ * @param aircraft Ponteiro para a aeronave a adicionar.
+ *
  * @return void
- * 
- * @note Se manager, aircraft ou o identificador da aeronave forem NULL,
- *       a função não realiza nenhuma operação. O identificador é duplicado
- *       para garantir que a tabela hash tenha sua própria cópia da chave.
- * 
+ *
+ * @note Se manager ou aircraft forem NULL, a função não realiza nenhuma operação.
  */
 void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft);
 
-
+/**
+ * @brief Cria um iterador para percorrer o catálogo de aeronaves.
+ *
+ * Inicializa um iterador que permite percorrer todas as aeronaves
+ * armazenadas no catálogo.
+ *
+ * @param catalog Ponteiro constante para o catálogo de aeronaves.
+ *
+ * @return Ponteiro para o iterador criado, ou NULL em caso de erro.
+ */
 AircraftIter* aircraft_catalog_iter_create(const AircraftCatalog* catalog);
 
+/**
+ * @brief Obtém a próxima aeronave do iterador.
+ *
+ * Avança o iterador e devolve a estrutura AircraftData associada
+ * à aeronave corrente.
+ *
+ * @param it Ponteiro para o iterador.
+ *
+ * @return Ponteiro constante para AircraftData se existir próximo elemento,
+ *         ou NULL se o iterador tiver terminado.
+ */
 const AircraftData* aircraft_catalog_iter_next(AircraftIter* it);
 
+/**
+ * @brief Liberta um iterador de aeronaves.
+ *
+ * Liberta a memória associada a um iterador previamente criado.
+ *
+ * @param it Ponteiro para o iterador a libertar.
+ *
+ * @return void
+ */
 void aircraft_catalog_iter_free(AircraftIter* it);
 
 /**
- * @brief Obtém uma aeronave do catálogo pelo seu identificador.
- * 
- * Esta função procura e retorna uma aeronave no catálogo usando o seu
- * identificador como chave de pesquisa. A pesquisa é realizada na tabela
- * hash do catálogo, garantindo acesso eficiente em tempo O(1) médio.
- * 
+ * @brief Obtém uma aeronave através do seu identificador.
+ *
+ * Procura no catálogo uma aeronave associada ao identificador fornecido.
+ *
  * @param manager Ponteiro para o catálogo de aeronaves.
- * @param identifier String contendo o identificador da aeronave a procurar.
- * 
- * @return Ponteiro para o objeto Aircraft se encontrado, ou NULL se a aeronave
- *         não existir no catálogo, ou se manager ou identifier forem NULL.
- * 
- * @note A aeronave retornada pode ser modificada pelo chamador. Para acesso
- *       apenas de leitura, considere usar uma versão que retorne const Aircraft*.
- * 
+ * @param identifier Identificador da aeronave.
+ *
+ * @return Ponteiro constante para a aeronave se existir,
+ *         ou NULL caso contrário.
  */
-const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier);
+const Aircraft* get_aircraft_by_identifier(
+    AircraftCatalog* manager,
+    const char* identifier
+);
 
 /**
- * @brief Incrementa o contador de voos de uma aeronave específica.
- * 
- * Esta função procura uma aeronave no catálogo pelo seu identificador e
- * incrementa o seu contador de voos. É utilizada para registar cada vez
- * que uma aeronave realiza um voo (não cancelado).
- * 
- * @param aircraft_id String contendo o identificador da aeronave.
+ * @brief Incrementa o contador de voos de uma aeronave.
+ *
+ * Atualiza o número de voos realizados pela aeronave com o identificador
+ * fornecido.
+ *
+ * @param aircraft_id Identificador da aeronave.
  * @param manager Ponteiro para o catálogo de aeronaves.
- * 
+ *
  * @return void
- * 
- * @note Se manager ou aircraft_id forem NULL, ou se aircraft_id for uma string
- *       vazia, ou se a aeronave não existir no catálogo, a função não realiza
- *       nenhuma operação.
- * 
- * @see get_aircraft_by_identifier
- * @see aircraft_increment_flight_count
  */
-void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager);
+void aircrafts_counter_increment(
+    const char* aircraft_id,
+    AircraftCatalog* manager
+);
 
+/**
+ * @brief Obtém o número de voos realizados por uma aeronave.
+ *
+ * @param data Ponteiro constante para a estrutura AircraftData.
+ *
+ * @return Número de voos realizados pela aeronave, ou 0 se data for NULL.
+ */
 int get_aircraft_flight_count(const AircraftData* data);
 
 /**
  * @brief Obtém o número total de aeronaves no catálogo.
- * 
- * Esta função retorna a quantidade total de aeronaves armazenadas no catálogo,
- * consultando o tamanho da tabela hash que as contém.
- * 
+ *
  * @param catalog Ponteiro para o catálogo de aeronaves.
- * 
- * @return Número total de aeronaves no catálogo, ou 0 se catalog for NULL.
- * 
+ *
+ * @return Número total de aeronaves armazenadas no catálogo,
+ *         ou 0 se catalog for NULL.
  */
 int get_total_aircrafts_in_catalog(AircraftCatalog* catalog);
 
+/**
+ * @brief Obtém a aeronave associada a uma estrutura AircraftData.
+ *
+ * @param data Ponteiro constante para AircraftData.
+ *
+ * @return Ponteiro constante para a aeronave, ou NULL se data for NULL.
+ */
 const Aircraft* get_aircraft_from_data(const AircraftData* data);
 
 #endif
