@@ -9,13 +9,13 @@
 #include <stdio.h>
 
 //==== Determinar o passageiro que esteve mais tempo no Top 10 semanal durante um período
-QueryResult* execute_query4(ReservationCatalog* reservation_catalog, PassengerCatalog* passenger_catalog, char* begin_date, char* end_date) {
+QueryResult* execute_query4(PassengerCatalog* passenger_catalog, char* begin_date, char* end_date) {
     QueryResult* res = create_query_result();
     
-    if (!reservation_catalog || !passenger_catalog) return res;
+    if (!passenger_catalog) return res;
 
     int count = 0;
-    char* winner_id = reservation_catalog_get_top_passenger_in_period(reservation_catalog, begin_date, end_date, &count);
+    char* winner_id = passenger_catalog_get_top_passenger_in_period(passenger_catalog, begin_date, end_date, &count);
 
     if (winner_id != NULL) {
         const Passenger* p = get_passenger_by_dnumber(passenger_catalog, atoi(winner_id));

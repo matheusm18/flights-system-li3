@@ -5,6 +5,25 @@
 #include "entities/passenger.h"
 
 /**
+ * @typedef WeeklyTop
+ * @brief Estrutura opaca que representa os passageiros com maior gasto numa semana.
+ *
+ * Esta estrutura é utilizada internamente para suportar a Query 4, armazenando
+ * o identificador da semana e os IDs dos passageiros com maior gasto nesse período.
+ * A sua definição concreta encontra-se no ficheiro de implementação.
+ */
+typedef struct weekly_top WeeklyTop;
+
+/**
+ * @typedef PassengerSpend
+ * @brief Estrutura auxiliar para associar um passageiro ao seu valor gasto.
+ *
+ * Utilizada internamente durante o processamento e ordenação de passageiros
+ * com base no total gasto num determinado período.
+ */
+typedef struct passenger_spend PassengerSpend;
+
+/**
  * @typedef PassengerCatalog
  * @brief Estrutura opaca que representa um catálogo de passageiros.
  *
@@ -72,6 +91,96 @@ void passenger_catalog_destroy(PassengerCatalog* manager);
  * @note Se manager ou passenger forem NULL, a função não realiza nenhuma operação.
  */
 void passenger_catalog_add(PassengerCatalog* manager, Passenger* passenger);
+
+/**
+ * @brief Atualiza o total gasto por um passageiro numa determinada semana.
+ *
+ * Esta função incrementa o valor gasto por um passageiro identificado por
+ * passenger_id numa semana específica, identificada por weekID.
+ *
+ * @param manager Ponteiro para o catálogo de passageiros.
+ * @param weekID Identificador da semana.
+ * @param passenger_id Identificador do passageiro.
+ * @param price Valor a adicionar ao total gasto.
+ *
+ * @return void
+ */
+void passenger_catalog_add_price_increment(
+    PassengerCatalog* manager,
+    const char* weekID,
+    const char* passenger_id,
+    double price
+);
+
+/**
+ * @brief Função de comparação de passageiros por valor gasto.
+ *
+ * Compara dois PassengerSpend, ordenando-os por valor gasto de forma decrescente.
+ * Em caso de empate, a ordenação é feita pelo identificador do passageiro.
+ *
+ * @param a Ponteiro para o primeiro elemento a comparar.
+ * @param b Ponteiro para o segundo elemento a comparar.
+ *
+ * @return Valor negativo, zero ou positivo conforme a ordenação.
+ */
+int compare_passengers(const void* a, const void* b);
+
+/**
+ * @brief Função de comparação de semanas.
+ *
+ * Compara duas estruturas WeeklyTop com base na chave da semana.
+ *
+ * @param a Ponteiro para o primeiro elemento a comparar.
+ * @param b Ponteiro para o segundo elemento a comparar.
+ *
+ * @return Valor negativo, zero ou positivo conforme a ordenação.
+ */
+int compare_weeks(const void* a, const void* b);
+
+/**
+ * @brief Função de comparação de strings.
+ *
+ * Compara duas strings lexicograficamente.
+ *
+ * @param a Ponteiro para a primeira string.
+ * @param b Ponteiro para a segunda string.
+ *
+ * @return Valor negativo, zero ou positivo conforme a ordenação.
+ */
+int compare_strings(const void *a, const void *b);
+
+/**
+ * @brief Prepara os dados necessários para a Query 4.
+ *
+ * Processa as estatísticas semanais e constrói uma linha temporal com
+ * os passageiros de maior gasto por semana, permitindo consultas eficientes.
+ *
+ * @param manager Ponteiro para o catálogo de passageiros.
+ *
+ * @return void
+ */
+void passenger_catalog_prepare_query4(PassengerCatalog* manager);
+
+/**
+ * @brief Obtém o passageiro mais frequente no top semanal num dado período.
+ *
+ * Determina o passageiro que aparece mais vezes no top de passageiros
+ * com maior gasto entre duas datas.
+ *
+ * @param manager Ponteiro para o catálogo de passageiros.
+ * @param begin_date Data de início do período (string).
+ * @param end_date Data de fim do período (string).
+ * @param out_count Ponteiro onde será armazenado o número de ocorrências.
+ *
+ * @return String com o identificador do passageiro vencedor (alocada dinamicamente),
+ *         ou NULL se não existirem dados no período indicado.
+ */
+char* passenger_catalog_get_top_passenger_in_period(
+    PassengerCatalog* manager,
+    char* begin_date,
+    char* end_date,
+    int* out_count
+);
 
 /**
  * @brief Verifica se um número de documento existe no catálogo.

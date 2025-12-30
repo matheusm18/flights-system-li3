@@ -4,7 +4,7 @@
 #include <string.h>
 
 struct flight {
-    char *flight_id;
+    char flight_id[9];
     long departure;
     long actual_departure;
     //long arrival;
@@ -21,7 +21,6 @@ struct flight {
 Flight* create_flight(char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival, const char* gate, const char* status, 
                       const char* origin, const char* destination, const char* aircraft, const char* airline) {
 
-    (void) departure;
     (void) arrival;
     (void) actual_arrival;
     (void) gate;
@@ -30,19 +29,15 @@ Flight* create_flight(char* flight_id, long departure, long actual_departure, lo
     Flight* flight = malloc(sizeof(Flight));
     if (!flight) return NULL;
     
-    flight->flight_id = strdup(flight_id);
+    memset(flight, 0, sizeof(Flight));
+    strncpy(flight->flight_id, flight_id, 8);
 
     flight->departure = departure;
     flight->actual_departure = actual_departure;
-    //flight->arrival = arrival;
-    //flight->actual_arrival = actual_arrival;
-
-    //flight->gate = strdup(gate);
     flight->status = strdup(status);
     flight->origin = strdup(origin);
     flight->destination = strdup(destination);
     flight->aircraft = strdup(aircraft);
-    //flight->airline = strdup(airline);
 
     return flight;
 }
@@ -50,13 +45,10 @@ Flight* create_flight(char* flight_id, long departure, long actual_departure, lo
 void destroy_flight(Flight* f) {
     if (!f) return;
 
-    free(f->flight_id);
-    //free(f->gate);
     free(f->status);
     free(f->origin);
     free(f->destination);
     free(f->aircraft);
-    //free(f->airline);
 
     free(f);
 }

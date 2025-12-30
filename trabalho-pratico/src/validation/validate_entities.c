@@ -3,6 +3,7 @@
 #include "catalog/catalog_manager.h"
 #include "catalog/airport_catalog.h"
 #include "catalog/aircraft_catalog.h"
+#include "catalog/passenger_catalog.h"
 #include "catalog/flight_catalog.h"
 #include "validation/aircraft_validation.h"
 #include "validation/airport_validation.h"
@@ -267,7 +268,7 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
 
     int dob_int = string_to_date(dob);
 
-    Passenger* passenger = create_passenger(document_number, first_name, last_name, dob_int, nationality, gender);
+    Passenger* passenger = create_passenger(document_number, first_name, last_name, dob_int, nationality);
     
     if (passenger != NULL) passenger_catalog_add(passenger_catalog, passenger);
 }
@@ -301,9 +302,7 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     char *priority_boarding = fields[6];
     char *qr_code           = fields[7];
 
-    (void) qr_code;
-
-    if (get_reservation_by_id(reservation_catalog, reservation_id) != NULL ||
+    if (reservation_exists(reservation_catalog, reservation_id) ||
         !validate_reservation_id(reservation_id) ||
         !validate_flight_ids_reservation(flight_ids, flight_catalog) ||
         !validate_passenger_document_number(document_number) ||
@@ -394,8 +393,10 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     free(clean_ids);
 
     if (q4_week_id != NULL && q4_week_id[0] != '\0') {
-        reservation_catalog_add_price_increment(reservation_catalog, q4_week_id, document_number, total_price);
+        passenger_catalog_add_price_increment(passenger_catalog, q4_week_id, document_number, total_price);
     }
+
+    /* Decidimos não armazenar as reservas visto que não precisavamos destes dados
 
     bool extra_luggage_bool = string_to_bool(extra_luggage);
     bool priority_boarding_bool =
@@ -412,6 +413,9 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
 
     if (res)
         reservation_catalog_add(reservation_catalog, res);
+    */
+   
+    reservation_catalog_add(reservation_catalog, reservation_id);
 
     for (int i = 0; i < flight_count; i++)
         free(flight_ids_array[i]);

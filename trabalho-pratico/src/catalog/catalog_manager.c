@@ -29,6 +29,8 @@ void catalog_manager_destroy(CatalogManager* manager) {
     free(manager);
 }
 
+// getters
+
 AirportCatalog* get_airports_from_catalog_manager(const CatalogManager* manager) {
     return manager->airport_catalog;
 }

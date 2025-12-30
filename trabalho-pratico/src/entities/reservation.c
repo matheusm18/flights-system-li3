@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-// não está em comentario porque nem se quer criamos reservas para já
+// temos a estrutura mas já não armazenamos as reservas
 struct reservation {
     char* reservation_id;
     char** flight_ids;
@@ -12,7 +12,7 @@ struct reservation {
     double price;
     bool extra_luggage;
     bool priority_boarding;
-    //char* qr_code;
+    char* qr_code;
 };
 
 Reservation* create_reservation(const char* reservation_id, char** flight_ids, const char* document_number, const char* seat, double price, bool extra_luggage, bool priority_boarding) {

@@ -26,9 +26,6 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
     airport->name = strdup(name);
     airport->city = strdup(city);
     airport->country = strdup(country);
-    //airport->latitude = atof(latitude);
-    //airport->longitude = atof(longitude);
-    //strncpy(airport->icao, icao, 5);
     airport->type = airport_type_to_char(type);
 
     return airport;

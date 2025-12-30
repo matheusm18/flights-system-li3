@@ -35,8 +35,7 @@ Passenger* create_passenger(
     char* first_name,
     char* last_name,
     int dob,
-    char* nationality,
-    char* gender
+    char* nationality
 );
 
 /**

@@ -116,6 +116,6 @@ void load_datasets(const char* dataset_path, CatalogManager* catalog_manager) {
     load_csv_file(reservations_file, 8, process_valid_line_reservations, catalog_manager,
                   "resultados/reservations_errors.csv", init_reservations_errors_file);
 
-    reservation_catalog_prepare_query4(get_reservations_from_catalog_manager(catalog_manager));
+    passenger_catalog_prepare_query4(get_passengers_from_catalog_manager(catalog_manager)); // preparar a query4
 
 }

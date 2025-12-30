@@ -2,29 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-// não está em comentario porque nem se quer criamos passageiros para já
 struct passenger {
     int document_number;
+    int dob;
     char* first_name;
     char* last_name;
-    int dob;
     char* nationality;
-    char gender;
-    // email, phone, address, photo não são armazenados para já
+    // char gender;
+    // email, phone, address, photo não são armazenados
 
 };
 
-Passenger* create_passenger(char* document_number, char* first_name, char* last_name, int dob, char* nationality, char* gender) {
+Passenger* create_passenger(char* document_number, char* first_name, char* last_name, int dob, char* nationality) {
 
     Passenger* passenger = malloc(sizeof(Passenger));
     if (passenger == NULL) return NULL;
 
     passenger->document_number = atoi(document_number);
+    passenger->dob = dob;
     passenger->first_name = strdup(first_name);
     passenger->last_name = strdup(last_name);
-    passenger->dob = dob;
     passenger->nationality = strdup(nationality);
-    passenger->gender = gender[0];
 
     return passenger;
 }
@@ -46,6 +44,12 @@ int get_passenger_dnumber(const Passenger* passenger) {
     return passenger->document_number;
 }
 
+int get_passenger_dob(const Passenger* passenger) {
+    if (passenger == NULL) return -1;
+    
+    return passenger->dob;
+}
+
 char* get_passenger_first_name(const Passenger* passenger) {
     if (passenger == NULL) return NULL;
     
@@ -56,12 +60,6 @@ char* get_passenger_last_name(const Passenger* passenger) {
     if (passenger == NULL) return NULL;
     
     return strdup(passenger->last_name);
-}
-
-int get_passenger_dob(const Passenger* passenger) {
-    if (passenger == NULL) return -1;
-    
-    return passenger->dob;
 }
 
 char* get_passenger_nationality(const Passenger* passenger) {

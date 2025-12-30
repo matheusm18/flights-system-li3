@@ -77,15 +77,6 @@ void aircraft_catalog_iter_free(AircraftIter* it) {
 }
 
 
-// getters
-
-const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
-    if (manager == NULL || identifier == NULL) return NULL;
-
-    AircraftData* data = g_hash_table_lookup(manager->aircraft_data_by_identifier,identifier);
-    if (data == NULL) return NULL;
-    else return data->aircraft;
-} 
 
 void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager) {
     if (!manager || !aircraft_id || !*aircraft_id) return;
@@ -95,6 +86,17 @@ void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manag
         data->flight_count++;
     }
 }
+
+
+// getters
+
+const Aircraft* get_aircraft_by_identifier(AircraftCatalog* manager, const char* identifier) {
+    if (manager == NULL || identifier == NULL) return NULL;
+
+    AircraftData* data = g_hash_table_lookup(manager->aircraft_data_by_identifier,identifier);
+    if (data == NULL) return NULL;
+    else return data->aircraft;
+} 
 
 int get_aircraft_flight_count(const AircraftData* data) {
     return data ? data->flight_count : 0;
