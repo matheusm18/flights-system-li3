@@ -10,9 +10,10 @@
 #include <string.h>
 #include <ncurses.h>
 #include "io/output_writer.h"
+#include "utils/utils_validation.h"
 
 #define MIN_ROWS 30
-#define MIN_COLS 100
+#define MIN_COLS 190
 
 void wait_for_bigger_terminal_size() {
     int rows, cols;
@@ -55,7 +56,7 @@ static int contar_tokens(const char* str) {
 }
 
 void run_menu_loop(CatalogManager* manager) {
-    char args[35];
+    char args[96];
 
     while (1) {
         wait_for_bigger_terminal_size();
@@ -78,7 +79,7 @@ void run_menu_loop(CatalogManager* manager) {
         int argumentos_validos = 0;
         int cancelar_query = 0;
         
-        char args_copy[35]; 
+        char args_copy[96]; 
 
         while (!argumentos_validos) {  
             ui_pedir_argumentos(q, com_S, args, sizeof(args));
@@ -110,6 +111,19 @@ void run_menu_loop(CatalogManager* manager) {
                 while (token && n_args < 10) {
                     arg_tokens[n_args++] = token;
                     token = strtok(NULL, " ");
+                }
+
+                if (get_query_id(q) == 6 && n_args > 1) {
+                    // a query 6 só tem 1 argumento, temos de juntar tudo
+                    char temp[256] = "";
+                    for (int i = 0; i < n_args; i++) {
+                        if (i > 0) strcat(temp, " ");
+                        strcat(temp, arg_tokens[i]);
+                    }
+                    // substituir o primeiro token pelo texto completo
+                    strcpy(args_copy, temp);
+                    arg_tokens[0] = args_copy;
+                    n_args = 1; 
                 }
 
                 // validar semanticamente os argumentos
@@ -197,23 +211,15 @@ void run_menu_loop(CatalogManager* manager) {
         keypad(content_pad, TRUE); // ativa o suporte a teclas especiais
 
         if(total_lines == 0){
-            curs_set(0);
-            int msg_height = 3;
-            int msg_width  = 39;
-            int starty = (LINES - msg_height) / 2;
-            int startx = (COLS - msg_width) / 2;
+            char* msg = "[!] Sem resultados a apresentar [!]";
 
-            WINDOW* msg_win = newwin(msg_height, msg_width, starty, startx);
-            wbkgd(msg_win, COLOR_PAIR(4) | A_BOLD);
-            box(msg_win, 0, 0);
+            int pad_mid_col = (pad_width - strlen(msg)) / 2;
+            int pad_mid_row = (pad_height - 2) / 2;
+            wattron(content_pad, A_BOLD | COLOR_PAIR(3));
+            mvwprintw(content_pad, pad_mid_row, pad_mid_col, "%s", msg);
+            wattroff(content_pad, A_BOLD | COLOR_PAIR(3));
 
-            mvwprintw(msg_win, 1, 2, "[!] Sem resultados a apresentar [!]");
-            wrefresh(msg_win);
-
-            wgetch(msg_win);
-            curs_set(1);
-
-            delwin(msg_win);
+            total_lines = 1;
         } else {
             // escrever conteúdo no pad
             write_result(result, NULL, com_S ? '=' : ';', 1, content_pad);
@@ -304,6 +310,7 @@ void start_interactive_ui(CatalogManager* manager) {
         } else {
             strcpy(dataset_path, input);
         }
+
 
         int len = strlen(dataset_path);
         if (len > 0 && dataset_path[len-1] != '/') {

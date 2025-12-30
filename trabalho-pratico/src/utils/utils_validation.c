@@ -193,3 +193,80 @@ bool validate_int_pos(const char *str) {
 
     return true;
 }
+
+
+bool validate_parentheses(char *str, int len) {
+    int open_positions[100];
+    int top = -1;
+    bool inside_paren = false; // Flag para saber se já estamos dentro de parênteses
+    
+    for (int i = 0; i < len; i++) {
+        if (str[i] == '(') {
+            // Já estamos dentro de parênteses? Não pode!
+            if (inside_paren) {
+                return false; // Parênteses dentro de parênteses
+            }
+            
+            // Verificar se não é vazio "()"
+            if (i + 1 < len && str[i+1] == ')') {
+                return false;
+            }
+            
+            // Verificar se não é o último caractere
+            if (i == len - 1) {
+                return false;
+            }
+            
+            // Guardar posição e marcar que estamos dentro de parênteses
+            if (top < 99) {
+                open_positions[++top] = i;
+                inside_paren = true;
+            } else {
+                return false;
+            }
+        }
+        else if (str[i] == ')') {
+            // Verificar se há '(' correspondente
+            if (top < 0) {
+                return false; // ')' sem '('
+            }
+            
+            // Verificar se não é vazio "()"
+            int open_pos = open_positions[top];
+            if (open_pos == i - 1) {
+                return false;
+            }
+            
+            // Remover '(' da stack e marcar que saímos dos parênteses
+            top--;
+            inside_paren = false;
+        }
+    }
+    
+    // Verificar se todos os '(' foram fechados
+    return top == -1;
+}
+
+bool validate_basic_special_chars(const char *str, int len) {
+    // não pode começar ou terminar com espaço ou &
+    if (str[0] == ' ' || str[0] == '&' || str[0] == ')') {
+        return false;
+    }
+    if (str[len-1] == ' ' || str[len-1] == '&' || str[len-1] == '(') {
+        return false;
+    }
+    
+    // não pode ter espaços duplos
+    for (int i = 0; i < len - 1; i++) {
+        if (str[i] == ' ' && str[i+1] == ' ') {
+            return false;
+        }
+        if (str[i] == '&' && str[i+1] == '&') {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+

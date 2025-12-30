@@ -89,29 +89,33 @@ ValidationResult validate_query5(char **args) {
     return (ValidationResult){true, NULL};
 }
 
-ValidationResult validate_query6(char **args) { // argumento tem de ser inserido entre " " !!!!!!!!!!
+ValidationResult validate_query6(char **args) {    
     char *nationality = args[0];
+    int len = strlen(nationality);
 
-    if (!isupper((unsigned char)nationality[0])) {
-        return (ValidationResult){false, "Nacionalidade deve comecar com letra maiuscula"};
+    // primeiro caractere deve ser letra
+    if (!isalpha((unsigned char)nationality[0])) {
+        return (ValidationResult){false, "Nacionalidade deve comecar com letra"};
     }
-
-    bool expect_upper = false; // Flag para indicar se esperamos maiúscula após espaço
     
-    for (int i = 1; nationality[i] != '\0'; i++) {
-        if (nationality[i] == ' ') {
-            expect_upper = true; // Próximo caractere deve ser maiúscula
-        } else if (isalpha((unsigned char)nationality[i])) {
-            if (expect_upper && !isupper((unsigned char)nationality[i])) {
-                return (ValidationResult){false, "Cada palavra da nacionalidade deve comecar com maiuscula"};
-            }
-            expect_upper = false;
-        } else {
-            // nao é letra nem espaço
-            return (ValidationResult){false, "Nacionalidade deve conter apenas letras e espacos"};
+    // validar parênteses
+    if (!validate_parentheses(nationality, len)) {
+        return (ValidationResult){false, "Parenteses mal formatados"};
+    }
+    
+    // validar caracteres permitidos
+    for (int i = 0; i < len; i++) {
+        char c = nationality[i];
+        if (!isalnum((unsigned char)c) && c != ' ' && c != '&' && c != '(' && c != ')') {
+            return (ValidationResult){false, "Caractere invalido na nacionalidade"};
         }
     }
-
+    
+    // validar caracteres especiais básicos
+    if (!validate_basic_special_chars(nationality, len)) {
+        return (ValidationResult){false, "Caracteres especiais mal posicionados"};
+    }
+    
     return (ValidationResult){true, NULL};
 }
 

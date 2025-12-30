@@ -126,4 +126,42 @@ bool string_to_bool(const char *str);
  */
 bool validate_int_pos(const char *str);
 
+
+/**
+ * @brief Valida a estrutura de parênteses em uma string.
+ *
+ * Esta função verifica se os parênteses na string seguem algumas regras específicas:
+ * - Não permite parênteses aninhados: '(' dentro de outro '(' é inválido.
+ * - Não permite parênteses vazios: "()" é inválido.
+ * - Cada '(' deve ter um ')' correspondente.
+ * - Um '(' não pode ser o último caractere da string.
+ * - Um ')' não pode aparecer sem um '(' correspondente.
+ *
+ * @param str Ponteiro para a string a ser validada.
+ * @param len Comprimento da string.
+ * @return true Se todos os parênteses estiverem corretamente balanceados e válidos.
+ * @return false Se algum parêntese violar as regras acima.
+ *
+ */
+bool validate_parentheses(const char *str, int len);
+
+/**
+ * @brief Valida caracteres especiais básicos em uma string.
+ *
+ * Esta função verifica se uma string atende a algumas regras básicas de formatação:
+ * - Não pode começar com espaço, '&' ou ')'.
+ * - Não pode terminar com espaço, '&' ou '('.
+ * - Não pode conter espaços duplos consecutivos.
+ * - Não pode conter '&&' consecutivos.
+ *
+ * @param str Ponteiro para a string a ser validada.
+ * @param len Comprimento da string.
+ * @return true Se a string passar todas as validações.
+ * @return false Se a string violar qualquer uma das regras acima.
+ *
+ */
+bool validate_basic_special_chars(const char *str, int len);
+
+
+
 #endif

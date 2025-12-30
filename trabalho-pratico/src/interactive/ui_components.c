@@ -80,7 +80,7 @@ void ui_menu_inicial() {
 
 
 char* ui_pedir_caminho_dataset() {
-   static char path[200];
+    static char path[200];
     memset(path, 0, sizeof(path));
 
     int pos = 0;
@@ -121,46 +121,46 @@ char* ui_pedir_caminho_dataset() {
     mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
 
     curs_set(1);
-        noecho();
+    noecho();
 
-        while (1) {
-            wmove(win, input_y + line, input_x + pos);
-            wrefresh(win);
+    while (1) {
+        wmove(win, input_y + line, input_x + pos);
+        wrefresh(win);
 
-            ch = wgetch(win);
+        ch = wgetch(win);
 
-            if (ch == '\n' || ch == KEY_ENTER)
-                break;
+        if (ch == '\n' || ch == KEY_ENTER)
+            break;
 
-            else if ((ch == KEY_BACKSPACE || ch == 127 || ch == 8)) {
-                if (pos > 0) {
-                    pos--;
-                    path[pos + line * max_width] = '\0';
-                    mvwaddch(win, input_y + line, input_x + pos, ' ');
-                } else if (line > 0) {
-                    line--;
-                    pos = max_width;
-                }
+        else if ((ch == KEY_BACKSPACE || ch == 127 || ch == 8)) {
+            if (pos > 0) {
+                pos--;
+                path[pos + line * max_width] = '\0';
+                mvwaddch(win, input_y + line, input_x + pos, ' ');
+            } else if (line > 0) {
+                line--;
+                pos = max_width;
             }
-            else if (isprint(ch) && pos + line*max_width < 200) { // limite do buffer
-                path[pos + line * max_width] = ch;
-                mvwaddch(win, input_y + line, input_x + pos, ch);
-                pos++;
+        }
+        else if (isprint(ch) && pos + line*max_width < 200) { // limite do buffer
+            path[pos + line * max_width] = ch;
+            mvwaddch(win, input_y + line, input_x + pos, ch);
+            pos++;
 
-                if (pos >= max_width) { // ir para linha seguinte
-                    if (line + 1 < max_height) {
-                        line++;
-                        pos = 0;
-                    } else {
-                        pos = max_width - 1; // não deixa ultrapassar a caixa
-                    }
+            if (pos >= max_width) { // ir para linha seguinte
+                if (line + 1 < max_height) {
+                    line++;
+                    pos = 0;
+                } else {
+                    pos = max_width - 1; // não deixa ultrapassar a caixa
                 }
             }
         }
+    }
 
-        curs_set(0);
-        delwin(win);
-        return path;
+    curs_set(0);
+    delwin(win);
+    return path;
 }
 
 
@@ -302,17 +302,9 @@ void ui_pedir_argumentos(const Query* q, int com_S, char* buffer, int size) {
 
     int num_args = get_query_num_args(q);
     
-    // calcular largura máxima da caixa principal
-    int max_len = strlen("== EXECUTE QUERY xx == ");
-    
-    for (int i = 0; i < num_args; i++) {
-        const QueryArg* arg = get_query_arg_at(q, i);
-        int len = strlen(get_arg_nome(arg)) + 3; // +3 para os chars < > ou [ ]
-        if (len > max_len) max_len = len;
-    }
-    
-    int width = max_len + 17;
-    int height = 12;
+
+    int width = 188;
+    int height = 28;
 
     int starty = (LINES - height) / 2;
     int startx = (COLS - width) / 2;
@@ -608,7 +600,7 @@ void ui_mostrar_erro_arg(ValidationResult *res, int *escolha) {
     int highlight = 0;
     int ch;
 
-    int width = strlen(msg) + 14;
+    int width = strlen(msg) + 20;
     int height = 8;
     int starty = (LINES - height) / 2;
     int startx = (COLS - width) / 2;
