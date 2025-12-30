@@ -64,7 +64,7 @@ void ui_menu_inicial() {
     wattron(win, COLOR_PAIR(3) | A_BOLD);  
     wprintw(win, "ENTER");
     wattroff(win, COLOR_PAIR(3) | A_BOLD); 
-    wprintw(win, " indicar o caminho de dados]");
+    wprintw(win, " para indicar o caminho de dados]");
 
     wrefresh(win);
 
