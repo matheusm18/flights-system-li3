@@ -340,7 +340,7 @@ void ui_pedir_argumentos(const Query* q, int com_S, char* buffer, int size) {
 
     // criar subjanela para legenda 
     int box_height = 4;
-    int box_width = width - 6; 
+    int box_width = 25; 
     int box_starty = y;
     int box_startx = 3;
 
