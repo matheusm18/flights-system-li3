@@ -106,7 +106,7 @@ ValidationResult validate_query6(char **args) {
     // validar caracteres permitidos
     for (int i = 0; i < len; i++) {
         char c = nationality[i];
-        if (!isalnum((unsigned char)c) && c != ' ' && c != '&' && c != '(' && c != ')') {
+        if (!isalnum((unsigned char)c) && c != ' ' && c != '&' && c != '(' && c != ')' && c!= '-' && c != '\'') {
             return (ValidationResult){false, "Caractere invalido na nacionalidade"};
         }
     }
