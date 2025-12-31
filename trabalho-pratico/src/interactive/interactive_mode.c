@@ -12,8 +12,8 @@
 #include "io/output_writer.h"
 #include "utils/utils_validation.h"
 
-#define MIN_ROWS 30
-#define MIN_COLS 190
+#define MIN_ROWS 39
+#define MIN_COLS 160
 
 void wait_for_bigger_terminal_size() {
     int rows, cols;
@@ -84,6 +84,7 @@ void run_menu_loop(CatalogManager* manager) {
         while (!argumentos_validos) {  
             ui_pedir_argumentos(q, com_S, args, sizeof(args));
 
+            
             strcpy(args_copy, args); // usar args_copy para validações (strtok) e args original para executar
 
             int tokens = contar_tokens(args);
@@ -318,12 +319,38 @@ void start_interactive_ui(CatalogManager* manager) {
         }
 
         GDir* dir = g_dir_open(dataset_path, 0, NULL);
-        if (dir != NULL) {
-            g_dir_close(dir);
-            break;
-        } else {
+        if (dir == NULL) {
             ui_mostrar_erro_dataset();
+            continue;
         }
+        g_dir_close(dir);
+
+        char* essential_files[] = {
+            "flights.csv", 
+            "passengers.csv",
+            "reservations.csv",
+            "airports.csv",
+            "aircrafts.csv"
+        };
+        
+        int num_files = 5;  
+        int all_files_exist = 1;
+
+        for (int i = 0; i < num_files; i++) {
+            char full_path[600];
+            snprintf(full_path, sizeof(full_path), "%s%s", dataset_path, essential_files[i]);
+            
+            if (g_file_test(full_path, G_FILE_TEST_EXISTS) == 0) {
+                all_files_exist = 0;
+                break;
+            }
+        }
+        
+        if (!all_files_exist) {
+            ui_mostrar_erro_dataset();
+            continue;
+        }
+        break;
     }
 
     WINDOW* load_win = ui_mostrar_carregamento_inicio();

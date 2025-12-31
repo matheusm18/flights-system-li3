@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#define FRAME_WIDTH   160
+#define FRAME_HEIGHT   39
+
 // calcula a largura do menu automaticamente
 int largura_menu_queries(int n) {
     int max = 0;
@@ -30,47 +33,54 @@ void print_center(WINDOW *w, int y, const char *text) {
 void ui_menu_inicial() {
     curs_set(0);
     noecho();
-    int width = 75;   
-    int height = 20;  
+    
+    int frame_y = (LINES - FRAME_HEIGHT) / 2;
+    int frame_x = (COLS  - FRAME_WIDTH)  / 2;
 
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
+    
+    WINDOW* pad = newpad(20, 75);
+    wbkgd(pad, COLOR_PAIR(1));
+    box(pad, 0, 0);
 
-    WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, ' ' | A_NORMAL);
-    keypad(win, TRUE);
-    box(win, 0, 0);
+    int pad_screen_y = frame_y + (FRAME_HEIGHT - 20) / 2;
+    int pad_screen_x = frame_x + (FRAME_WIDTH  - 75)  / 2;
 
-    wattron(win, COLOR_PAIR(2) | A_BOLD);
-    mvwprintw(win, 1, 17, "_");
-    mvwprintw(win, 2, 15, "-=\\`\\");
-    mvwprintw(win, 3, 11, "|\\ ____\\_\\__");
-    mvwprintw(win, 4, 9, "-=\\c`\"\"\"\"\"\"\" \"`)");
-    mvwprintw(win, 5, 13, "~~~~~/ /~~`");
-    mvwprintw(win, 6, 14, "-==/ / ");
-    mvwprintw(win, 7, 16 , "'-'");
-    mvwprintw(win, 8, 31, "\\       /            _\\/_");
-    mvwprintw(win, 9, 33, ".-'-.              //o\\  _\\/_");
-    mvwprintw(win, 10, 14, "_  ___  __  _ --_ /     \\ _--_ __  __ _ | __/o\\\\ _");
-    mvwprintw(win, 11, 13, "=-=_=-=-_=-=_=-_= -=======- = =-=_=-=_,-'|\"'\"\"-|-,_ ");
-    mvwprintw(win, 12, 13, "=- _=-=-_=- _=-= _--=====- _=-=_-_,-\"          |");
-    mvwprintw(win, 13, 15, "=- =- =-= =- = -  -===- -= - .");
-    wattroff(win, COLOR_PAIR(2) | A_BOLD);
+    wattron(pad, COLOR_PAIR(2) | A_BOLD);
+    mvwprintw(pad, 1, 17, "_");
+    mvwprintw(pad, 2, 15, "-=\\`\\");
+    mvwprintw(pad, 3, 11, "|\\ ____\\_\\__");
+    mvwprintw(pad, 4, 9, "-=\\c`\"\"\"\"\"\"\" \"`)");
+    mvwprintw(pad, 5, 13, "~~~~~/ /~~`");
+    mvwprintw(pad, 6, 14, "-==/ / ");
+    mvwprintw(pad, 7, 16 , "'-'");
+    mvwprintw(pad, 8, 31, "\\       /            _\\/_");
+    mvwprintw(pad, 9, 33, ".-'-.              //o\\  _\\/_");
+    mvwprintw(pad, 10, 14, "_  ___  __  _ --_ /     \\ _--_ __  __ _ | __/o\\\\ _");
+    mvwprintw(pad, 11, 13, "=-=_=-=-_=-=_=-_= -=======- = =-=_=-=_,-'|\"'\"\"-|-,_ ");
+    mvwprintw(pad, 12, 13, "=- _=-=-_=- _=-= _--=====- _=-=_-_,-\"          |");
+    mvwprintw(pad, 13, 15, "=- =- =-= =- = -  -===- -= - .");
+    wattroff(pad, COLOR_PAIR(2) | A_BOLD);
 
     int y = 16;
-    int x = (width - strlen("[pressione ENTER para indicar o caminho de dados]")) / 2;
+    int x = (75 - strlen("[pressione ENTER para indicar o caminho de dados]")) / 2;
 
-    mvwprintw(win, y, x + 2, "[pressione ");
-    wattron(win, COLOR_PAIR(3) | A_BOLD);  
-    wprintw(win, "ENTER");
-    wattroff(win, COLOR_PAIR(3) | A_BOLD); 
-    wprintw(win, " para indicar o caminho de dados]");
+    mvwprintw(pad, y, x + 2, "[pressione ");
+    wattron(pad, COLOR_PAIR(3) | A_BOLD);  
+    wprintw(pad, "ENTER");
+    wattroff(pad, COLOR_PAIR(3) | A_BOLD); 
+    wprintw(pad, " para indicar o caminho de dados]");
 
-    wrefresh(win);
+    wrefresh(frame);
 
-    while (wgetch(win) != 10) {}
+    prefresh(pad,0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 20 - 1, pad_screen_x + 75  - 1);
 
-    delwin(win);
+    while (wgetch(frame) != 10) {}
+
+    delwin(pad);
+    delwin(frame);
     wattrset(stdscr, A_NORMAL); 
     attrset(COLOR_PAIR(0));    
     clear();
@@ -91,43 +101,54 @@ char* ui_pedir_caminho_dataset() {
     int max_height = 7;     // número de linhas da "caixa do computador"
     int line = 0;
 
-    WINDOW* win = newwin(28, 90, (LINES-28)/2, (COLS-90)/2);
-    wbkgd(win, ' ' | A_NORMAL);
-    keypad(win, TRUE);
+    int frame_y = (LINES - FRAME_HEIGHT) / 2;
+    int frame_x = (COLS  - FRAME_WIDTH)  / 2;
+
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
+
+    WINDOW* pad = newpad(25, 78);
+    wbkgd(pad, ' ' | A_NORMAL);
+
+    int pad_screen_y = frame_y + (FRAME_HEIGHT - 25) / 2;
+    int pad_screen_x = frame_x + (FRAME_WIDTH  - 78) / 2;
 
 
-    mvwprintw(win, 1,  2, "              _____________________________________________");
-    mvwprintw(win, 2,  2, "             /                                             \\");
-    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
-    mvwprintw(win, 4,  2, "            |   |                                       |   |");
-    mvwprintw(win, 5,  2, "            |   |  C:\\>                                 |   |");
-    mvwprintw(win, 6,  2, "            |   |                                       |   |");
-    mvwprintw(win, 7,  2, "            |   |                                       |   |");
-    mvwprintw(win, 8,  2, "            |   |                                       |   |");
-    mvwprintw(win, 9,  2, "            |   |                                       |   |");
-    mvwprintw(win, 10, 2, "            |   |                                       |   |");
-    mvwprintw(win, 11, 2, "            |   |                                       |   |");
-    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
-    mvwprintw(win, 13, 2, "            |                                               |");
-    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
-    mvwprintw(win, 15, 2, "                   \\___________________________________/");
-    mvwprintw(win, 16, 2, "                ___________________________________________");
-    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
-    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
-    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
-    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
-    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
-    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
-    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
+    mvwprintw(pad, 1,  2, "              _____________________________________________");
+    mvwprintw(pad, 2,  2, "             /                                             \\");
+    mvwprintw(pad, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(pad, 4,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 5,  2, "            |   |  C:\\>                                 |   |");
+    mvwprintw(pad, 6,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 7,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 8,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 9,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 10, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 11, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(pad, 13, 2, "            |                                               |");
+    mvwprintw(pad, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(pad, 15, 2, "                   \\___________________________________/");
+    mvwprintw(pad, 16, 2, "                ___________________________________________");
+    mvwprintw(pad, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(pad, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(pad, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(pad, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(pad, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(pad, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(pad, 23, 2, "`---._.-------------------------------------------------------------._.---'");
 
     curs_set(1);
     noecho();
+    wrefresh(frame);
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 25 - 1,pad_screen_x + 78 - 1);
 
     while (1) {
-        wmove(win, input_y + line, input_x + pos);
-        wrefresh(win);
+        wmove(pad, input_y + line, input_x + pos);
+        prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 25 - 1, pad_screen_x + 78 - 1);
 
-        ch = wgetch(win);
+        ch = wgetch(frame);
 
         if (ch == '\n' || ch == KEY_ENTER)
             break;
@@ -136,7 +157,7 @@ char* ui_pedir_caminho_dataset() {
             if (pos > 0) {
                 pos--;
                 path[pos + line * max_width] = '\0';
-                mvwaddch(win, input_y + line, input_x + pos, ' ');
+                mvwaddch(pad, input_y + line, input_x + pos, ' ');
             } else if (line > 0) {
                 line--;
                 pos = max_width;
@@ -144,7 +165,7 @@ char* ui_pedir_caminho_dataset() {
         }
         else if (isprint(ch) && pos + line*max_width < 200) { // limite do buffer
             path[pos + line * max_width] = ch;
-            mvwaddch(win, input_y + line, input_x + pos, ch);
+            mvwaddch(pad, input_y + line, input_x + pos, ch);
             pos++;
 
             if (pos >= max_width) { // ir para linha seguinte
@@ -159,39 +180,45 @@ char* ui_pedir_caminho_dataset() {
     }
 
     curs_set(0);
-    delwin(win);
+    delwin(pad);
+    delwin(frame);
     return path;
 }
 
 
-
-
 int ui_menu_queries(int n) {
-    
     curs_set(0);
     int highlight = 0;
     int ch;
 
-    int height = n + 5;
-    int width = largura_menu_queries(n);
-    if (width > COLS - 4) width = COLS - 4;
+    int frame_y = (LINES - FRAME_HEIGHT) / 2;
+    int frame_x = (COLS - FRAME_WIDTH) / 2;
 
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
 
-    WINDOW* menuwin = newwin(height, width, starty, startx);
-    wbkgd(menuwin, ' ' | A_NORMAL);
+    int pad_width  = largura_menu_queries(n);        
+    int pad_height = n + 5;
+    if (pad_height > FRAME_HEIGHT - 2) pad_height = FRAME_HEIGHT - 2;
 
-    box(menuwin, 0, 0);
-    keypad(menuwin, TRUE);
+    WINDOW* pad = newpad(pad_height, pad_width);
+    wbkgd(pad, ' ' | A_NORMAL);
+    box(pad,0,0);
 
-    wattron(menuwin, COLOR_PAIR(2) | A_BOLD);  
-    mvwprintw(menuwin, 1, (width - strlen("=== MENU DE QUERIES ==="))/2, "=== MENU DE QUERIES ===");
-    wattroff(menuwin, COLOR_PAIR(2) | A_BOLD); 
+    int pad_screen_y = frame_y + (FRAME_HEIGHT - pad_height) / 2;
+    int pad_screen_x = frame_x + (FRAME_WIDTH  - pad_width)  / 2; 
+
+    wattron(pad, COLOR_PAIR(2) | A_BOLD);  
+    mvwprintw(pad, 1, (pad_width - strlen("=== MENU DE QUERIES ==="))/2, "=== MENU DE QUERIES ===");
+    wattroff(pad, COLOR_PAIR(2) | A_BOLD); 
+
+    wrefresh(frame);  
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
 
     while (1) {
         for (int i = 0; i < n; i++) {
-            if (i == highlight) wattron(menuwin, A_REVERSE); // wattron(WINDOW *win, int attr); liga um atributo a uma janela específica
+            if (i == highlight) wattron(pad, A_REVERSE); // wattron(WINDOW *win, int attr); liga um atributo a uma janela específica
             
             const Query* q = get_query_at_index(i);
             
@@ -202,12 +229,14 @@ int ui_menu_queries(int n) {
             */
 
             if (q) {
-                mvwprintw(menuwin, i + 3, 2, "%d - %-15s | %s", get_query_id(q), get_query_nome(q), get_query_descricao(q));
+                mvwprintw(pad, i + 3, 2, "%d - %-15s | %s", get_query_id(q), get_query_nome(q), get_query_descricao(q));
             }
-            wattroff(menuwin, A_REVERSE); // desliga
+            wattroff(pad, A_REVERSE); // desliga
         }
-        wrefresh(menuwin);
-        ch = wgetch(menuwin);
+
+        prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
+
+        ch = wgetch(frame);
 
         switch (ch) {
             case KEY_UP: 
@@ -217,7 +246,8 @@ int ui_menu_queries(int n) {
                 highlight = (highlight + 1) % n; 
                 break;
             case 10:  // ENTER
-                delwin(menuwin); // apaga a janela
+                delwin(pad);
+                delwin(frame); // apaga a janela
                 clear();   
                 refresh();
                 curs_set(1); 
@@ -230,7 +260,7 @@ int ui_menu_formato_resultado(int query_id) {
     curs_set(0);
     const char* options[] = {
         "  - resultados separados por ';'",
-        " - resultados separados por '='",
+        "  - resultados separados por '='",
         "[voltar]"
     };
 
@@ -238,74 +268,79 @@ int ui_menu_formato_resultado(int query_id) {
     int highlight = 0;
     int ch;
 
-    int max = 0;
+    int max_len = 0;
     for (int i = 0; i < n_options; i++) {
         int len = strlen(options[i]);
-        if (len > max) max = len;
+        if (len > max_len) max_len = len;
     }
 
-    int height = 8;
-    int width = max + 8;
-    if (width > COLS - 4) width = COLS - 4;
+    int frame_y = (LINES - FRAME_HEIGHT) / 2;
+    int frame_x = (COLS - FRAME_WIDTH) / 2;
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
 
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
+    int pad_height = n_options + 5; 
+    int pad_width = max_len + 8;   
+    if (pad_width > FRAME_WIDTH - 4) pad_width = FRAME_WIDTH - 4; 
 
-    WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, ' ' | A_NORMAL);
-    box(win, 0, 0);
-    keypad(win, TRUE);
+    WINDOW* pad = newpad(pad_height, pad_width);
+    wbkgd(pad, ' ' | A_NORMAL);
+    box(pad, 0, 0);
 
-    char buf[64];
+    int pad_screen_y = frame_y + (FRAME_HEIGHT - pad_height) / 2;
+    int pad_screen_x = frame_x + (FRAME_WIDTH - pad_width) / 2;
+
+    char buf[9];
     snprintf(buf, sizeof(buf), "QUERY %d", query_id);
+    wattron(pad, COLOR_PAIR(2) | A_BOLD);
+    mvwprintw(pad, 1, (pad_width - strlen(buf)) / 2, "%s", buf);
+    wattroff(pad, COLOR_PAIR(2) | A_BOLD);
 
-    wattron(win, COLOR_PAIR(2) | A_BOLD);
-    mvwprintw(win, 1, (width- strlen(buf)) / 2, "QUERY %d", query_id);
-    wattroff(win, COLOR_PAIR(2) | A_BOLD);
+    wrefresh(frame);
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
 
     while (1) {
         for (int i = 0; i < n_options; i++) {
-            if (i == highlight) wattron(win, A_REVERSE);
+            if (i == highlight) wattron(pad, A_REVERSE);
 
             if (i == 0)
-                mvwprintw(win, i + 3, 4, "%d%s", query_id, options[i]);
+                mvwprintw(pad, i + 3, 4, "%d%s", query_id, options[i]);
             else if (i == 1)
-                mvwprintw(win, i + 3, 4, "%dS%s", query_id, options[i]);
+                mvwprintw(pad, i + 3, 4, "%dS%s", query_id, options[i]);
             else
-                mvwprintw(win, i + 4, 16, "%s", options[i]);
+                mvwprintw(pad, i + 4, (pad_width - strlen(options[i])) / 2, "%s", options[i]);
 
-            if (i == highlight) wattroff(win, A_REVERSE);
+            if (i == highlight) wattroff(pad, A_REVERSE);
         }
 
-        wrefresh(win);
-        ch = wgetch(win);
 
-        if (ch == 10) { // enter
-            delwin(win);
+        prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
+        ch = wgetch(frame);
+
+        if (ch == 10) { // ENTER
+            delwin(pad);
+            delwin(frame);
             clear();        
             refresh();  
             curs_set(1);    
             return highlight;
         }
 
-        if (ch == KEY_UP) {
-            highlight = (highlight - 1 + n_options) % n_options;
-        } else if (ch == KEY_DOWN) {
-            highlight = (highlight + 1) % n_options;
-        }
+        if (ch == KEY_UP) highlight = (highlight - 1 + n_options) % n_options;
+        if (ch == KEY_DOWN) highlight = (highlight + 1) % n_options;
     }
 }
+
 
 void ui_pedir_argumentos(const Query* q, int com_S, char* buffer, int size) {
     clear();
     refresh();
 
     int num_args = get_query_num_args(q);
-    
 
-    int width = 188;
-    int height = 28;
-
+    int width = FRAME_WIDTH;
+    int height = FRAME_HEIGHT;
     int starty = (LINES - height) / 2;
     int startx = (COLS - width) / 2;
 
@@ -314,7 +349,7 @@ void ui_pedir_argumentos(const Query* q, int com_S, char* buffer, int size) {
     wbkgd(win, ' ' | A_NORMAL);
     box(win, 0, 0);
 
-    char titulo_caixa[256];
+    char titulo_caixa[32];
     snprintf(titulo_caixa, sizeof(titulo_caixa), "== EXECUTE QUERY %d%s ==", get_query_id(q), com_S ? "S" : "");
 
     wattron(win, COLOR_PAIR(2) | A_BOLD);
@@ -380,49 +415,64 @@ int ui_menu_aviso_argumentos(int obrigatorios, int recebidos) {
     int highlight = 0;
     int ch;
 
-    int width = 50;
-    int height = n_options + 7;
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
+    int pad_width = 50;
+    int pad_height = n_options + 7;
+    
+    int frame_height = FRAME_HEIGHT;
+    int frame_width  = FRAME_WIDTH;
+    int frame_y = (LINES - frame_height) / 2;
+    int frame_x = (COLS - frame_width) / 2;
+    
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
+    wrefresh(frame);
 
-    WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, ' ' | A_NORMAL);
-    box(win, 0, 0);
-    keypad(win, TRUE);
+    WINDOW* pad = newpad(pad_height, pad_width);
+    wbkgd(pad, ' ' | A_NORMAL);
+    box(pad, 0, 0);
+
+    int pad_screen_y = frame_y + (frame_height - pad_height) / 2;
+    int pad_screen_x = frame_x + (frame_width - pad_width) / 2;
+
 
     char titulo[] = " [!] AVISO [!] ";
-    wattron(win, COLOR_PAIR(5) | A_BOLD);
-    mvwprintw(win, 0, (width - strlen(titulo)) / 2, "%s", titulo);
-    wattroff(win, COLOR_PAIR(5) | A_BOLD);
+    wattron(pad, COLOR_PAIR(5) | A_BOLD);
+    mvwprintw(pad, 0, (pad_width - strlen(titulo)) / 2, "%s", titulo);
+    wattroff(pad, COLOR_PAIR(5) | A_BOLD);
 
-    print_center(win, 2, "Faltam argumentos obrigatorios.");
+    print_center(pad, 2, "Faltam argumentos obrigatorios.");
     char buffer[100];
 
     snprintf(buffer, sizeof(buffer), "Esperado pelo menos %d argumento(s).", obrigatorios);
-    print_center(win, 3, buffer);
+    print_center(pad, 3, buffer);
 
     snprintf(buffer, sizeof(buffer),"Recebido: %d.", recebidos);
-    print_center(win, 4, buffer);
+    print_center(pad, 4, buffer);
 
     int button_y = 6;
     int spacing = 4;
 
     int total_width = strlen(options[0]) + strlen(options[1]) + spacing;
-    int start_button_x = (width - total_width) / 2;
+    int start_button_x = (pad_width - total_width) / 2;
+
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
 
     while (1) {
         int x = start_button_x;
 
         for (int i = 0; i < n_options; i++) {
-            if (i == highlight) wattron(win, A_REVERSE);
-            mvwprintw(win, button_y, x, "%s", options[i]);
-            if (i == highlight) wattroff(win, A_REVERSE);
+            if (i == highlight) wattron(pad, A_REVERSE);
+            mvwprintw(pad, button_y, x, "%s", options[i]);
+            if (i == highlight) wattroff(pad, A_REVERSE);
 
             x += strlen(options[i]) + spacing;
         }
-        wrefresh(win);
+       
+        wrefresh(frame);
+        prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
 
-        ch = wgetch(win);
+        ch = wgetch(frame);
         switch (ch) {
             case KEY_LEFT:
                 highlight = (highlight - 1 + n_options) % n_options;
@@ -432,7 +482,8 @@ int ui_menu_aviso_argumentos(int obrigatorios, int recebidos) {
                 highlight = (highlight + 1) % n_options;
                break;
             case 10: 
-                delwin(win);
+                delwin(pad);
+                delwin(frame);
                 curs_set(1);
                 return highlight; 
         }
@@ -440,150 +491,168 @@ int ui_menu_aviso_argumentos(int obrigatorios, int recebidos) {
 }
 
 void ui_mostrar_erro_dataset() {
-    int width  = 90;
-    int height = 28;
+    int frame_y = (LINES - FRAME_HEIGHT) / 2;
+    int frame_x = (COLS  - FRAME_WIDTH)  / 2;
 
-    int starty = (LINES - height) / 2;
-    int startx = (COLS  - width)  / 2;
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
 
-    WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, ' ' | A_NORMAL);
-    keypad(win, TRUE);
+    WINDOW* pad = newpad(25, 78);
+    wbkgd(pad, ' ' | A_NORMAL);
+
+    int pad_screen_y = frame_y + (FRAME_HEIGHT - 25) / 2;
+    int pad_screen_x = frame_x + (FRAME_WIDTH  - 78) / 2;
 
 
-    mvwprintw(win, 1,  2, "              _____________________________________________");
-    mvwprintw(win, 2,  2, "             /                                             \\");
-    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
-    mvwprintw(win, 4,  2, "            |   |                                       |   |");
-    mvwprintw(win, 5,  2, "            |   |                                       |   |");
-    mvwprintw(win, 6,  2, "            |   |                                       |   |");
-    mvwprintw(win, 7,  2, "            |   | [tentar novamente]                    |   |");
-    mvwprintw(win, 8,  2, "            |   |                                       |   |");
-    mvwprintw(win, 9,  2, "            |   |                                       |   |");
-    mvwprintw(win, 10, 2, "            |   |                                       |   |");
-    mvwprintw(win, 11, 2, "            |   |                                       |   |");
-    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
-    mvwprintw(win, 13, 2, "            |                                               |");
-    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
-    mvwprintw(win, 15, 2, "                   \\___________________________________/");
-    mvwprintw(win, 16, 2, "                ___________________________________________");
-    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
-    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
-    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
-    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
-    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
-    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
-    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
+    mvwprintw(pad, 1,  2, "              _____________________________________________");
+    mvwprintw(pad, 2,  2, "             /                                             \\");
+    mvwprintw(pad, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(pad, 4,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 5,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 6,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 7,  2, "            |   | [tentar novamente]                    |   |");
+    mvwprintw(pad, 8,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 9,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 10, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 11, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(pad, 13, 2, "            |                                               |");
+    mvwprintw(pad, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(pad, 15, 2, "                   \\___________________________________/");
+    mvwprintw(pad, 16, 2, "                ___________________________________________");
+    mvwprintw(pad, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(pad, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(pad, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(pad, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(pad, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(pad, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(pad, 23, 2, "`---._.-------------------------------------------------------------._.---'");
 
-    wattron(win, COLOR_PAIR(5) | A_BOLD);
-    mvwprintw(win, 5, 20, "Caminho de dataset invalido!  ");
-    wattroff(win,COLOR_PAIR(5) | A_BOLD);
+    wattron(pad, COLOR_PAIR(5) | A_BOLD);
+    mvwprintw(pad, 5, 20, "Caminho de dataset invalido!  ");
+    wattroff(pad,COLOR_PAIR(5) | A_BOLD);
 
-    wrefresh(win);
+    wrefresh(frame);
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 25 - 1, pad_screen_x + 78 - 1);
 
     int ch;
     flushinp(); 
-    while ((ch = wgetch(win)) != 10 && ch != KEY_ENTER); 
+    while ((ch = wgetch(frame)) != 10 && ch != KEY_ENTER); 
 
-    delwin(win);
+    delwin(pad);
+    delwin(frame);
 }
 
 WINDOW* ui_mostrar_carregamento_inicio() {
     clear();
     refresh();
-    int width  = 90;
-    int height = 28;
 
-    int starty = (LINES - height) / 2;
-    int startx = (COLS  - width)  / 2;
-
-    WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, ' ' | A_NORMAL);
-    keypad(win, TRUE);
-
-
-    mvwprintw(win, 1,  2, "              _____________________________________________");
-    mvwprintw(win, 2,  2, "             /                                             \\");
-    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
-    mvwprintw(win, 4,  2, "            |   |                                       |   |");
-    mvwprintw(win, 5,  2, "            |   |                                       |   |");
-    mvwprintw(win, 6,  2, "            |   |                                       |   |");
-    mvwprintw(win, 7,  2, "            |   |                                       |   |");
-    mvwprintw(win, 8,  2, "            |   |                                       |   |");
-    mvwprintw(win, 9,  2, "            |   |                                       |   |");
-    mvwprintw(win, 10, 2, "            |   |                                       |   |");
-    mvwprintw(win, 11, 2, "            |   |                                       |   |");
-    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
-    mvwprintw(win, 13, 2, "            |                                               |");
-    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
-    mvwprintw(win, 15, 2, "                   \\___________________________________/");
-    mvwprintw(win, 16, 2, "                ___________________________________________");
-    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
-    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
-    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
-    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
-    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
-    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
-    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
-
-    wattron(win, A_BOLD);
-    mvwprintw(win, 5, 20, "> A carregar dados...");
-    wattroff(win, A_BOLD);
-
-    wrefresh(win);
+    int frame_y = (LINES - FRAME_HEIGHT) / 2;
+    int frame_x = (COLS  - FRAME_WIDTH)  / 2;
     
-    return win;
+
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
+
+    WINDOW* pad = newpad(25, 78);
+    wbkgd(pad, ' ' | A_NORMAL);
+
+    int pad_screen_y = frame_y + (FRAME_HEIGHT - 25) / 2;
+    int pad_screen_x = frame_x + (FRAME_WIDTH  - 78) / 2;
+
+
+    mvwprintw(pad, 1,  2, "              _____________________________________________");
+    mvwprintw(pad, 2,  2, "             /                                             \\");
+    mvwprintw(pad, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(pad, 4,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 5,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 6,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 7,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 8,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 9,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 10, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 11, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(pad, 13, 2, "            |                                               |");
+    mvwprintw(pad, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(pad, 15, 2, "                   \\___________________________________/");
+    mvwprintw(pad, 16, 2, "                ___________________________________________");
+    mvwprintw(pad, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(pad, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(pad, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(pad, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(pad, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(pad, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(pad, 23, 2, "`---._.-------------------------------------------------------------._.---'");
+
+    wattron(pad, A_BOLD);
+    mvwprintw(pad, 5, 20, "> A carregar dados...");
+    wattroff(pad, A_BOLD);
+
+    wrefresh(frame);
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 25 - 1, pad_screen_x + 78 - 1);
+    
+    return frame;
 }
 
 void ui_mostrar_carregamento_fim() {
     curs_set(0);
     noecho();
 
-    int width  = 90;
-    int height = 28;
+    int frame_y = (LINES - FRAME_HEIGHT) / 2;
+    int frame_x = (COLS  - FRAME_WIDTH)  / 2;
 
-    int starty = (LINES - height) / 2;
-    int startx = (COLS  - width)  / 2;
+    WINDOW* frame = newwin(FRAME_HEIGHT, FRAME_WIDTH, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
 
-    WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, ' ' | A_NORMAL);
-    keypad(win, TRUE);
+    WINDOW* pad = newpad(25, 78);
+    wbkgd(pad, ' ' | A_NORMAL);
+
+    int pad_screen_y = frame_y + (FRAME_HEIGHT - 25) / 2;
+    int pad_screen_x = frame_x + (FRAME_WIDTH  - 78) / 2;
 
 
-    mvwprintw(win, 1,  2, "              _____________________________________________");
-    mvwprintw(win, 2,  2, "             /                                             \\");
-    mvwprintw(win, 3,  2, "            |    _______________________________________    |");
-    mvwprintw(win, 4,  2, "            |   |                                       |   |");
-    mvwprintw(win, 5,  2, "            |   |                                       |   |");
-    mvwprintw(win, 6,  2, "            |   |                                       |   |");
-    mvwprintw(win, 7,  2, "            |   | [pressione ENTER para continuar]      |   |");
-    mvwprintw(win, 8,  2, "            |   |                                       |   |");
-    mvwprintw(win, 9,  2, "            |   |                                       |   |");
-    mvwprintw(win, 10, 2, "            |   |                                       |   |");
-    mvwprintw(win, 11, 2, "            |   |                                       |   |");
-    mvwprintw(win, 12, 2, "            |   |_______________________________________|   |");
-    mvwprintw(win, 13, 2, "            |                                               |");
-    mvwprintw(win, 14, 2, "             \\_____________________________________________/");
-    mvwprintw(win, 15, 2, "                   \\___________________________________/");
-    mvwprintw(win, 16, 2, "                ___________________________________________");
-    mvwprintw(win, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
-    mvwprintw(win, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
-    mvwprintw(win, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
-    mvwprintw(win, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
-    mvwprintw(win, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
-    mvwprintw(win, 22, 2, ":-------------------------------------------------------------------------:");
-    mvwprintw(win, 23, 2, "`---._.-------------------------------------------------------------._.---'");
+    mvwprintw(pad, 1,  2, "              _____________________________________________");
+    mvwprintw(pad, 2,  2, "             /                                             \\");
+    mvwprintw(pad, 3,  2, "            |    _______________________________________    |");
+    mvwprintw(pad, 4,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 5,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 6,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 7,  2, "            |   | [pressione ENTER para continuar]      |   |");
+    mvwprintw(pad, 8,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 9,  2, "            |   |                                       |   |");
+    mvwprintw(pad, 10, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 11, 2, "            |   |                                       |   |");
+    mvwprintw(pad, 12, 2, "            |   |_______________________________________|   |");
+    mvwprintw(pad, 13, 2, "            |                                               |");
+    mvwprintw(pad, 14, 2, "             \\_____________________________________________/");
+    mvwprintw(pad, 15, 2, "                   \\___________________________________/");
+    mvwprintw(pad, 16, 2, "                ___________________________________________");
+    mvwprintw(pad, 17, 2, "             _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_");
+    mvwprintw(pad, 18, 2, "          _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_");
+    mvwprintw(pad, 19, 2, "       _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_");
+    mvwprintw(pad, 20, 2, "    _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_");
+    mvwprintw(pad, 21, 2, " _-'.-.-.-.-.-. .---.-. .-------------------------. .-.---. .---.-.-.-.`-_");
+    mvwprintw(pad, 22, 2, ":-------------------------------------------------------------------------:");
+    mvwprintw(pad, 23, 2, "`---._.-------------------------------------------------------------._.---'");
 
-    wattron(win, A_BOLD);
-    mvwprintw(win, 5, 20, "Carregamento concluído! ");
-    wattroff(win, A_BOLD);
+    wattron(pad, A_BOLD);
+    mvwprintw(pad, 5, 20, "Carregamento concluído! ");
+    wattroff(pad, A_BOLD);
+
+    wrefresh(frame);
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 25 - 1, pad_screen_x + 78 - 1);
 
 
     int ch;
     flushinp();
-    while ((ch = wgetch(win)) != '\n' && ch != KEY_ENTER);
+    while ((ch = wgetch(frame)) != '\n' && ch != KEY_ENTER);
 
-    delwin(win);
+    delwin(pad);
+    delwin(frame);
     clear();
     refresh();
     curs_set(1);
@@ -594,44 +663,60 @@ void ui_mostrar_erro_arg(ValidationResult *res, int *escolha) {
     curs_set(0);
     clear();
     refresh();
+
     const char* msg = validation_result_get_erro(res);
     const char* options[] = {"[tentar novamente]", "[voltar ao menu]"};
     int n_options = 2;
     int highlight = 0;
     int ch;
 
-    int width = strlen(msg) + 20;
-    int height = 8;
-    int starty = (LINES - height) / 2;
-    int startx = (COLS - width) / 2;
+    int frame_height = FRAME_HEIGHT;
+    int frame_width  = FRAME_WIDTH;
+    int frame_y = (LINES - frame_height) / 2;
+    int frame_x = (COLS - frame_width) / 2;
 
-    WINDOW* win = newwin(height, width, starty, startx);
-    wbkgd(win, ' ' | A_NORMAL);
-    box(win, 0, 0);
-    keypad(win, TRUE);
+    WINDOW* frame = newwin(frame_height, frame_width, frame_y, frame_x);
+    wbkgd(frame, ' ' | A_NORMAL);
+    keypad(frame, TRUE);
 
-    wattron(win, COLOR_PAIR(5) | A_BOLD);
-    mvwprintw(win, 0, (width - 12)/2, "[! ERRO !]");
-    wattroff(win, COLOR_PAIR(5) | A_BOLD);
+    int pad_width = strlen(msg) + 20;
+    if (pad_width > FRAME_WIDTH - 4) pad_width = FRAME_WIDTH - 4;
 
-    print_center(win, 2, msg);
+    int pad_height = 8;
+
+    WINDOW* pad = newpad(pad_height, pad_width);
+    wbkgd(pad, ' ' | A_NORMAL);
+    box(pad, 0, 0);
+
+    int pad_screen_y = frame_y + (frame_height - pad_height) / 2;
+    int pad_screen_x = frame_x + (frame_width - pad_width) / 2;
+
+    wattron(pad, COLOR_PAIR(5) | A_BOLD);
+    mvwprintw(pad, 0, (pad_width - 12)/2, "[! ERRO !]");
+    wattroff(pad, COLOR_PAIR(5) | A_BOLD);
+
+    print_center(pad, 2, msg);
 
     int button_y = 5;
     int spacing = 4;
     int total_width = strlen(options[0]) + strlen(options[1]) + spacing;
-    int start_button_x = (width - total_width) / 2;
+    int start_button_x = (pad_width - total_width) / 2;
+
+    prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
 
     while (1) {
         int x = start_button_x;
         for (int i = 0; i < n_options; i++) {
-            if (i == highlight) wattron(win, A_REVERSE);
-            mvwprintw(win, button_y, x, "%s", options[i]);
-            if (i == highlight) wattroff(win, A_REVERSE);
+            if (i == highlight) wattron(pad, A_REVERSE);
+            mvwprintw(pad, button_y, x, "%s", options[i]);
+            if (i == highlight) wattroff(pad, A_REVERSE);
             x += strlen(options[i]) + spacing;
         }
 
-        wrefresh(win);
-        ch = wgetch(win);
+        wrefresh(frame);
+        prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + pad_height - 1, pad_screen_x + pad_width - 1);
+
+        ch = wgetch(frame);
 
         switch (ch) {
             case KEY_LEFT:
@@ -642,7 +727,8 @@ void ui_mostrar_erro_arg(ValidationResult *res, int *escolha) {
                 break;
             case 10: // ENTER
                 *escolha = highlight;
-                delwin(win);
+                delwin(pad);
+                delwin(frame);
                 curs_set(1);
                 return;
         }
