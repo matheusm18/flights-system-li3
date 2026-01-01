@@ -52,7 +52,6 @@ void aircraft_catalog_add(AircraftCatalog* manager, Aircraft* aircraft) {
     }
 }
 
-
 // parte dos iters
 
 AircraftIter* aircraft_catalog_iter_create(const AircraftCatalog* catalog) {
@@ -75,8 +74,6 @@ const AircraftData* aircraft_catalog_iter_next(AircraftIter* it) {
 void aircraft_catalog_iter_free(AircraftIter* it) {
     if (it) free(it);
 }
-
-
 
 void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manager) {
     if (!manager || !aircraft_id || !*aircraft_id) return;

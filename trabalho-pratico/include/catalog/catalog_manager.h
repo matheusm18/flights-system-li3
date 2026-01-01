@@ -121,4 +121,21 @@ PassengerCatalog* get_passengers_from_catalog_manager(const CatalogManager* mana
  */
 ReservationCatalog* get_reservations_from_catalog_manager(const CatalogManager* manager);
 
+/**
+ * @brief Obtém um ponteiro único para uma string a partir da "String Pool" central.
+ * * Esta função implementa a lógica de *String Pool* para otimização de memória.
+ * Ela verifica se a string fornecida já existe na tabela de hash interna do gestor.
+ * - Se existir: Retorna o ponteiro para a string já armazenada (reutilização).
+ * - Se não existir: Cria uma cópia da string, armazena na pool e retorna o novo ponteiro.
+ * * Esta estratégia evita a duplicação de strings repetidas (como nomes de países,
+ * modelos de avião, companhias aéreas), reduzindo drasticamente o consumo de RAM.
+ * * @param manager Ponteiro para o CatalogManager.
+ * @param str A string original que se deseja processar.
+ * * @return Ponteiro para a string única armazenada na pool.
+ * * @warning O ponteiro retornado PERTENCE ao CatalogManager. **NÃO se deve executar free()**
+ * neste ponteiro individualmente. A memória será libertada automaticamente
+ * quando catalog_manager_destroy() for chamado.
+ */
+char* catalog_manager_get_string_from_pool(CatalogManager* manager, const char* str);
+
 #endif

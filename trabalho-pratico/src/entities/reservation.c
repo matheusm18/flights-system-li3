@@ -20,9 +20,9 @@ Reservation* create_reservation(const char* reservation_id, char** flight_ids, c
     Reservation* reservation = malloc(sizeof(Reservation));
     if (reservation == NULL) return NULL;
     
-    reservation->reservation_id = strdup(reservation_id);
-    reservation->document_number = strdup(document_number);
-    reservation->seat = strdup(seat);
+    reservation->reservation_id = (char*) reservation_id;
+    reservation->document_number = (char*) document_number;
+    reservation->seat = (char*) seat;
     reservation->price = price;
     reservation->extra_luggage = extra_luggage;
     reservation->priority_boarding = priority_boarding;
@@ -42,10 +42,6 @@ Reservation* create_reservation(const char* reservation_id, char** flight_ids, c
 
 void destroy_reservation(Reservation* r) {
     if (r == NULL) return;
-
-    free(r->reservation_id);
-    free(r->document_number);
-    free(r->seat);
 
     if (r->flight_ids) {
         for (int i = 0; i < 2; i++) {

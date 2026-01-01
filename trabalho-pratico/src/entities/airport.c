@@ -23,9 +23,9 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
     
     strncpy(airport->code, code, 3);
     airport->code[3] = '\0';
-    airport->name = strdup(name);
-    airport->city = strdup(city);
-    airport->country = strdup(country);
+    airport->name = (char*) name;
+    airport->city = (char*) city;
+    airport->country = (char*) country;
     airport->type = airport_type_to_char(type);
 
     return airport;
@@ -33,10 +33,6 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
 
 void destroy_airport(Airport* a) {
     if (a != NULL) {
-
-        free(a->name);
-        free(a->city);
-        free(a->country);
 
         free(a);
     }

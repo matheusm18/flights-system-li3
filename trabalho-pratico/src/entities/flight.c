@@ -11,8 +11,8 @@ struct flight {
     //long actual_arrival;
     //char* gate;
     char* status;
-    char* origin;
-    char* destination;
+    char origin[4];
+    char destination[4];
     char* aircraft;
     //char* airline;
     //char* tracking_url;
@@ -31,24 +31,19 @@ Flight* create_flight(char* flight_id, long departure, long actual_departure, lo
     
     memset(flight, 0, sizeof(Flight));
     strncpy(flight->flight_id, flight_id, 8);
+    strncpy(flight->origin, origin, 3);
+    strncpy(flight->destination, destination, 3);
 
     flight->departure = departure;
     flight->actual_departure = actual_departure;
-    flight->status = strdup(status);
-    flight->origin = strdup(origin);
-    flight->destination = strdup(destination);
-    flight->aircraft = strdup(aircraft);
+    flight->status = (char*) status;
+    flight->aircraft = (char*) aircraft;
 
     return flight;
 }
 
 void destroy_flight(Flight* f) {
     if (!f) return;
-
-    free(f->status);
-    free(f->origin);
-    free(f->destination);
-    free(f->aircraft);
 
     free(f);
 }

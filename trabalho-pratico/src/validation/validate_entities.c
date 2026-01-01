@@ -58,8 +58,12 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
                 type);
         return;
     }
+    
+    char* pooled_name = catalog_manager_get_string_from_pool(manager, name);
+    char* pooled_city = catalog_manager_get_string_from_pool(manager, city);
+    char* pooled_country = catalog_manager_get_string_from_pool(manager, country);
 
-    Airport* airport = create_airport(code, name, city, country, latitude, longitude, icao, type);
+    Airport* airport = create_airport(code, pooled_name, pooled_city, pooled_country, latitude, longitude, icao, type);
     
     if (airport != NULL) {
         airport_catalog_add(get_airports_from_catalog_manager(manager), airport);
@@ -107,7 +111,10 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     int capacity_int = atoi(capacity);
     int range_int = atoi(range);
 
-    Aircraft* aircraft = create_aircraft(identifier, manufacturer, model, year_int, capacity_int, range_int);
+    char* pooled_manufacturer = catalog_manager_get_string_from_pool(manager, manufacturer);
+    char* pooled_model = catalog_manager_get_string_from_pool(manager, model);
+
+    Aircraft* aircraft = create_aircraft(identifier, pooled_manufacturer, pooled_model, year_int, capacity_int, range_int);
 
     if (aircraft != NULL) {
         aircraft_catalog_add(get_aircrafts_from_catalog_manager(manager), aircraft);
@@ -191,8 +198,11 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         return;
     }
 
-    Flight* flight = create_flight(flight_id, departure_dt, actual_departure_dt, arrival_dt, actual_arrival_dt, gate, status, origin, destination, 
-                                   aircraft, airline);        
+    char* pooled_status = catalog_manager_get_string_from_pool(manager, status);
+    char* pooled_aircraft = catalog_manager_get_string_from_pool(manager, aircraft);
+
+    Flight* flight = create_flight(flight_id, departure_dt, actual_departure_dt, arrival_dt, actual_arrival_dt, gate, pooled_status, origin, destination, 
+                                   pooled_aircraft, airline);        
 
     if (flight != NULL) {
         flight_catalog_add(flight_catalog, flight);
@@ -268,7 +278,11 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
 
     int dob_int = string_to_date(dob);
 
-    Passenger* passenger = create_passenger(document_number, first_name, last_name, dob_int, nationality);
+    char* pooled_first_name = catalog_manager_get_string_from_pool(manager, first_name);
+    char* pooled_last_name = catalog_manager_get_string_from_pool(manager, last_name);
+    char* pooled_nationality = catalog_manager_get_string_from_pool(manager, nationality);
+
+    Passenger* passenger = create_passenger(document_number, pooled_first_name, pooled_last_name, dob_int, pooled_nationality);
     
     if (passenger != NULL) passenger_catalog_add(passenger_catalog, passenger);
 }
@@ -402,11 +416,14 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     bool priority_boarding_bool =
         string_to_bool(priority_boarding);
 
+    char* pooled_seat = catalog_manager_get_string_from_pool(manager, seat);
+    char* pooled_model = catalog_manager_get_string_from_pool(manager, model);
+    
     Reservation* res =
         create_reservation(reservation_id,
                            flight_ids_array,
                            document_number,
-                           seat,
+                           pooled_seat,
                            atof(price),
                            extra_luggage_bool,
                            priority_boarding_bool);

@@ -21,8 +21,8 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
     strncpy(aircraft->identifier, identifier, 8);
 
     aircraft->identifier[8] = '\0';
-    aircraft->manufacturer = strdup(manufacturer);
-    aircraft->model = strdup(model);
+    aircraft->manufacturer = (char*) manufacturer;
+    aircraft->model = (char*) model;
     aircraft->year = year;
     //aircraft->capacity = capacity;
     //aircraft->range = range;
@@ -32,9 +32,6 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
 
 void destroy_aircraft(Aircraft* a) {
     if (a != NULL) {
-
-        free(a->manufacturer);
-        free(a->model);
 
         free(a);
     }

@@ -9,32 +9,29 @@
 
 void parse_csv_line(char *line, char *fields[], int max_fields, int *num_fields) {
     int i = 0;
-    char *ptr = line;
-
-    while (*ptr && i < max_fields) {
-        // SEMPRE começa com aspas
-        if (*ptr != '"') {
-            break;
-        }
+    char *current = line;
+    
+    while (*current && i < max_fields) {
         
-        ptr++; // pula a primeira aspas
-        fields[i++] = ptr; // guarda o início do campo no array de campos
+        // encontrar a aspas de abertura
+        char *start_quote = strchr(current, '"');
+        if (!start_quote) break; 
         
-        // procura a aspas de fecho
-        while (*ptr && !(*ptr == '"' && (*(ptr+1) == ',' || *(ptr+1) == '\0' || *(ptr+1) == '\r' || *(ptr+1) == '\n'))) {
-            ptr++;
-        }
+        char *content_start = start_quote + 1;
         
-        if (*ptr == '"') {
-            *ptr = '\0'; // termina string
-            ptr++;
-            if (*ptr == ',') ptr++; // pula vírgula
+        // encontrar a aspas de fecho
+        char *end_quote = strchr(content_start, '"');
+        if (!end_quote) break;
         
-        } else {
-            // aspas não fechada
-            break;
-        }
+        *end_quote = '\0'; 
+        
+        // guardar o campo
+        fields[i++] = content_start;
+        
+        // preparar para o próximo
+        current = end_quote + 1;
     }
+    
     *num_fields = i;
 }
 
@@ -53,8 +50,6 @@ void read_csv(int fields_length, const char *filename, void (*callback)(char **f
             first_line = 0;
             continue;
         }
-        
-        line[strcspn(line, "\r\n")] = '\0'; // remove newline characters
 
         char *fields[fields_length];  // array de strings
         int num_fields = 0;
@@ -79,6 +74,9 @@ void load_csv_file(const char* path, int num_fields,
     FILE *errors_file = fopen(errors_file_name, "a");
     if (!errors_file) { perror("Erro ao abrir arquivo de erros"); return; }
 
+    char io_buffer[8192]; 
+    setvbuf(errors_file, io_buffer, _IOFBF, sizeof(io_buffer));
+    
     read_csv(num_fields, path, process_line, catalog_manager, errors_file);
     fclose(errors_file);
 }

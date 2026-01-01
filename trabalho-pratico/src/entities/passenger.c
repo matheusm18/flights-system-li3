@@ -20,19 +20,15 @@ Passenger* create_passenger(char* document_number, char* first_name, char* last_
 
     passenger->document_number = atoi(document_number);
     passenger->dob = dob;
-    passenger->first_name = strdup(first_name);
-    passenger->last_name = strdup(last_name);
-    passenger->nationality = strdup(nationality);
+    passenger->first_name = (char*) first_name;
+    passenger->last_name = (char*) last_name;
+    passenger->nationality = (char*) nationality;
 
     return passenger;
 }
 
 void destroy_passenger(Passenger* p) {
     if (p != NULL) {
-
-        free(p->first_name);
-        free(p->last_name);
-        free(p->nationality);
 
         free(p);
     }
