@@ -416,13 +416,14 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     bool priority_boarding_bool =
         string_to_bool(priority_boarding);
 
+    char* pooled_reservation_id = catalog_manager_get_string_from_pool(manager, reservation_id);
+    char* pooled_document_number = catalog_manager_get_string_from_pool(manager, document_number);
     char* pooled_seat = catalog_manager_get_string_from_pool(manager, seat);
-    char* pooled_model = catalog_manager_get_string_from_pool(manager, model);
-    
+
     Reservation* res =
-        create_reservation(reservation_id,
+        create_reservation(pooled_reservation_id,
                            flight_ids_array,
-                           document_number,
+                           pooled_document_number,
                            pooled_seat,
                            atof(price),
                            extra_luggage_bool,
