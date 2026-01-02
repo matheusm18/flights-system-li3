@@ -4,7 +4,24 @@
 #include <glib.h>
 #include "entities/flight.h"
 
+/**
+ * @struct airline_stats
+ * @brief Estrutura que armazena estatísticas associadas a uma companhia aérea.
+ *
+ * Esta estrutura é utilizada para manter informação agregada sobre os atrasos
+ * de voos de uma determinada companhia aérea, permitindo o cálculo de métricas
+ * como o atraso médio.
+ */
 typedef struct airline_stats AirlineStats;
+
+/**
+ * @struct flight_catalog
+ * @brief Estrutura responsável pelo armazenamento e acesso eficiente aos voos.
+ *
+ * Esta estrutura organiza a informação relativa aos voos e companhias aéreas,
+ * utilizando tabelas de hash e arrays dinâmicos para permitir pesquisas
+ * rápidas e iteração eficiente.
+ */
 typedef struct flight_catalog FlightCatalog;
 
 /**

@@ -132,6 +132,10 @@ void passenger_catalog_prepare_query4 (PassengerCatalog* manager) {
         week_stats->week_key = strdup(week_str);
         week_stats->count = 0;
 
+        for(int i = 0; i < 10; i++){
+            week_stats->top_ids[i] = NULL;
+        }
+
         guint num_p = g_hash_table_size(week_data);
         if (num_p > 0) {
             struct passenger_spend* temp_list = malloc(sizeof(struct passenger_spend) * num_p);
