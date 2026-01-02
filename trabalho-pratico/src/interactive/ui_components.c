@@ -96,7 +96,7 @@ char* ui_pedir_caminho_dataset() {
     int pos = 0;
     int ch;
     int input_y = 5;
-    int input_x = 2 + 24;   // após "C:\> "
+    int input_x = 1 + 24;   // após "C:\> "
     int max_width  = 30;    
     int max_height = 7;     // número de linhas da "caixa do computador"
     int line = 0;
@@ -119,7 +119,7 @@ char* ui_pedir_caminho_dataset() {
     mvwprintw(pad, 2,  2, "             /                                             \\");
     mvwprintw(pad, 3,  2, "            |    _______________________________________    |");
     mvwprintw(pad, 4,  2, "            |   |                                       |   |");
-    mvwprintw(pad, 5,  2, "            |   |  C:\\>                                 |   |");
+    mvwprintw(pad, 5,  2, "            |   | C:\\>                                  |   |");
     mvwprintw(pad, 6,  2, "            |   |                                       |   |");
     mvwprintw(pad, 7,  2, "            |   |                                       |   |");
     mvwprintw(pad, 8,  2, "            |   |                                       |   |");
@@ -511,7 +511,7 @@ void ui_mostrar_erro_dataset() {
     mvwprintw(pad, 4,  2, "            |   |                                       |   |");
     mvwprintw(pad, 5,  2, "            |   |                                       |   |");
     mvwprintw(pad, 6,  2, "            |   |                                       |   |");
-    mvwprintw(pad, 7,  2, "            |   | [tentar novamente]                    |   |");
+    mvwprintw(pad, 7,  2, "            |   |                                       |   |");
     mvwprintw(pad, 8,  2, "            |   |                                       |   |");
     mvwprintw(pad, 9,  2, "            |   |                                       |   |");
     mvwprintw(pad, 10, 2, "            |   |                                       |   |");
@@ -532,6 +532,12 @@ void ui_mostrar_erro_dataset() {
     wattron(pad, COLOR_PAIR(5) | A_BOLD);
     mvwprintw(pad, 5, 20, "Caminho de dataset invalido!  ");
     wattroff(pad,COLOR_PAIR(5) | A_BOLD);
+
+    mvwprintw(pad, 7, 20, "[pressione "); 
+    wattron(pad, COLOR_PAIR(3) | A_BOLD);
+    wprintw(pad, "ENTER");
+    wattroff(pad, COLOR_PAIR(3) | A_BOLD);
+    wprintw(pad, " para voltar]");
 
     wrefresh(frame);
     prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 25 - 1, pad_screen_x + 78 - 1);
@@ -621,7 +627,7 @@ void ui_mostrar_carregamento_fim() {
     mvwprintw(pad, 4,  2, "            |   |                                       |   |");
     mvwprintw(pad, 5,  2, "            |   |                                       |   |");
     mvwprintw(pad, 6,  2, "            |   |                                       |   |");
-    mvwprintw(pad, 7,  2, "            |   | [pressione ENTER para continuar]      |   |");
+    mvwprintw(pad, 7,  2, "            |   |                                       |   |");
     mvwprintw(pad, 8,  2, "            |   |                                       |   |");
     mvwprintw(pad, 9,  2, "            |   |                                       |   |");
     mvwprintw(pad, 10, 2, "            |   |                                       |   |");
@@ -642,6 +648,12 @@ void ui_mostrar_carregamento_fim() {
     wattron(pad, A_BOLD);
     mvwprintw(pad, 5, 20, "Carregamento concluído! ");
     wattroff(pad, A_BOLD);
+
+    mvwprintw(pad, 7, 20, "[pressione "); 
+    wattron(pad, COLOR_PAIR(3) | A_BOLD);
+    wprintw(pad, "ENTER");
+    wattroff(pad, COLOR_PAIR(3) | A_BOLD);
+    wprintw(pad, " para continuar]");
 
     wrefresh(frame);
     prefresh(pad, 0, 0, pad_screen_y, pad_screen_x, pad_screen_y + 25 - 1, pad_screen_x + 78 - 1);
