@@ -2,6 +2,8 @@
 #define INTERACTIVE_MODE_H
 
 #include "catalog/catalog_manager.h"
+#include "interactive/query_defs.h"
+
 #include <ncurses.h>
 
 /**
@@ -16,7 +18,7 @@
  * @param manager Ponteiro para a estrutura CatalogManager contendo os catálogos
  *        carregados.
  */
-void start_interactive_ui(CatalogManager* manager);
+void start_interactive_ui(CatalogManager* manager, QueryManager* qm);
 
 /**
  * @brief Loop principal do menu interativo de queries.
@@ -27,7 +29,7 @@ void start_interactive_ui(CatalogManager* manager);
  *
  * @param manager Ponteiro para a estrutura CatalogManager.
  */
-void run_menu_loop(CatalogManager* manager);
+void run_menu_loop(CatalogManager* manager, QueryManager* qm);
 
 /**
  * @brief Aguarda até que o terminal tenha tamanho mínimo aceitável.
@@ -36,5 +38,15 @@ void run_menu_loop(CatalogManager* manager);
  * e MIN_COLS colunas. Durante a espera, é mostrado um aviso para o utilizador.
  */
 void wait_for_bigger_terminal_size();
+
+
+/**
+ * @brief Conta o número de palavras (tokens) numa string separadas por espaços.
+ *
+ * @param str A string a ser analisada.
+ * @return O número total de tokens encontrados. Retorna 0 se a string for NULL ou vazia.
+ * * @note O limite máximo para análise é de 512 caracteres devido ao tamanho do buffer temporário.
+ */
+int contar_tokens(const char* str);
 
 #endif

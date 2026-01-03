@@ -4,6 +4,7 @@
 #include "io/parser.h"
 #include "io/command_processor.h"
 #include "interactive/interactive_mode.h"
+#include "interactive/query_defs.h"
 #include <ncurses.h>
 
 int main(int argc, char **argv) {
@@ -40,12 +41,16 @@ int main(int argc, char **argv) {
     erase();
     refresh();
 
+    QueryManager* qm = create_query_manager(10);
+    init_all_queries(qm);
+
     CatalogManager* catalog_manager = catalog_manager_create();
 
-    start_interactive_ui(catalog_manager);
+    start_interactive_ui(catalog_manager, qm);
 
     endwin();
 
     catalog_manager_destroy(catalog_manager);
+    free_query_manager(qm);
     return 0;
 }

@@ -40,7 +40,7 @@ void wait_for_bigger_terminal_size() {
 }
 
 
-static int contar_tokens(const char* str) {
+int contar_tokens(const char* str) {
     int count = 0;
     char tmp[512];
     if (!str || strlen(str) == 0) return 0;
@@ -55,7 +55,7 @@ static int contar_tokens(const char* str) {
     return count;
 }
 
-void run_menu_loop(CatalogManager* manager) {
+void run_menu_loop(CatalogManager* manager, QueryManager* qm) {
     char args[96];
 
     while (1) {
@@ -64,9 +64,9 @@ void run_menu_loop(CatalogManager* manager) {
         erase();
         refresh();
 
-        int q_index = ui_menu_queries(7); // 6 queries + opção sair
+        int q_index = ui_menu_queries(qm); // 6 queries + opção sair
         
-        const Query* q = get_query_at_index(q_index);
+        const Query* q = get_query_at_index(qm, q_index);
         if (!q || get_query_id(q) == 0) break; 
 
         int com_S = 0;
@@ -292,7 +292,7 @@ void run_menu_loop(CatalogManager* manager) {
 }
 
 
-void start_interactive_ui(CatalogManager* manager) {
+void start_interactive_ui(CatalogManager* manager, QueryManager* qm) {
     wait_for_bigger_terminal_size();
     wbkgd(stdscr, COLOR_PAIR(1));
     
@@ -361,5 +361,5 @@ void start_interactive_ui(CatalogManager* manager) {
 
     ui_mostrar_carregamento_fim();
     
-    run_menu_loop(manager);
+    run_menu_loop(manager, qm);
 }

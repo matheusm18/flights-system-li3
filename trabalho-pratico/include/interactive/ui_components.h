@@ -12,12 +12,17 @@
  * Contém funções para menus, prompts, mensagens de erro e caixas gráficas em ncurses.
  */
 
+
 /**
- * @brief Calcula a largura do menu de queries automaticamente.
- * @param n Número de queries.
- * @return Largura mínima necessária para o menu.
+ * @brief Calcula a largura do menu de queries automaticamente com base no conteúdo.
+ * * Percorre todas as queries registadas no QueryManager para determinar o comprimento 
+ * da maior string (ID + Nome + Descrição), garantindo que o menu ncurses 
+ * se ajusta visualmente ao conteúdo.
+ *
+ * @param qm Ponteiro constante para o QueryManager.
+ * @return Largura mínima (em colunas) necessária para renderizar o menu.
  */
-int largura_menu_queries(int n);
+int largura_menu_queries(const QueryManager* qm);
 
 /**
  * @brief Imprime texto centralizado numa janela.
@@ -39,11 +44,14 @@ void ui_menu_inicial();
 char* ui_pedir_caminho_dataset();
 
 /**
- * @brief Menu para selecionar uma query.
- * @param n Número de queries.
- * @return Índice da query selecionada (0-based).
+ * @brief Renderiza o menu de seleção de queries e processa a entrada do utilizador.
+ * * Cria um pad dinâmico em ncurses que lista todas as queries disponíveis no gestor.
+ * Permite a navegação com as setas do teclado e seleção com a tecla ENTER.
+ *
+ * @param qm Ponteiro constante para o QueryManager.
+ * @return Índice da query selecionada (0 a num_queries - 1).
  */
-int ui_menu_queries(int n);
+int ui_menu_queries(const QueryManager* qm);
 
 /**
  * @brief Menu para selecionar formato de resultado (normal ou 'S') para uma query.

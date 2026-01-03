@@ -8,11 +8,13 @@
 #define FRAME_HEIGHT   39
 
 // calcula a largura do menu automaticamente
-int largura_menu_queries(int n) {
+int largura_menu_queries(const QueryManager* qm) {
     int max = 0;
     char buffer[512];
+    int n = get_total_queries(qm);
+
     for (int i = 0; i < n; i++) {
-        const Query* q = get_query_at_index(i);
+        const Query* q = get_query_at_index(qm, i);
         
         if (!q) continue;
 
@@ -186,10 +188,11 @@ char* ui_pedir_caminho_dataset() {
 }
 
 
-int ui_menu_queries(int n) {
+int ui_menu_queries(const QueryManager* qm) {
     curs_set(0);
     int highlight = 0;
     int ch;
+    int n = get_total_queries(qm);
 
     int frame_y = (LINES - FRAME_HEIGHT) / 2;
     int frame_x = (COLS - FRAME_WIDTH) / 2;
@@ -198,7 +201,7 @@ int ui_menu_queries(int n) {
     wbkgd(frame, ' ' | A_NORMAL);
     keypad(frame, TRUE);
 
-    int pad_width  = largura_menu_queries(n);        
+    int pad_width  = largura_menu_queries(qm);        
     int pad_height = n + 5;
     if (pad_height > FRAME_HEIGHT - 2) pad_height = FRAME_HEIGHT - 2;
 
@@ -220,7 +223,7 @@ int ui_menu_queries(int n) {
         for (int i = 0; i < n; i++) {
             if (i == highlight) wattron(pad, A_REVERSE); // wattron(WINDOW *win, int attr); liga um atributo a uma janela específica
             
-            const Query* q = get_query_at_index(i);
+            const Query* q = get_query_at_index(qm, i);
             
             /*
             menuwin - janela onde vai escrever
