@@ -3,7 +3,7 @@
 
 #include "interactive/query_defs.h"
 #include <ncurses.h>
-#include "validation/validate_arg.h"
+#include "validation/arg_validation.h"
 
 /**
  * @file ui_components.h

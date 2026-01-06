@@ -1,4 +1,4 @@
-#include "validation/validate_entities.h"
+#include "validation/entities_validation.h"
 
 #include "catalog/catalog_manager.h"
 #include "catalog/airport_catalog.h"
@@ -10,7 +10,7 @@
 #include "validation/flight_validation.h"
 #include "validation/passenger_validation.h"
 #include "validation/reservation_validation.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 #include "utils/query4_utils.h"
 
 #include <stdlib.h>

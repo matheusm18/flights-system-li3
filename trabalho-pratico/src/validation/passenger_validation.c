@@ -1,12 +1,11 @@
 #include "validation/passenger_validation.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
 
-//======== Syntactic validation: Passengers
 
 bool validate_passenger_document_number(const char *document_number){
     if (document_number == NULL) return false;

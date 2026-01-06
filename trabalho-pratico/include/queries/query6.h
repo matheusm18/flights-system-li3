@@ -3,7 +3,7 @@
 
 #include "queries/query_result.h"
 #include "catalog/reservation_catalog.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 #include <stdbool.h>
 
 /**

@@ -1,7 +1,7 @@
 #include "queries/query1.h"
 #include "catalog/airport_catalog.h"
 #include "entities/airport.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

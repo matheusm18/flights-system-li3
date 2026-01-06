@@ -9,7 +9,7 @@
 #include "catalog/airport_catalog.h"
 #include "entities/flight.h"
 #include "entities/airport.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 
 #include "math.h"
 

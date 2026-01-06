@@ -4,11 +4,10 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 #include "validation/airport_validation.h"
 #include "validation/aircraft_validation.h"
 
-//======== Syntactic validation: Flights
 
 bool validate_flight_id_flight(const char *flight_id) {
     if (!flight_id) return false;

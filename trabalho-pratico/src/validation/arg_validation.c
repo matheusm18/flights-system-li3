@@ -1,6 +1,6 @@
-#include "validation/validate_arg.h"
+#include "validation/arg_validation.h"
 #include "validation/airport_validation.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>

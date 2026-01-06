@@ -4,8 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-//======== Syntactic validation: Airports
-
 bool validate_code_airport(const char *code) {
     if (!code || strlen(code) != 3) return false;
     for (int i = 0; i < 3; i++) {

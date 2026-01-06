@@ -2,7 +2,7 @@
 #include "interactive/query_defs.h"
 #include "interactive/ui_components.h"
 #include "io/command_processor.h"
-#include "validation/validate_arg.h"
+#include "validation/arg_validation.h"
 #include "io/parser.h"
 #include "queries/query_result.h"
 #include <stdio.h>
@@ -10,7 +10,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include "io/output_writer.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 
 #define MIN_ROWS 39
 #define MIN_COLS 160

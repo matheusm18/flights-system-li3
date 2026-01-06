@@ -13,7 +13,7 @@
 #include "entities/passenger.h"
 #include "entities/flight.h"
 #include "entities/airport.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 
 QueryResult* execute_query6(ReservationCatalog* manager, char* nationality) {
     QueryResult* res = create_query_result();

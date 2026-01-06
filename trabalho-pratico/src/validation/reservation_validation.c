@@ -1,12 +1,10 @@
 #include "validation/reservation_validation.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "validation/flight_validation.h"
-
-//======== Syntactic validation: Reservations
 
 bool validate_reservation_id(const char *reservation_id) {
     if (!reservation_id || strlen(reservation_id) != 10) return false;

@@ -1,6 +1,6 @@
 #include "catalog/reservation_catalog.h"
 #include "entities/reservation.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 
 #include <glib.h>
 #include <stdlib.h>

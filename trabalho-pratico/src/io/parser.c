@@ -1,5 +1,5 @@
 #include "io/parser.h"
-#include "validation/validate_entities.h"
+#include "validation/entities_validation.h"
 #include "catalog/catalog_manager.h"
 #include "catalog/airport_catalog.h"
 #include <stdlib.h>

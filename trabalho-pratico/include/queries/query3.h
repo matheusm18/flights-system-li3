@@ -4,7 +4,7 @@
 #include "queries/query_result.h"
 #include "catalog/flight_catalog.h"
 #include "catalog/airport_catalog.h"
-#include "utils/utils_validation.h"
+#include "utils/validation_utils.h"
 #include <stdbool.h>
 
 /**
