@@ -42,7 +42,8 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
     char *icao = fields[6];
     char *type = fields[7];
 
-    if (!validate_code_airport(code) || !validate_latitude_airport(latitude) ||
+    if (get_airport_by_code(airport_catalog, code) != NULL ||
+        !validate_code_airport(code) || !validate_latitude_airport(latitude) ||
         !validate_longitude_airport(longitude) || !validate_type_airport(type)) {
 
         fprintf(errors_file,
@@ -93,7 +94,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     char *capacity = fields[4];
     char *range = fields[5];
 
-    if (!validate_year_aircraft(year)) {
+    if (get_aircraft_by_identifier(aircraft_catalog, identifier) != NULL || !validate_year_aircraft(year)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -151,7 +152,8 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
     char *airline = fields[10];
     char *tracking_url = fields[11];
 
-    if (!validate_flight_id_flight(flight_id) || !validate_datetime(departure) || !validate_datetime(actual_departure) ||
+    if (get_flight_by_flight_id_from_catalog(flight_catalog, flight_id) != NULL ||
+        !validate_flight_id_flight(flight_id) || !validate_datetime(departure) || !validate_datetime(actual_departure) ||
         !validate_datetime(arrival) || !validate_datetime(actual_arrival)) {
 
         fprintf(errors_file,
@@ -254,9 +256,11 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
     char *photo = fields[9];
 
     if (!validate_passenger_document_number(document_number) ||
+        get_passenger_by_dnumber(passenger_catalog, atoi(document_number)) != NULL ||
         !validate_passenger_email(email) ||
         !validate_passenger_gender(gender) ||
         !validate_passenger_birth_date(dob)) {
+
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
