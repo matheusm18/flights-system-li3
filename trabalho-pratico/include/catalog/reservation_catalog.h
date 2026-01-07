@@ -18,52 +18,49 @@ typedef struct reservation_stats_iterator ReservationStatsIter;
  * @typedef ReservationCatalog
  * @brief Estrutura opaca que representa o catálogo de reservas.
  *
- * O catálogo de reservas gere o registo de identificadores de reservas para
- * efeitos de validação de existência, bem como mantém estatísticas
- * agregadas por nacionalidade e por semana para responder às queries.
- *
- * @note Esta estrutura foi otimizada para armazenar apenas as chaves (IDs)
- * e não as estruturas de dados completas.
+ * O catálogo de reservas gere todas as reservas do sistema, bem como estatísticas
+ * agregadas por nacionalidade e por semana, suportando várias queries.
  */
 typedef struct reservation_catalog ReservationCatalog;
 
 /**
  * @brief Cria e inicializa um catálogo de reservas.
  *
- * Esta função aloca memória para um novo catálogo e inicializa
- * as tabelas hash necessárias para armazenar os identificadores de reserva
- * e as estruturas de estatísticas.
+ * Esta função aloca memória para um novo catálogo de reservas e inicializa
+ * todas as estruturas internas necessárias, incluindo tabelas hash para
+ * armazenar reservas e estatísticas.
  *
- * @return Ponteiro para o catálogo criado, ou NULL em caso de falha.
+ * @return Ponteiro para o catálogo de reservas criado, ou NULL em caso de falha
+ *         na alocação de memória.
  */
 ReservationCatalog* reservation_catalog_create();
 
 /**
- * @brief Destrói um catálogo de reservas e liberta a memória.
+ * @brief Destrói um catálogo de reservas e liberta toda a memória associada.
  *
- * Liberta as tabelas hash internas (incluindo as strings dos identificadores
- * de reserva armazenados) e todas as estruturas auxiliares de estatísticas.
+ * Esta função liberta todas as tabelas hash internas, estruturas auxiliares
+ * e reservas armazenadas no catálogo.
  *
- * @param manager Ponteiro para o catálogo a destruir.
+ * @param manager Ponteiro para o catálogo de reservas a ser destruído.
  *
  * @return void
  */
 void reservation_catalog_destroy(ReservationCatalog* manager);
 
 /**
- * @brief Regista um identificador de reserva no catálogo.
+ * @brief Adiciona uma reserva ao catálogo.
  *
- * Insere o ID da reserva na tabela de referência. Esta função armazena
- * apenas a chave (string) para permitir validações futuras de existência
- * sem guardar a estrutura Reservation completa, visando a
- * otimização de memória.
+ * Insere uma reserva no catálogo, associando o seu identificador único
+ * à estrutura Reservation correspondente.
  *
  * @param manager Ponteiro para o catálogo de reservas.
- * @param reservation_id String com o identificador único da reserva.
+ * @param reservation Ponteiro para a estrutura Reservation a adicionar.
  *
  * @return void
+ *
+ * @note Se manager ou reservation forem NULL, a função não realiza nenhuma operação.
  */
-void reservation_catalog_add(ReservationCatalog* manager, char* reservation_id);
+void reservation_catalog_add(ReservationCatalog* manager, Reservation* reservation);
 
 /**
  * @brief Incrementa o número de reservas associadas a uma nacionalidade e aeroporto.
@@ -130,18 +127,17 @@ int reservation_catalog_stats_iter_next(
 void reservation_catalog_stats_iter_destroy(ReservationStatsIter* it);
 
 /**
- * @brief Verifica se uma reserva existe no catálogo.
+ * @brief Obtém uma reserva a partir do seu identificador.
  *
- * Consulta a tabela de IDs de reserva para confirmar se o identificador
- * fornecido é válido e está registado no sistema.
+ * Procura no catálogo uma reserva com o identificador fornecido.
  *
  * @param manager Ponteiro para o catálogo de reservas.
- * @param reservation_id String com o identificador da reserva a verificar.
+ * @param reservation_id Identificador da reserva.
  *
- * @return true se o ID da reserva existir no catálogo, false caso contrário.
+ * @return Ponteiro para a estrutura Reservation se existir, ou NULL caso contrário.
  */
-bool reservation_exists(
-    ReservationCatalog* manager, 
+Reservation* get_reservation_by_id(
+    ReservationCatalog* manager,
     char* reservation_id
 );
 

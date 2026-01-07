@@ -24,7 +24,7 @@ struct reservation_stats_iterator {
 };
 
 struct reservation_catalog {
-    GHashTable* reservation_ids; // dado a chave (reservation_id) devolve o proprio id, útil para ver se existe
+    GHashTable* reservations_by_id;
     GHashTable* nationality_stats; // query 6
 };
 
@@ -32,7 +32,7 @@ ReservationCatalog* reservation_catalog_create() {
     ReservationCatalog* manager = malloc(sizeof(ReservationCatalog));
     if (!manager) return NULL;
 
-    manager->reservation_ids = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
+    manager->reservations_by_id = g_hash_table_new_full(g_str_hash, g_str_equal,g_free, (GDestroyNotify) destroy_reservation);
 
     manager->nationality_stats = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_hash_table_destroy);
 
@@ -42,16 +42,21 @@ ReservationCatalog* reservation_catalog_create() {
 void reservation_catalog_destroy(ReservationCatalog* manager) {
     if (!manager) return;
 
-    g_hash_table_destroy(manager->reservation_ids);
+    g_hash_table_destroy(manager->reservations_by_id);
     g_hash_table_destroy(manager->nationality_stats);
 
     free(manager);
 }
 
-void reservation_catalog_add(ReservationCatalog* manager, char* reservation_id) {
-    if (!manager || !reservation_id) return;
+void reservation_catalog_add(ReservationCatalog* manager, Reservation* reservation) {
+    if (!manager || !reservation) return;
 
-    g_hash_table_add(manager->reservation_ids, strdup(reservation_id));
+    char* identifier = get_reservation_identifier(reservation);
+    if (!identifier) return;
+
+    g_hash_table_insert(manager->reservations_by_id, strdup(identifier), reservation);
+
+    free(identifier);
 }
 
 void reservation_catalog_add_nationality_increment (ReservationCatalog* manager, const char* nationality, const char* airport_id) {
@@ -114,8 +119,8 @@ void reservation_catalog_stats_iter_destroy(ReservationStatsIter* it) {
     if (it) free(it);
 }
 
-bool reservation_exists(ReservationCatalog* manager, char* reservation_id) {
-    if (!manager || !reservation_id) return false;
-    
-    return g_hash_table_contains(manager->reservation_ids, reservation_id);
+Reservation* get_reservation_by_id (ReservationCatalog* manager, char* reservation_id) {
+    if (!manager || !reservation_id) return NULL;
+
+    return g_hash_table_lookup(manager->reservations_by_id, reservation_id);
 }

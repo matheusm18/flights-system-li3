@@ -42,8 +42,7 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
     char *icao = fields[6];
     char *type = fields[7];
 
-    if (get_airport_by_code(airport_catalog, code) != NULL ||
-        !validate_code_airport(code) || !validate_latitude_airport(latitude) ||
+    if (!validate_code_airport(code) || !validate_latitude_airport(latitude) ||
         !validate_longitude_airport(longitude) || !validate_type_airport(type)) {
 
         fprintf(errors_file,
@@ -66,7 +65,7 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
     Airport* airport = create_airport(code, pooled_name, pooled_city, pooled_country, latitude, longitude, icao, type);
     
     if (airport != NULL) {
-        airport_catalog_add(get_airports_from_catalog_manager(manager), airport);
+        airport_catalog_add(airport_catalog, airport);
     }
 }
 
@@ -94,7 +93,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     char *capacity = fields[4];
     char *range = fields[5];
 
-    if (get_aircraft_by_identifier(aircraft_catalog, identifier) != NULL || !validate_year_aircraft(year)) {
+    if (!validate_year_aircraft(year)) {
 
         fprintf(errors_file,
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
@@ -117,7 +116,7 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     Aircraft* aircraft = create_aircraft(identifier, pooled_manufacturer, pooled_model, year_int, capacity_int, range_int);
 
     if (aircraft != NULL) {
-        aircraft_catalog_add(get_aircrafts_from_catalog_manager(manager), aircraft);
+        aircraft_catalog_add(aircraft_catalog, aircraft);
     }
 }
 
@@ -152,8 +151,7 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
     char *airline = fields[10];
     char *tracking_url = fields[11];
 
-    if (get_flight_by_flight_id_from_catalog(flight_catalog, flight_id) != NULL ||
-        !validate_flight_id_flight(flight_id) || !validate_datetime(departure) || !validate_datetime(actual_departure) ||
+    if (!validate_flight_id_flight(flight_id) || !validate_datetime(departure) || !validate_datetime(actual_departure) ||
         !validate_datetime(arrival) || !validate_datetime(actual_arrival)) {
 
         fprintf(errors_file,
@@ -256,7 +254,6 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
     char *photo = fields[9];
 
     if (!validate_passenger_document_number(document_number) ||
-        get_passenger_by_dnumber(passenger_catalog, atoi(document_number)) != NULL ||
         !validate_passenger_email(email) ||
         !validate_passenger_gender(gender) ||
         !validate_passenger_birth_date(dob)) {
@@ -316,8 +313,7 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     char *priority_boarding = fields[6];
     char *qr_code           = fields[7];
 
-    if (reservation_exists(reservation_catalog, reservation_id) ||
-        !validate_reservation_id(reservation_id) ||
+    if (!validate_reservation_id(reservation_id) ||
         !validate_flight_ids_reservation(flight_ids, flight_catalog) ||
         !validate_passenger_document_number(document_number) ||
         !validate_document_number_reservation(document_number, passenger_catalog)) {
@@ -339,11 +335,6 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     if (!clean_ids) return;
 
     char *delims = "[]' ,\"";
-    char **flight_ids_array = calloc(2, sizeof(char*));
-    if (!flight_ids_array) {
-        free(clean_ids);
-        return;
-    }
 
     int flight_count = 0;
     char *token = strtok(clean_ids, delims);
@@ -354,7 +345,6 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     char* q4_week_id = NULL;
 
     while (token && flight_count < 2) {
-        flight_ids_array[flight_count] = strdup(token);
 
         Flight* flight =
             get_flight_by_flight_id_from_catalog(flight_catalog, token);
@@ -432,10 +422,4 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     if (res)
         reservation_catalog_add(reservation_catalog, res);
     */
-   
-    reservation_catalog_add(reservation_catalog, reservation_id);
-
-    for (int i = 0; i < flight_count; i++)
-        free(flight_ids_array[i]);
-    free(flight_ids_array);
 }
