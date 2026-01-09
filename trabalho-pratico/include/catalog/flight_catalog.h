@@ -73,27 +73,6 @@ void flight_catalog_add(FlightCatalog* manager, Flight* flight);
 void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id);
 
 /**
- * @brief Liberta a memória associada a uma estrutura AirlineStats.
- * 
- * @param a Ponteiro para a estrutura AirlineStats a destruir.
- */
-void destroy_airline(AirlineStats* a);
-
-/**
- * @brief Função de comparação entre duas companhias aéreas.
- * 
- * Critérios de ordenação:
- *  1. Média de atraso (ordem decrescente).
- *  2. Identificador da companhia aérea (ordem lexicográfica crescente).
- * 
- * @param a Ponteiro para o primeiro elemento.
- * @param b Ponteiro para o segundo elemento.
- * 
- * @return Valor negativo, zero ou positivo conforme a ordenação.
- */
-int compare_airlines(const void* a, const void* b);
-
-/**
  * @brief Ordena o array de estatísticas das companhias aéreas.
  * 
  * A ordenação é feita com base na função compare_airlines.

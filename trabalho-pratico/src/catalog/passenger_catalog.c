@@ -92,7 +92,7 @@ void passenger_catalog_add_price_increment (PassengerCatalog* manager, const cha
     }
 }
 
-int compare_passengers(const void* a, const void* b) {
+static int compare_passengers(const void* a, const void* b) {
     PassengerSpend* p1 = (PassengerSpend*)a;
     PassengerSpend* p2 = (PassengerSpend*)b;
     
@@ -101,13 +101,13 @@ int compare_passengers(const void* a, const void* b) {
     return strcmp(p1->id, p2->id); 
 }
 
-int compare_weeks(const void* a, const void* b) {
+static int compare_weeks(const void* a, const void* b) {
     const WeeklyTop *w1 = *(const WeeklyTop **)a;
     const WeeklyTop *w2 = *(const WeeklyTop **)b;
     return strcmp(w1->week_key, w2->week_key);
 }
 
-int compare_strings(const void *a, const void *b) {
+static int compare_strings(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 

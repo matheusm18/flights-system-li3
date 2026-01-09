@@ -26,7 +26,7 @@ struct airport_catalog {
     GHashTable* airport_data_by_code;
 };
 
-void destroy_airport_data(gpointer data) {
+static void destroy_airport_data(gpointer data) {
     AirportData* ad = (AirportData*)data;
     if (ad != NULL) {
         destroy_airport(ad->airport);
@@ -75,7 +75,7 @@ void airport_catalog_add_flight(AirportCatalog* manager, const char* code, Fligh
     if (data != NULL) g_ptr_array_add(data->departing_flights, flight);
 }
 
-int compare_flight_actual_departure(const void* a, const void* b) {
+static int compare_flight_actual_departure(const void* a, const void* b) {
     Flight* f1 = *(Flight**)a;
     Flight* f2 = *(Flight**)b;
 
@@ -163,8 +163,6 @@ void airport_flight_iter_free(AirportFlightIter* it) {
     if (it) free(it);
 }
 
-
-// acho que nao faz sentido remover o static aqui
 // binary search para encontrar primeiro voo >= start_date
 static int find_first_flight_in_range(GPtrArray* flights, int start_date) {
     if (!flights || flights->len == 0) return -1;
@@ -213,7 +211,6 @@ static int find_last_flight_in_range(GPtrArray* flights, int end_date, int start
     return last_idx;
 }
 
-
 int airport_catalog_count_flights_in_range(const AirportData* data, int start_date, int end_date) {
     if (!data || !data->departing_flights) return 0;
     
@@ -230,9 +227,7 @@ int airport_catalog_count_flights_in_range(const AirportData* data, int start_da
     return last_idx - first_idx + 1;
 }
 
-
 // getters
-
 
 const Airport* get_airport_by_code(AirportCatalog* manager, char* code) {
     if (manager == NULL || code == NULL) {

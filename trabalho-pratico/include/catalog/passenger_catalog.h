@@ -113,43 +113,6 @@ void passenger_catalog_add_price_increment(
 );
 
 /**
- * @brief Função de comparação de passageiros por valor gasto.
- *
- * Compara dois PassengerSpend, ordenando-os por valor gasto de forma decrescente.
- * Em caso de empate, a ordenação é feita pelo identificador do passageiro.
- *
- * @param a Ponteiro para o primeiro elemento a comparar.
- * @param b Ponteiro para o segundo elemento a comparar.
- *
- * @return Valor negativo, zero ou positivo conforme a ordenação.
- */
-int compare_passengers(const void* a, const void* b);
-
-/**
- * @brief Função de comparação de semanas.
- *
- * Compara duas estruturas WeeklyTop com base na chave da semana.
- *
- * @param a Ponteiro para o primeiro elemento a comparar.
- * @param b Ponteiro para o segundo elemento a comparar.
- *
- * @return Valor negativo, zero ou positivo conforme a ordenação.
- */
-int compare_weeks(const void* a, const void* b);
-
-/**
- * @brief Função de comparação de strings.
- *
- * Compara duas strings lexicograficamente.
- *
- * @param a Ponteiro para a primeira string.
- * @param b Ponteiro para a segunda string.
- *
- * @return Valor negativo, zero ou positivo conforme a ordenação.
- */
-int compare_strings(const void *a, const void *b);
-
-/**
  * @brief Prepara os dados necessários para a Query 4.
  *
  * Processa as estatísticas semanais e constrói uma linha temporal com

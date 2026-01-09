@@ -19,11 +19,7 @@ CatalogManager* catalog_manager_create() {
     manager->passenger_catalog = passenger_catalog_create();
     manager->reservation_catalog = reservation_catalog_create();
 
-    /*
-    A chave é a string. O valor é a mesma string (para economizar).
-    'free' é a função que será chamada em cada string quando o manager for destruído.
-    */
-    manager->string_pool = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
+    manager->string_pool = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL); // a chave é a string e o valor armazenado é a mesma string (para economizar)
 
     return manager;
 }
@@ -61,7 +57,7 @@ ReservationCatalog* get_reservations_from_catalog_manager(const CatalogManager* 
     return manager->reservation_catalog;
 }
 
-char* catalog_manager_get_string_from_pool(CatalogManager* manager, const char* str) {
+const char* catalog_manager_get_string_from_pool(CatalogManager* manager, const char* str) {
     if (!manager || !str) return NULL;
 
     // verifica se a string já existe na pool
@@ -76,5 +72,5 @@ char* catalog_manager_get_string_from_pool(CatalogManager* manager, const char* 
     
     g_hash_table_insert(manager->string_pool, new_str, new_str);
     
-    return new_str;
+    return (const char*) new_str;
 }

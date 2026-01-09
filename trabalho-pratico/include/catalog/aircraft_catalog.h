@@ -117,22 +117,6 @@ const AircraftData* aircraft_catalog_iter_next(AircraftIter* it);
 void aircraft_catalog_iter_free(AircraftIter* it);
 
 /**
- * @brief Obtém uma aeronave através do seu identificador.
- *
- * Procura no catálogo uma aeronave associada ao identificador fornecido.
- *
- * @param manager Ponteiro para o catálogo de aeronaves.
- * @param identifier Identificador da aeronave.
- *
- * @return Ponteiro constante para a aeronave se existir,
- *         ou NULL caso contrário.
- */
-const Aircraft* get_aircraft_by_identifier(
-    AircraftCatalog* manager,
-    const char* identifier
-);
-
-/**
  * @brief Incrementa o contador de voos de uma aeronave.
  *
  * Atualiza o número de voos realizados pela aeronave com o identificador
@@ -146,6 +130,22 @@ const Aircraft* get_aircraft_by_identifier(
 void aircrafts_counter_increment(
     const char* aircraft_id,
     AircraftCatalog* manager
+);
+
+/**
+ * @brief Obtém uma aeronave através do seu identificador.
+ *
+ * Procura no catálogo uma aeronave associada ao identificador fornecido.
+ *
+ * @param manager Ponteiro para o catálogo de aeronaves.
+ * @param identifier Identificador da aeronave.
+ *
+ * @return Ponteiro constante para a aeronave se existir,
+ *         ou NULL caso contrário.
+ */
+const Aircraft* get_aircraft_by_identifier(
+    AircraftCatalog* manager,
+    const char* identifier
 );
 
 /**

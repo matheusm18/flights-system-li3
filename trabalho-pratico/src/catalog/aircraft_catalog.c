@@ -16,7 +16,7 @@ struct aircraft_catalog {
     GHashTable* aircraft_data_by_identifier;
 };
 
-void destroy_aircraft_data(gpointer data) {
+static void destroy_aircraft_data(gpointer data) {
     AircraftData* ad = (AircraftData*)data;
     if (ad != NULL) {
         destroy_aircraft(ad->aircraft);
@@ -83,7 +83,6 @@ void aircrafts_counter_increment(const char* aircraft_id, AircraftCatalog* manag
         data->flight_count++;
     }
 }
-
 
 // getters
 

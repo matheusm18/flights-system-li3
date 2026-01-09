@@ -58,14 +58,14 @@ void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id) 
     g_ptr_array_add(manager->airline_array, stats);
 }
 
-void destroy_airline(AirlineStats* a) {
+static void destroy_airline(AirlineStats* a) {
     if (!a) return;
 
     free(a->airline_id);
     free(a);
 }
 
-int compare_airlines(const void* a, const void* b) {
+static int compare_airlines(const void* a, const void* b) {
     AirlineStats *as = *(AirlineStats**)a;
     AirlineStats *bs = *(AirlineStats**)b;
 

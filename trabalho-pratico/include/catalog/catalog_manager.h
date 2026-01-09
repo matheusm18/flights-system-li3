@@ -30,7 +30,6 @@ typedef struct CatalogManager CatalogManager;
  */
 CatalogManager* catalog_manager_create(void);
 
-
 /**
  * @brief Destrói um gestor de catálogos e liberta toda a memória associada.
  * 
@@ -131,11 +130,11 @@ ReservationCatalog* get_reservations_from_catalog_manager(const CatalogManager* 
  * modelos de avião, companhias aéreas), reduzindo drasticamente o consumo de RAM.
  * * @param manager Ponteiro para o CatalogManager.
  * @param str A string original que se deseja processar.
- * * @return Ponteiro para a string única armazenada na pool.
- * * @warning O ponteiro retornado PERTENCE ao CatalogManager. **NÃO se deve executar free()**
- * neste ponteiro individualmente. A memória será libertada automaticamente
- * quando catalog_manager_destroy() for chamado.
+ * * @return Ponteiro CONSTANTE para a string única armazenada na pool.
+ * * @warning O ponteiro retornado PERTENCE ao CatalogManager e é PARTILHADO.
+ * 1. **NÃO executar free()**: A memória é gerida pelo gestor.
+ * 2. **NÃO modificar o conteúdo**: A string é read-only.
  */
-char* catalog_manager_get_string_from_pool(CatalogManager* manager, const char* str);
+const char* catalog_manager_get_string_from_pool(CatalogManager* manager, const char* str);
 
 #endif
