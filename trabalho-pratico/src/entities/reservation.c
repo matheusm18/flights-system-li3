@@ -5,14 +5,14 @@
 
 // temos a estrutura mas já não armazenamos as reservas
 struct reservation {
-    char* reservation_id;
+    const char* reservation_id;
     char** flight_ids;
-    char* document_number;
-    char* seat;
+    const char* document_number;
+    const char* seat;
     double price;
     bool extra_luggage;
     bool priority_boarding;
-    char* qr_code;
+    // char* qr_code;
 };
 
 Reservation* create_reservation(const char* reservation_id, char** flight_ids, const char* document_number, const char* seat, double price, bool extra_luggage, bool priority_boarding) {
@@ -20,9 +20,9 @@ Reservation* create_reservation(const char* reservation_id, char** flight_ids, c
     Reservation* reservation = malloc(sizeof(Reservation));
     if (reservation == NULL) return NULL;
     
-    reservation->reservation_id = (char*) reservation_id;
-    reservation->document_number = (char*) document_number;
-    reservation->seat = (char*) seat;
+    reservation->reservation_id = reservation_id;
+    reservation->document_number = document_number;
+    reservation->seat = seat;
     reservation->price = price;
     reservation->extra_luggage = extra_luggage;
     reservation->priority_boarding = priority_boarding;

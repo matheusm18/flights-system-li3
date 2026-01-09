@@ -4,8 +4,8 @@
 
 struct aircraft {
     char identifier[9];
-    char* manufacturer;
-    char* model;
+    const char* manufacturer;
+    const char* model;
     unsigned short year;
     //unsigned short capacity;
     //unsigned short range;
@@ -21,8 +21,8 @@ Aircraft* create_aircraft(const char* identifier, const char* manufacturer, cons
     strncpy(aircraft->identifier, identifier, 8);
 
     aircraft->identifier[8] = '\0';
-    aircraft->manufacturer = (char*) manufacturer;
-    aircraft->model = (char*) model;
+    aircraft->manufacturer = manufacturer;
+    aircraft->model = model;
     aircraft->year = year;
     //aircraft->capacity = capacity;
     //aircraft->range = range;

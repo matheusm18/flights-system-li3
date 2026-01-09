@@ -19,33 +19,24 @@ typedef struct passenger Passenger;
 /**
  * @brief Cria e inicializa um novo passageiro.
  *
- * Constrói dinamicamente uma estrutura Passenger a partir dos dados fornecidos.
+ * Os campos de texto são armazenados por REFERÊNCIA para poupar memória.
  *
- * @param document_number Número de documento do passageiro como string.
- * @param first_name Nome próprio do passageiro.
- * @param last_name Apelido do passageiro.
- * @param dob Data de nascimento do passageiro (formato int).
- * @param nationality Nacionalidade do passageiro.
- * @param gender Género do passageiro como string (primeiro carácter usado).
+ * @param document_number Número de documento.
+ * @param first_name Nome próprio (NÃO duplicado; vem da String Pool).
+ * @param last_name Apelido (NÃO duplicado; vem da String Pool).
+ * @param dob Data de nascimento.
+ * @param nationality Nacionalidade (NÃO duplicado; vem da String Pool).
  *
- * @return Ponteiro para a estrutura Passenger criada, ou NULL em caso de falha.
+ * @return Ponteiro para Passenger ou NULL.
  */
-Passenger* create_passenger(
-    char* document_number,
-    char* first_name,
-    char* last_name,
-    int dob,
-    char* nationality
-);
+Passenger* create_passenger(const char* document_number, const char* first_name, const char* last_name, int dob, const char* nationality);
 
 /**
  * @brief Liberta a memória de um passageiro.
  *
- * Liberta todos os campos dinamicamente alocados e a própria estrutura Passenger.
+ * NÃO liberta `first_name`, `last_name` ou `nationality`(pertencem à StringPool).
  *
- * @param p Ponteiro para o passageiro a destruir.
- *
- * @return void
+ * @param p Ponteiro para o passageiro.
  */
 void destroy_passenger(Passenger* p);
 

@@ -15,41 +15,25 @@ typedef struct aircraft Aircraft;
 
 /**
  * @brief Cria um novo objeto Aircraft.
- * 
- * Esta função aloca memória e inicializa um novo objeto Aircraft com os
- * dados fornecidos. O identificador é copiado com limite de 8 caracteres,
- * enquanto o fabricante e modelo são duplicados dinamicamente. O contador
- * de voos é inicializado a zero.
- * 
- * @param identifier String que contêm o identificador da aeronave (máximo 8 caracteres).
- * @param manufacturer String que contêm o nome do fabricante.
- * @param model String que contêm o modelo da aeronave.
- * @param year Ano de fabricação da aeronave.
- * @param capacity Capacidade de passageiros 
- * @param range Alcance da aeronave 
- * 
- * @return Ponteiro para o objeto Aircraft criado, ou NULL se a alocação falhar.
- * 
- * @note Os campos capacity e range estão atualmente comentados (implementação futura).
- *       O identificador é limitado a 8 caracteres mais o terminador '\0'.
- * 
- * @see destroy_aircraft
+ * * Aloca memória para a estrutura Aircraft.
+ * - O `identifier` é COPIADO internamente (max 8 chars).
+ * - `manufacturer` e `model` são armazenados por REFERÊNCIA.
+ * * @param identifier Identificador da aeronave (Será copiado).
+ * @param manufacturer Ponteiro para o fabricante (NÃO é duplicado; vem da String Pool).
+ * @param model Ponteiro para o modelo (NÃO é duplicado; vem da String Pool).
+ * @param year Ano de fabrico.
+ * @param capacity Capacidade (não utilizado).
+ * @param range Alcance (não utilizado).
+ * * @return Ponteiro para o objeto Aircraft criado.
+ * * @warning O caller não deve libertar `manufacturer` ou `model` visto que estes pertencem à String Pool.
  */
 Aircraft* create_aircraft(const char* identifier, const char* manufacturer, const char* model, unsigned short year, unsigned short capacity, unsigned short range);
 
 /**
- * @brief Destrói um objeto Aircraft e liberta toda a memória associada.
- * 
- * Esta função liberta toda a memória alocada para um objeto Aircraft,
- * incluindo as strings alocadas dinamicamente (manufacturer e model)
- * e a própria estrutura.
- * 
- * @param a Ponteiro para o objeto Aircraft a ser destruído.
- * 
- * @return void
- * 
- * @note Se a for NULL, a função não realiza nenhuma operação.
- * 
+ * @brief Destrói um objeto Aircraft.
+ * * Liberta a estrutura Aircraft.
+ * NÃO liberta as strings `manufacturer` e `model` (pertencem à StringPool).
+ * * @param a Ponteiro para o objeto Aircraft.
  */
 void destroy_aircraft(Aircraft* a);
 

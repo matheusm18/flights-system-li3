@@ -10,7 +10,7 @@ UTILS_DIR = $(SRC_DIR)/utils
 
 # Compilador
 CC     = gcc
-CFLAGS = -fno-omit-frame-pointer -Wall -Wextra -Ofast -march=native -g -Iinclude `pkg-config --cflags glib-2.0`
+CFLAGS = -fno-omit-frame-pointer -Wall -Wextra -Werror=discarded-qualifiers -Ofast -march=native -g -Iinclude `pkg-config --cflags glib-2.0`
 LDFLAGS= `pkg-config --libs glib-2.0` -lm
 
 NCURSES = -lncurses

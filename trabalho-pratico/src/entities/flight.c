@@ -10,15 +10,15 @@ struct flight {
     //long arrival;
     //long actual_arrival;
     //char* gate;
-    char* status;
+    const char* status;
     char origin[4];
     char destination[4];
-    char* aircraft;
+    const char* aircraft;
     //char* airline;
     //char* tracking_url;
 };
 
-Flight* create_flight(char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival, const char* gate, const char* status, 
+Flight* create_flight(const char* flight_id, long departure, long actual_departure, long arrival, long actual_arrival, const char* gate, const char* status, 
                       const char* origin, const char* destination, const char* aircraft, const char* airline) {
 
     (void) arrival;
@@ -36,8 +36,8 @@ Flight* create_flight(char* flight_id, long departure, long actual_departure, lo
 
     flight->departure = departure;
     flight->actual_departure = actual_departure;
-    flight->status = (char*) status;
-    flight->aircraft = (char*) aircraft;
+    flight->status = status;
+    flight->aircraft = aircraft;
 
     return flight;
 }

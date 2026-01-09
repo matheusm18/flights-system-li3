@@ -23,38 +23,28 @@ typedef struct reservation Reservation;
 /**
  * @brief Cria e inicializa uma nova reserva.
  *
- * Aloca dinamicamente memória para a estrutura Reservation e inicializa
- * todos os campos com os valores fornecidos.
+ * - `flight_ids`: O array de strings é DUPLICADO internamente.
+ * - Outros campos strings: Armazenados por REFERÊNCIA.
  *
- * @param reservation_id Identificador único da reserva.
- * @param flight_ids Array de strings contendo os IDs dos voos (tamanho fixo 2).
- * @param document_number Número de documento do passageiro.
- * @param seat Lugar reservado para o passageiro.
- * @param price Preço da reserva.
- * @param extra_luggage Indica se há bagagem extra.
- * @param priority_boarding Indica se há prioridade de embarque.
+ * @param reservation_id ID da reserva (NÃO duplicado; vem da String Pool).
+ * @param flight_ids Array de IDs de voo (Serão duplicados).
+ * @param document_number Documento do passageiro (NÃO duplicado; vem da String Pool).
+ * @param seat Lugar (NÃO duplicado; vem da String Pool).
+ * @param price Preço.
+ * @param extra_luggage Bagagem extra.
+ * @param priority_boarding Prioridade.
  *
- * @return Ponteiro para a estrutura Reservation criada, ou NULL se ocorrer erro
- *         na alocação de memória.
+ * @return Ponteiro para Reservation ou NULL.
  */
-Reservation* create_reservation(
-    const char* reservation_id,
-    char** flight_ids,
-    const char* document_number,
-    const char* seat,
-    double price,
-    bool extra_luggage,
-    bool priority_boarding
-);
+Reservation* create_reservation(const char* reservation_id, char** flight_ids, const char* document_number, const char* seat, double price, bool extra_luggage, bool priority_boarding);
 
 /**
- * @brief Liberta a memória associada a uma reserva.
+ * @brief Liberta a memória de uma reserva.
  *
- * Liberta todos os campos dinamicamente alocados e a própria estrutura.
+ * Liberta a estrutura e o array `flight_ids`.
+ * NÃO liberta `reservation_id`, `document_number` ou `seat`.
  *
- * @param r Ponteiro para a estrutura Reservation a destruir.
- *
- * @return void
+ * @param r Ponteiro para a reserva.
  */
 void destroy_reservation(Reservation* r);
 

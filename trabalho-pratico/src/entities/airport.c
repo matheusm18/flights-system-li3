@@ -4,9 +4,9 @@
 
 struct airport {
     char code[4];
-    char* name;
-    char* city;
-    char* country;
+    const char* name;
+    const char* city;
+    const char* country;
     //double latitude;
     //double longitude;
     //char icao[5];
@@ -23,9 +23,9 @@ Airport* create_airport(const char *code, const char* name, const char* city, co
     
     strncpy(airport->code, code, 3);
     airport->code[3] = '\0';
-    airport->name = (char*) name;
-    airport->city = (char*) city;
-    airport->country = (char*) country;
+    airport->name = name;
+    airport->city = city;
+    airport->country = country;
     airport->type = airport_type_to_char(type);
 
     return airport;

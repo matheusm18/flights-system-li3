@@ -20,45 +20,27 @@ typedef struct airport Airport;
 
 /**
  * @brief Cria um novo objeto Airport.
- * 
- * Esta função aloca memória e inicializa um novo objeto Airport com os
- * dados fornecidos. O código IATA é copiado com limite de 3 caracteres,
- * enquanto name, city e country são duplicados dinamicamente. Inicializa
- * também um array dinâmico (GPtrArray) para armazenar voos de partida.
- * 
- * @param code String que contêm o código IATA do aeroporto (3 caracteres).
- * @param name String que contêm o nome do aeroporto.
- * @param city String que contêm a cidade do aeroporto.
- * @param country String que contêm o país do aeroporto.
- * @param latitude String que contêm a latitude (atualmente não utilizada).
- * @param longitude String que contêm a longitude (atualmente não utilizada).
- * @param icao String que contêm o código ICAO (atualmente não utilizado).
- * @param type String que contêm o tipo de aeroporto.
- * 
- * @return Ponteiro para o objeto Airport criado, ou NULL se a alocação falhar.
- * 
- * @note Os campos latitude, longitude e icao estão atualmente comentados
- *       (implementação futura). O código é limitado a 3 caracteres mais
- *       o terminador '\0'.
- * 
+ * * Aloca memória para a estrutura Airport.
+ * - O código IATA (`code`) é COPIADO internamente (max 3 chars).
+ * - Os campos `name`, `city` e `country` são armazenados por REFERÊNCIA.
+ * * @param code String com o código IATA (Será copiado).
+ * @param name Ponteiro para o nome (NÃO é duplicado; vem da String Pool).
+ * @param city Ponteiro para a cidade (NÃO é duplicado; vem da String Pool).
+ * @param country Ponteiro para o país (NÃO é duplicado; vem da String Pool).
+ * @param latitude Latitude (não utilizada).
+ * @param longitude Longitude (não utilizada).
+ * @param icao Código ICAO (não utilizado).
+ * @param type Tipo de aeroporto.
+ * * @return Ponteiro para o objeto Airport criado, ou NULL se falhar.
+ * * @warning O caller não deve libertar `name`, `city` ou `country` visto que estes pertencem à String Pool.
  */
 Airport* create_airport(const char *code, const char* name, const char* city, const char* country, const char* latitude, const char* longitude, const char* icao, const char* type);
 
 /**
- * @brief Destrói um objeto Airport e liberta toda a memória associada.
- * 
- * Esta função liberta toda a memória alocada para um objeto Airport,
- * incluindo as strings alocadas dinamicamente (name, city, country),
- * o array de voos de partida, e a própria estrutura.
- * 
- * @param a Ponteiro para o objeto Airport a ser destruído.
- * 
- * @return void
- * 
- * @note Se a for NULL, a função não realiza nenhuma operação.
- *       O array de voos é libertado mas os objetos Flight em si não são
- *       destruídos (são geridos pelo FlightCatalog).
- * 
+ * @brief Destrói um objeto Airport.
+ * * Liberta a estrutura Airport e o array de voos.
+ * NÃO liberta as strings `name`, `city` ou `country` (pertencem à StringPool).
+ * * @param airport Ponteiro para o objeto Airport a ser destruído.
  */
 void destroy_airport(Airport* airport);
 

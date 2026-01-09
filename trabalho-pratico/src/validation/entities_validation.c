@@ -59,9 +59,9 @@ void process_valid_line_airports(char **fields, int num_fields, void* user_data,
         return;
     }
     
-    char* pooled_name = catalog_manager_get_string_from_pool(manager, name);
-    char* pooled_city = catalog_manager_get_string_from_pool(manager, city);
-    char* pooled_country = catalog_manager_get_string_from_pool(manager, country);
+    const char* pooled_name = catalog_manager_get_string_from_pool(manager, name);
+    const char* pooled_city = catalog_manager_get_string_from_pool(manager, city);
+    const char* pooled_country = catalog_manager_get_string_from_pool(manager, country);
 
     Airport* airport = create_airport(code, pooled_name, pooled_city, pooled_country, latitude, longitude, icao, type);
     
@@ -111,8 +111,8 @@ void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data
     int capacity_int = atoi(capacity);
     int range_int = atoi(range);
 
-    char* pooled_manufacturer = catalog_manager_get_string_from_pool(manager, manufacturer);
-    char* pooled_model = catalog_manager_get_string_from_pool(manager, model);
+    const char* pooled_manufacturer = catalog_manager_get_string_from_pool(manager, manufacturer);
+    const char* pooled_model = catalog_manager_get_string_from_pool(manager, model);
 
     Aircraft* aircraft = create_aircraft(identifier, pooled_manufacturer, pooled_model, year_int, capacity_int, range_int);
 
@@ -198,8 +198,8 @@ void process_valid_line_flights(char **fields, int num_fields, void* user_data, 
         return;
     }
 
-    char* pooled_status = catalog_manager_get_string_from_pool(manager, status);
-    char* pooled_aircraft = catalog_manager_get_string_from_pool(manager, aircraft);
+    const char* pooled_status = catalog_manager_get_string_from_pool(manager, status);
+    const char* pooled_aircraft = catalog_manager_get_string_from_pool(manager, aircraft);
 
     Flight* flight = create_flight(flight_id, departure_dt, actual_departure_dt, arrival_dt, actual_arrival_dt, gate, pooled_status, origin, destination, 
                                    pooled_aircraft, airline);        
@@ -279,9 +279,9 @@ void process_valid_line_passengers(char **fields, int num_fields, void* user_dat
 
     int dob_int = string_to_date(dob);
 
-    char* pooled_first_name = catalog_manager_get_string_from_pool(manager, first_name);
-    char* pooled_last_name = catalog_manager_get_string_from_pool(manager, last_name);
-    char* pooled_nationality = catalog_manager_get_string_from_pool(manager, nationality);
+    const char* pooled_first_name = catalog_manager_get_string_from_pool(manager, first_name);
+    const char* pooled_last_name = catalog_manager_get_string_from_pool(manager, last_name);
+    const char* pooled_nationality = catalog_manager_get_string_from_pool(manager, nationality);
 
     Passenger* passenger = create_passenger(document_number, pooled_first_name, pooled_last_name, dob_int, pooled_nationality);
     
@@ -410,9 +410,9 @@ void process_valid_line_reservations(char **fields, int num_fields, void* user_d
     bool priority_boarding_bool =
         string_to_bool(priority_boarding);
 
-    char* pooled_reservation_id = catalog_manager_get_string_from_pool(manager, reservation_id);
-    char* pooled_document_number = catalog_manager_get_string_from_pool(manager, document_number);
-    char* pooled_seat = catalog_manager_get_string_from_pool(manager, seat);
+    const char* pooled_reservation_id = catalog_manager_get_string_from_pool(manager, reservation_id);
+    const char* pooled_document_number = catalog_manager_get_string_from_pool(manager, document_number);
+    const char* pooled_seat = catalog_manager_get_string_from_pool(manager, seat);
 
     Reservation* res =
         create_reservation(pooled_reservation_id,

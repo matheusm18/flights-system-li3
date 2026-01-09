@@ -17,6 +17,13 @@ struct flight_catalog {
     GPtrArray* airline_array;
 };
 
+static void destroy_airline(AirlineStats* a) {
+    if (!a) return;
+
+    free(a->airline_id);
+    free(a);
+}
+
 FlightCatalog* flight_catalog_create() {
     FlightCatalog* manager = malloc(sizeof(FlightCatalog));
     manager->flights_by_flight_id = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify) destroy_flight);
@@ -56,13 +63,6 @@ void flight_catalog_add_airline_stats(FlightCatalog* manager, char* airline_id) 
     
     g_hash_table_insert(manager->airline_lookup, stats->airline_id, stats);
     g_ptr_array_add(manager->airline_array, stats);
-}
-
-static void destroy_airline(AirlineStats* a) {
-    if (!a) return;
-
-    free(a->airline_id);
-    free(a);
 }
 
 static int compare_airlines(const void* a, const void* b) {

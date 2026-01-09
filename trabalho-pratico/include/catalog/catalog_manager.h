@@ -125,7 +125,7 @@ ReservationCatalog* get_reservations_from_catalog_manager(const CatalogManager* 
  * * Esta função implementa a lógica de *String Pool* para otimização de memória.
  * Ela verifica se a string fornecida já existe na tabela de hash interna do gestor.
  * - Se existir: Retorna o ponteiro para a string já armazenada (reutilização).
- * - Se não existir: Cria uma cópia da string, armazena na pool e retorna o novo ponteiro.
+ * - Se não existir: Cria uma cópia da string, armazena na pool e retorna o novo ponteiro (como const).
  * * Esta estratégia evita a duplicação de strings repetidas (como nomes de países,
  * modelos de avião, companhias aéreas), reduzindo drasticamente o consumo de RAM.
  * * @param manager Ponteiro para o CatalogManager.
