@@ -16,7 +16,6 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
 
     if (!airport_manager || !start_date_str || !end_date_str) return NULL;
 
-    // converter strings de data para int (YYYYMMDD)
     int start_date = string_to_date(start_date_str);
     int end_date   = string_to_date(end_date_str);
 
@@ -34,7 +33,6 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
 
         int count = airport_catalog_count_flights_in_range(data, start_date, end_date);
 
-        // atualiza melhor aeroporto
         if (count > best_count || 
             (count == best_count && best_code && strcmp(current_code, best_code) < 0) ||
             (count > 0 && best_code == NULL)) {
@@ -47,7 +45,7 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
         else free(current_code);
     }
 
-    airport_catalog_iter_free(air_it); // libertar o iterador de aeroportos
+    airport_catalog_iter_free(air_it); 
 
     QueryResult* res = create_query_result();
 
@@ -61,7 +59,7 @@ QueryResult* execute_query3(AirportCatalog* airport_manager, char* start_date_st
             tokens[1] = get_airport_name(best_airport);
             tokens[2] = get_airport_city(best_airport);
             tokens[3] = get_airport_country(best_airport);
-            tokens[4] = int_to_string(best_count); // função auxiliar da "utils.c" que já aloca memória para a string
+            tokens[4] = int_to_string(best_count); 
 
             add_line_to_result(res, tokens, 5);
 

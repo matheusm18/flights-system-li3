@@ -37,7 +37,6 @@ void destroy_min_heap(MinHeap* h) {
     free(h);
 }
 
-// NOTA: como são funções dependentes das estruturas internas da min heap colocamos static
 static void swap_aircraft(AircraftCount* a, AircraftCount* b) {
     AircraftCount tmp = *a;
     *a = *b;
@@ -49,7 +48,6 @@ static void heapify_down(MinHeap* h, int idx) {
     int left = 2 * idx + 1;
     int right = 2 * idx + 2;
     
-    // comparar com lado esquerdo
     if (left < h->size) {
         if (h->heap[left].flight_count < h->heap[smallest].flight_count ||
             (h->heap[left].flight_count == h->heap[smallest].flight_count &&
@@ -59,7 +57,6 @@ static void heapify_down(MinHeap* h, int idx) {
         }
     }
     
-    // comparar com lado direito
     if (right < h->size) {
         if (h->heap[right].flight_count < h->heap[smallest].flight_count ||
             (h->heap[right].flight_count == h->heap[smallest].flight_count &&
@@ -79,7 +76,6 @@ static void heapify_up(MinHeap* h, int idx) {
     if (idx == 0) return;
     int parent = (idx - 1) / 2;
     
-    // Subir se: menor flight_count OU (mesmo flight_count E maior ID)
     if (h->heap[idx].flight_count < h->heap[parent].flight_count ||
         (h->heap[idx].flight_count == h->heap[parent].flight_count &&
          strcmp(h->heap[idx].aircraft_id, h->heap[parent].aircraft_id) > 0)) {
@@ -107,7 +103,7 @@ static int compare_aircraft_desc(const void* a, const void* b) {
 void insert_min_heap(MinHeap* h, const char* aircraft_id, int flight_count) {
     if (!h || !aircraft_id) return;
     
-    if (h->size < h->capacity) { // se a heap não está cheia vai adicionar normalmente
+    if (h->size < h->capacity) { 
         h->heap[h->size].aircraft_id = strdup(aircraft_id);
 
         if (!h->heap[h->size].aircraft_id) return;
@@ -117,13 +113,13 @@ void insert_min_heap(MinHeap* h, const char* aircraft_id, int flight_count) {
         heapify_up(h, h->size);
 
         h->size++;
-    } else { // se a heap está cheia vai comparar com o topo que é o menor elemento
+    } else { 
         
         int should_replace = 0;
         
         if (flight_count > h->heap[0].flight_count) {
             should_replace = 1;
-        } else if (flight_count == h->heap[0].flight_count) {   // se tem o mesmo número de voos ent mantem o menor id
+        } else if (flight_count == h->heap[0].flight_count) {   
             if (strcmp(aircraft_id, h->heap[0].aircraft_id) < 0) {
                 should_replace = 1;
             }

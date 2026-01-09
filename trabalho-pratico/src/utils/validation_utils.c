@@ -10,10 +10,8 @@ char* int_to_string(int value) {
 
     char buffer[32];
 
-    // snprintf é seguro porque nunca escreve mais do que o tamanho do buffer
     snprintf(buffer, sizeof(buffer), "%d", value);
 
-    // strdup aloca memória na heap exatamente do tamanho da string gerada
     return strdup(buffer);
 }
 
@@ -127,7 +125,7 @@ long string_to_datetime(const char* str) {
     int h = (str[11]-'0')*10 + (str[12]-'0');
     int min = (str[14]-'0')*10 + (str[15]-'0');
     
-    return (long)y*100000000L + m*1000000L + d*10000L + h*100 + min; ///< O 'L' força o cálculo a ser feito em long (evita overflow)
+    return (long)y*100000000L + m*1000000L + d*10000L + h*100 + min; 
 }
 
 int get_date_part(long datetime) {
@@ -198,26 +196,22 @@ bool validate_int_pos(const char *str) {
 bool validate_parentheses(char *str, int len) {
     int open_positions[100];
     int top = -1;
-    bool inside_paren = false; // Flag para saber se já estamos dentro de parênteses
+    bool inside_paren = false; 
     
     for (int i = 0; i < len; i++) {
         if (str[i] == '(') {
-            // Já estamos dentro de parênteses? Não pode!
             if (inside_paren) {
-                return false; // Parênteses dentro de parênteses
+                return false; 
             }
             
-            // Verificar se não é vazio "()"
             if (i + 1 < len && str[i+1] == ')') {
                 return false;
             }
             
-            // Verificar se não é o último caractere
             if (i == len - 1) {
                 return false;
             }
             
-            // Guardar posição e marcar que estamos dentro de parênteses
             if (top < 99) {
                 open_positions[++top] = i;
                 inside_paren = true;
@@ -226,37 +220,31 @@ bool validate_parentheses(char *str, int len) {
             }
         }
         else if (str[i] == ')') {
-            // Verificar se há '(' correspondente
             if (top < 0) {
-                return false; // ')' sem '('
+                return false; 
             }
             
-            // Verificar se não é vazio "()"
             int open_pos = open_positions[top];
             if (open_pos == i - 1) {
                 return false;
             }
             
-            // Remover '(' da stack e marcar que saímos dos parênteses
             top--;
             inside_paren = false;
         }
     }
     
-    // Verificar se todos os '(' foram fechados
     return top == -1;
 }
 
 bool validate_basic_special_chars(const char *str, int len) {
-    // não pode começar ou terminar com espaço ou &
     if (str[0] == ' ' || str[0] == '&' || str[0] == ')') {
         return false;
     }
     if (str[len-1] == ' ' || str[len-1] == '&' || str[len-1] == '(') {
         return false;
     }
-    
-    // não pode ter espaços duplos
+
     for (int i = 0; i < len - 1; i++) {
         if (str[i] == ' ' && str[i+1] == ' ') {
             return false;

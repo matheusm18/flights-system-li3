@@ -48,7 +48,7 @@ QueryResult* execute_query2(AircraftCatalog* aircraft_manager, int n, char* manu
 
     aircraft_catalog_iter_free(iter);
 
-    sort_desc_min_heap(heap); // só vai ordenar n elementos
+    sort_desc_min_heap(heap); 
 
     int limit = min_heap_size(heap);
 

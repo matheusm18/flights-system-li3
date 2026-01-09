@@ -3,12 +3,12 @@
 #include <string.h>
 
 struct result_line {
-    char** tokens; // array de tokens
+    char** tokens; 
     int num_tokens;
 };
 
 struct query_result {
-    ResultLine** lines; // array de ponteiros para as linhas
+    ResultLine** lines; 
     int num_lines;
     int capacity;
 };
@@ -18,7 +18,7 @@ QueryResult* create_query_result() {
     if (res == NULL) return NULL;
 
     res->num_lines = 0;
-    res->capacity = 10; // capacidade inicial de 10 linhas de resultado
+    res->capacity = 10; 
     res->lines = malloc(res->capacity * sizeof(ResultLine*));
     
     if (res->lines == NULL) {
@@ -32,7 +32,6 @@ QueryResult* create_query_result() {
 void add_line_to_result(QueryResult* res, char** tokens, int num_tokens) {
     if (res == NULL || tokens == NULL) return;
 
-    // verificar se atingiu o limite (para fazer resize)
     if (res->num_lines >= res->capacity) {
         int new_capacity = res->capacity * 2;
 
@@ -59,21 +58,17 @@ void destroy_query_result(QueryResult* res) {
     for (int i = 0; i < res->num_lines; i++) {
         ResultLine* line = res->lines[i];
         if (line) {
-            // liberta cada string (token) individual
             for (int j = 0; j < line->num_tokens; j++) {
                 free(line->tokens[j]);
             }
-            free(line->tokens); // liberta o array de tokens
-            free(line); // liberta a struct da linha
+            free(line->tokens); 
+            free(line); 
         }
     }
-    // liberta o array de linhas e a struct
     free(res->lines);
     free(res);
 }
 
-
-// getters
 
 int get_result_num_lines(const QueryResult* res) {
     if (res == NULL) return 0;

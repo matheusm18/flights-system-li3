@@ -31,20 +31,16 @@ void date_to_week_key_buf(int date, char buf[20]) {
     int month = (date / 100) % 100;
     int day   = date % 100;
 
-    // descobrir qual o dia da semana atual (0 = dom a 6 = sab)
     int wday = weekday(year, month, day);
 
-    // recuar até Domingo
-    day = day - wday;
+    day = day - wday; // recuar até domingo
 
-    // corrigir underflow de dia/mês/ano 
     while (day <= 0) {
         month--;
         if (month < 1) {
             month = 12;
             year--;
         }
-        // soma os dias do mes anterior ao saldo negativo
         day += get_days_in_month_adj(month, year);
     }
 

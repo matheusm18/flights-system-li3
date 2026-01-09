@@ -33,7 +33,7 @@ QueryResult* execute_query4(PassengerCatalog* passenger_catalog, char* begin_dat
             add_line_to_result(res, tokens, 6);
         }
         
-        free(winner_id); // libertar a string retornada pelo catálogo
+        free(winner_id); 
     }
 
     return res;

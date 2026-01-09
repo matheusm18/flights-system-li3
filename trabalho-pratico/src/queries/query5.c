@@ -21,7 +21,7 @@ void prepare_airline_stats_for_sorting(FlightCatalog* flight_manager) {
         int delayed_flights = get_airline_stats_flights_count(s);
         if (delayed_flights > 0) {
             double media = (double)get_airline_stats_total_delay(s) / delayed_flights;
-            set_airline_stats_media(s, round(media * 1000.0) / 1000.0); // arredondar para 3 casas decimais
+            set_airline_stats_media(s, round(media * 1000.0) / 1000.0); 
         }
     }
 }
