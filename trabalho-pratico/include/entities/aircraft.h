@@ -1,6 +1,16 @@
 #ifndef AIRCRAFT_H
 #define AIRCRAFT_H
 
+/**
+ * @struct aircraft
+ * @brief Estrutura que representa uma aeronave.
+ *
+ * A estrutura aircraft armazena informação essencial sobre uma aeronave, incluindo:
+ *  - Identificador único da aeronave
+ *  - Fabricante da aeronave
+ *  - Modelo da aeronave
+ *  - Ano de fabrico
+ */
 typedef struct aircraft Aircraft;
 
 /**

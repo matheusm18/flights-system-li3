@@ -4,6 +4,18 @@
 #include "entities/flight.h"
 #include <glib.h>
 
+
+/**
+ * @struct airport
+ * @brief Estrutura que representa um aeroporto.
+ *
+ * A estrutura airport armazena informação essencial sobre um aeroporto, incluindo:
+ *  - Código IATA do aeroporto
+ *  - Nome do aeroporto
+ *  - Cidade onde está localizado
+ *  - País onde está localizado
+ *  - Tipo de aeroporto
+ */
 typedef struct airport Airport;
 
 /**

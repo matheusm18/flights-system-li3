@@ -9,25 +9,43 @@
 /**
  * @brief Inicia a interface interativa do programa.
  *
- * Esta função controla todo o fluxo da UI interativa:
- *  - Verifica o tamanho mínimo do terminal
- *  - Pede ao utilizador o caminho para o dataset
- *  - Carrega os datasets no CatalogManager
- *  - Executa o menu de queries de forma interativa
+ * Esta função é responsável por:
+ *  - Verificar o tamanho do terminal
+ *  - Apresentar o menu inicial
+ *  - Solicitar e validar o caminho para o dataset
+ *  - Verificar a existência dos ficheiros essenciais (flights.csv, passengers.csv, 
+ *    reservations.csv, airports.csv, aircrafts.csv)
+ *  - Carregar os dados do dataset
+ *  - Iniciar o loop principal do menu
  *
- * @param manager Ponteiro para a estrutura CatalogManager contendo os catálogos
- *        carregados.
+ * Se o utilizador não fornecer um caminho, é utilizado o caminho padrão 
+ * "dataset-fase-2/sem_erros/". A função valida que o diretório existe e contém 
+ * todos os ficheiros necessários antes de prosseguir com o carregamento.
+ *
+ * @param manager Ponteiro para o gestor de catálogos que armazenará os dados carregados
+ * @param qm Ponteiro para o gestor de queries que processará as consultas do utilizador
  */
 void start_interactive_ui(CatalogManager* manager, QueryManager* qm);
 
 /**
  * @brief Loop principal do menu interativo de queries.
  *
- * Permite navegar pelas queries disponíveis, validar argumentos,
- * executar queries e mostrar os resultados numa interface ncurses
- * com scroll e suporte a teclado e rato.
+ * Esta função implementa o ciclo principal da interface interativa, responsável por:
+ *  - Apresentar o menu de seleção de queries
+ *  - Solicitar e validar o formato de saída (normal ou com flag S)
+ *  - Pedir e validar os argumentos obrigatórios e opcionais
+ *  - Executar a query selecionada
+ *  - Apresentar os resultados numa janela scrollável com suporte a navegação por 
+ *    teclado (setas, Page Up/Down) e rato (scroll)
+ *  - Permitir retornar ao menu principal
  *
- * @param manager Ponteiro para a estrutura CatalogManager.
+ * A função mantém-se em loop até o utilizador escolher sair. Em caso de argumentos 
+ * inválidos, apresenta mensagens de erro e permite reintroduzir os valores ou cancelar.
+ * Os resultados são apresentados numa interface ncurses com frame e área de conteúdo 
+ * scrollável (pad).
+ *
+ * @param manager Ponteiro para o gestor de catálogos com os dados carregados
+ * @param qm Ponteiro para o gestor de queries que contém as queries disponíveis
  */
 void run_menu_loop(CatalogManager* manager, QueryManager* qm);
 
