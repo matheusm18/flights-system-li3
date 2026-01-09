@@ -4,43 +4,6 @@
 #include <stdio.h>
 
 /**
- * @brief Inicializa o ficheiro de erros de aeronaves.
- * 
- * Esta função cria (ou limpa se já existir) o ficheiro "aircrafts_errors.csv"
- * no diretório "resultados/" e escreve o cabeçalho com os nomes das colunas.
- * O ficheiro será usado para registar aeronaves que apresentem erros de validação
- * durante o processamento.
- * 
- * @return void
- * 
- * @note Se ocorrer erro ao criar o ficheiro, uma mensagem de erro é impressa
- *       em stderr através de perror().
- */
-void init_aircrafts_errors_file();
-
-/**
- * @brief Processa uma linha válida do ficheiro de aeronaves.
- * 
- * Esta função realiza validações, converte os campos para os tipos apropriados, cria um objeto Aircraft e
- * adiciona-o ao catálogo. Se houver erros de validação, a linha é escrita no ficheiro de erros.
- * 
- * @param fields Array de strings que contêm os campos da linha CSV:
- *               [0] identifier, [1] manufacturer, [2] model, [3] year,
- *               [4] capacity, [5] range.
- * @param num_fields Número de campos no array (não utilizado).
- * @param user_data Ponteiro para o CatalogManager que contém os catálogos.
- * @param errors_file Ponteiro para o ficheiro onde serão escritas as linhas
- *                    com erros de validação.
- * 
- * @return void
- * 
- * @see validate_year_aircraft
- * @see create_aircraft
- * @see aircraft_catalog_add
- */
-void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data, FILE *errors_file);
-
-/**
  * @brief Inicializa o ficheiro de erros de aeroportos.
  * 
  * Esta função cria (ou limpa se já existir) o ficheiro "airports_errors.csv"
@@ -79,6 +42,43 @@ void init_airports_errors_file();
  * @see airport_catalog_add
  */
 void process_valid_line_airports(char **fields, int num_fields, void* user_data, FILE *errors_file);
+
+/**
+ * @brief Inicializa o ficheiro de erros de aeronaves.
+ * 
+ * Esta função cria (ou limpa se já existir) o ficheiro "aircrafts_errors.csv"
+ * no diretório "resultados/" e escreve o cabeçalho com os nomes das colunas.
+ * O ficheiro será usado para registar aeronaves que apresentem erros de validação
+ * durante o processamento.
+ * 
+ * @return void
+ * 
+ * @note Se ocorrer erro ao criar o ficheiro, uma mensagem de erro é impressa
+ *       em stderr através de perror().
+ */
+void init_aircrafts_errors_file();
+
+/**
+ * @brief Processa uma linha válida do ficheiro de aeronaves.
+ * 
+ * Esta função realiza validações, converte os campos para os tipos apropriados, cria um objeto Aircraft e
+ * adiciona-o ao catálogo. Se houver erros de validação, a linha é escrita no ficheiro de erros.
+ * 
+ * @param fields Array de strings que contêm os campos da linha CSV:
+ *               [0] identifier, [1] manufacturer, [2] model, [3] year,
+ *               [4] capacity, [5] range.
+ * @param num_fields Número de campos no array (não utilizado).
+ * @param user_data Ponteiro para o CatalogManager que contém os catálogos.
+ * @param errors_file Ponteiro para o ficheiro onde serão escritas as linhas
+ *                    com erros de validação.
+ * 
+ * @return void
+ * 
+ * @see validate_year_aircraft
+ * @see create_aircraft
+ * @see aircraft_catalog_add
+ */
+void process_valid_line_aircrafts(char **fields, int num_fields, void* user_data, FILE *errors_file);
 
 /**
  * @brief Inicializa o ficheiro de erros de voos.

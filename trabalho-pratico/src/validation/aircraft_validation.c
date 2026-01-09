@@ -4,7 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
 bool validate_year_aircraft(const char *string) {
     if (!string) return false;
 
