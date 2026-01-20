@@ -10,6 +10,9 @@ Second phase: ? / 20 :star:
 The following images showcase the intuitive ncurses-based interface, structured around a hierarchy of **Frames** and **Pads**.
 
 ![Menu Inicial](docs/images/menu-inicial.png)
+![Caminho](docs/images/caminho.png)
+![Menu](docs/images/menu-queries.png)
+![Resultados](docs/images/resultados.png)
 
 Additional images can be found in [`docs/images`](docs/images).
 
