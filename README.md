@@ -2,18 +2,14 @@
 
 This project is a C-based database system for managing airline-related information, including airports, flights, passengers, and reservations. 
 
-First phase: ? / 20 :star:
+First phase: ? / 20 :star: 
+
 Second phase: ? / 20 :star:
 
-## <img src="https://github.com/user-attachments/assets/65d34eaa-e720-4db6-8cba-366c5f4deecf" width="25" alt="icon"/> Interactive Mode
+## <img src="https://emojis.slackmojis.com/emojis/images/1643514165/1263/terminal.png?1643514165" width="25" alt="icon"/> Interactive Mode
 The following images showcase the intuitive ncurses-based interface, structured around a hierarchy of **Frames** and **Pads**.
 
 ![Menu Inicial](docs/images/menu-inicial.png)
-![Caminho](docs/images/introduzir-caminho.png)
-![Menu Queries](docs/images/menu-queries.png)
-![Formato](docs/images/formato.png)
-![Argumentos](docs/images/arg.png)
-![Resultados](docs/images/resultados.png)
 
 Additional images can be found in [`docs/images`](docs/images).
 
