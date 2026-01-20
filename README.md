@@ -16,5 +16,5 @@ Additional images can be found in [`docs/images`](docs/images).
 ##  <img src="https://emojis.slackmojis.com/emojis/images/1643511735/40714/computer.gif?1643511735" width="25"/> Authors
 
 **Débora Caetano** - [@deboravcaetano](https://github.com/deboravcaetano) <br>
-**Matheus Azevedo** - [@gxnca](https://github.com/matheusm18) <br>
-**Francisco Martins** - [@enricoprazeres](https://github.com/XicoMartins707)
+**Matheus Azevedo** - [@matheusm18](https://github.com/matheusm18) <br>
+**Francisco Martins** - [@XicoMartins707](https://github.com/XicoMartins707)
