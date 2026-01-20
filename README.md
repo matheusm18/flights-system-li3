@@ -10,11 +10,14 @@ Second phase: ? / 20 :star:
 The following images showcase the intuitive ncurses-based interface, structured around a hierarchy of **Frames** and **Pads**.
 
 ![Menu Inicial](docs/images/menu-inicial.png)
+![Caminho](docs/images/caminho.png)
+![Menu](docs/images/menu-queries.png)
+![Resultados](docs/images/resultados.png)
 
 Additional images can be found in [`docs/images`](docs/images).
 
 ##  <img src="https://emojis.slackmojis.com/emojis/images/1643511735/40714/computer.gif?1643511735" width="25"/> Authors
 
 **Débora Caetano** - [@deboravcaetano](https://github.com/deboravcaetano) <br>
-**Matheus Azevedo** - [@gxnca](https://github.com/matheusm18) <br>
-**Francisco Martins** - [@enricoprazeres](https://github.com/XicoMartins707)
+**Matheus Azevedo** - [@matheusm18](https://github.com/matheusm18) <br>
+**Francisco Martins** - [@XicoMartins707](https://github.com/XicoMartins707)
