@@ -55,23 +55,21 @@ dkms.conf
 *.csv
 
 # Outputs do programa
-trabalho-pratico/outputs-fase-1/*.txt
-trabalho-pratico/outputs-fase-1/command*_output.txt
-trabalho-pratico/outputs-fase-2/*.txt
-trabalho-pratico/outputs-fase-2/command*_output.txt
+outputs-fase-1/*.txt
+outputs-fase-1/command*_output.txt
+outputs-fase-2/*.txt
+outputs-fase-2/command*_output.txt
 
 # Datasets
-trabalho-pratico/dataset*/
-trabalho-pratico/dataset-fase-1*/
-
-trabalho-pratico/dataset*/
-trabalho-pratico/dataset-fase-2*/
+dataset*/
+dataset-fase-1*/
+dataset-fase-2*/
 
 # Resultados esperados do programa
-trabalho-pratico/resultados/*.txt
-trabalho-pratico/resultados/command*_output.txt
+resultados/*.txt
+resultados/command*_output.txt
 
 # Executáveis específicos do projeto
-trabalho-pratico/programa-principal
-trabalho-pratico/programa-testes
-trabalho-pratico/programa-interativo
+programa-principal
+programa-testes
+programa-interativo
