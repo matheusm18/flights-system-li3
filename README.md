@@ -1,5 +1,6 @@
-# Laboratórios de Informática III (2025/2026)
+# -͟͟͞✈︎ LI3
 
-* Débora Luana Pinto Caetano - A112332 - deboravcaetano
-* Matheus Henrique Monteiro da Silva Azevedo - A111430 - matheusm18
-* Franscisco Luciano Martins - A111775 - xicomartins707
+This project is a C-based database system for managing airline-related information, including airports, flights, passengers, and reservations. It supports multiple query operations over the stored data, allowing efficient retrieval and analysis of information.
+
+The system includes an interactive terminal application built with ncurses, providing a user-friendly interface for exploring and querying the database. A strong emphasis was placed on encapsulation and modular design, ensuring clear separation of responsibilities between components, improved maintainability, and safer data access.
+
