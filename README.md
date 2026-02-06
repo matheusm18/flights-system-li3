@@ -4,7 +4,7 @@ This project is a C-based database system for managing airline-related informati
 
 First phase: 19.4 / 20 :star: 
 
-Second phase: ? / 20 :star:
+Second phase: 20 / 20 :star:
 
 ## <img src="https://emojis.slackmojis.com/emojis/images/1643514165/1263/terminal.png?1643514165" width="25" alt="icon"/> Interactive Mode
 The following images showcase the intuitive ncurses-based interface, structured around a hierarchy of **Frames** and **Pads**.
